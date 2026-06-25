@@ -232,3 +232,68 @@ Added 10 new high-search-volume error pages:
 - Write blog post: "Top 10 JavaScript Errors and How to Fix Them"
 - Consider adding a blog section for content marketing
 - Cross-link new errors more aggressively
+
+---
+
+## Day 5 — June 25, 2026 (Sprint 5)
+
+### What was built
+Added 5 high-search-volume error pages:
+- **Python:** `IndentationError: expected an indented block` — extremely common beginner error, one of the most searched Python errors
+- **Python:** `IndexError: list index out of range` — top Python runtime error, especially common in loops and data processing
+- **JavaScript:** `SyntaxError: Unexpected token` — universal JS parsing error, massive search volume
+- **Node.js:** `Error: connect ECONNREFUSED` — common connection error when services aren't running
+- **SQL:** `ERROR: duplicate key value violates unique constraint` — common PostgreSQL/MySQL constraint error
+
+### Error count
+- **79 error entries** across 15 languages/platforms
+- 86 total static pages (79 error pages + 7 structural)
+
+### Language distribution (updated)
+| Language | Count |
+|----------|-------|
+| JavaScript | 15 |
+| Python | 16 |
+| Node.js | 11 |
+| React | 4 |
+| Git | 5 |
+| SQL | 6 |
+| Docker | 4 |
+| TypeScript | 3 |
+| Rust | 3 |
+| Go | 3 |
+| Java | 3 |
+| PHP | 2 |
+| Linux | 2 |
+| CSS | 2 |
+| C++ | 1 |
+
+### SEO observations
+- `py-indentation-error` targets one of the most Googled Python errors — every beginner hits this
+- `js-syntax-error-unexpected-token` has massive search volume across all JS developers
+- `node-econnrefused` is extremely common in Docker/development environments
+- `sql-duplicate-key-constraint` targets a common database error with high-intent searches
+- Cross-linked new errors to existing related errors
+- FAQPage schema on all error pages targets featured snippets
+
+### Metrics
+- **Errors live:** 79 (up from 74)
+- **Total pages:** 86
+- **Build status:** clean, all static
+
+### What's working
+- Python coverage is now strong (16 errors) — one of the most Googled languages
+- Node.js errors expanded to 11 — covers the most common runtime issues
+- SQL errors now at 6 — better database error coverage
+- FAQPage + BreadcrumbList schemas should trigger rich snippets
+
+### What needs attention
+- Still zero external traffic
+- Need blog posts for content marketing
+- Should consider adding Kotlin, Swift, or Ruby errors for broader coverage
+
+### Next day's plan
+- Add 10 more errors (target 89+)
+- Write blog post: "Top 10 Python Errors and How to Fix Them"
+- Add errors for Swift, Kotlin, or Ruby
+- Cross-link errors more aggressively
