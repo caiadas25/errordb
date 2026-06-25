@@ -1535,5 +1535,116 @@ export const errors: ErrorEntry[] = [
     ],
     codeExample: `# ❌ Bad\nprint(username) # NameError: name 'username' is not defined\n\n# ✅ Good\nusername = "alice"\nprint(username)\n\n# ❌ Bad - scope issue\ndef greet():\n    print(name) # NameError if name not defined before greet()\n\nname = "alice"\ngreet() # Works now`,
     relatedErrors: ["py-import-error", "js-reference-not-defined"]
+  },
+  {
+    id: "py-indentation-error",
+    errorMessage: "IndentationError: expected an indented block",
+    language: "Python",
+    category: "IndentationError",
+    explanation: "Python uses indentation to define code blocks. After a colon (in if, for, while, def, class, etc.), the next line must be indented. An empty block or incorrect indentation triggers this error.",
+    causes: [
+      "Forgot to indent after a colon (if/for/while/def/class)",
+      "Empty block without a pass statement",
+      "Mixed tabs and spaces for indentation",
+      "Inconsistent indentation levels"
+    ],
+    solutions: [
+      "Add proper indentation (4 spaces recommended) after the colon",
+      "Use `pass` for empty blocks: `if True: pass`",
+      "Configure your editor to use spaces, not tabs",
+      "Enable 'show whitespace' in your editor to spot mixed indentation"
+    ],
+    codeExample: `# ❌ Bad\ndef greet():\n    print("hello")\n    if True:\n\n# ✅ Good\ndef greet():\n    print("hello")\n    if True:\n        pass\n\n# ✅ Good\ndef greet():\n    print("hello")\n    if True:\n        print("condition met")`,
+    relatedErrors: ["py-indentation-error-unexpected"]
+  },
+  {
+    id: "py-index-out-of-range",
+    errorMessage: "IndexError: list index out of range",
+    language: "Python",
+    category: "IndexError",
+    explanation: "You're trying to access an element at an index that doesn't exist in the list (or string/tuple). The index is either negative beyond the start or greater than or equal to the length.",
+    causes: [
+      "Index is greater than or equal to the list length",
+      "Off-by-one error in a loop (using <= instead of <)",
+      "Empty list being indexed",
+      "List modified during iteration"
+    ],
+    solutions: [
+      "Check the list length before indexing: `if i < len(lst)`",
+      "Use `enumerate()` instead of manual index tracking",
+      "Add bounds checking or try/except for dynamic data",
+      "Use `len(lst) - 1` for the last valid index"
+    ],
+    codeExample: `# ❌ Bad\nitems = [1, 2, 3]\nprint(items[3])  # IndexError\n\n# ✅ Bad - off by one\nfor i in range(len(items) + 1):  # includes invalid index\n    print(items[i])\n\n# ✅ Good\nfor i in range(len(items)):  # only valid indices\n    print(items[i])\n\n# ✅ Best\nfor item in items:\n    print(item)`,
+    relatedErrors: ["py-key-error", "js-cannot-read-properties-of-undefined"]
+  },
+  {
+    id: "js-syntax-error-unexpected-token",
+    errorMessage: "SyntaxError: Unexpected token",
+    language: "JavaScript",
+    category: "SyntaxError",
+    explanation: "The JavaScript parser encountered a character or sequence of characters it didn't expect at that position. This is a syntax error — the code cannot be executed at all.",
+    causes: [
+      "Missing closing bracket, parenthesis, or brace",
+      "Missing comma between elements or arguments",
+      "Trailing comma in older environments (ES5)",
+      "Using reserved words as identifiers",
+      "Mixing up = and == or ===",
+      "Async/await used outside async function"
+    ],
+    solutions: [
+      "Check for missing closing brackets/braces/parentheses",
+      "Look at the line number and the line before for missing commas",
+      "Remove trailing commas if targeting older browsers",
+      "Use your editor's syntax highlighting to spot issues",
+      "Paste into an online syntax checker for a clear error message"
+    ],
+    codeExample: `// ❌ Bad - missing closing brace\ndef greet() {\n  console.log("hi")\n// ❌ Bad - trailing comma in old JS\nconst arr = [1, 2, 3,];\n\n// ✅ Good\ndef greet() {\n  console.log("hi")\n}\nconst arr = [1, 2, 3];`,
+    relatedErrors: ["js-is-not-a-function", "js-reference-not-defined"]
+  },
+  {
+    id: "node-econnrefused",
+    errorMessage: "Error: connect ECONNREFUSED 127.0.0.1:5432",
+    language: "Node.js",
+    category: "ConnectionError",
+    explanation: "Your Node.js application tried to connect to a network service (database, API, Redis, etc.) but the target server refused the connection. It's either not running, listening on a different port, or blocked by a firewall.",
+    causes: [
+      "The target service is not running",
+      "Wrong host or port in the connection string",
+      "Service is listening on a different interface (e.g., localhost vs 0.0.0.0)",
+      "Firewall blocking the connection",
+      "Docker container not started or port not mapped"
+    ],
+    solutions: [
+      "Start the service: `docker-compose up -d` or `systemctl start postgresql`",
+      "Verify the port matches the service's actual listening port",
+      "Check if the service is bound to 127.0.0.1 vs 0.0.0.0",
+      "Use `netstat -tlnp` or `ss -tlnp` to check listening ports",
+      "For Docker, ensure port mapping: `-p 5432:5432`"
+    ],
+    codeExample: `# Check if the service is running\nnetstat -tlnp | grep 5432\n# or\nss -tlnp | grep 5432\n\n# Start PostgreSQL (Ubuntu)\nsudo systemctl start postgresql\n\n# Start with Docker\ndocker-compose up -d postgres`,
+    relatedErrors: ["node-enoent", "node-eaddrinuse"]
+  },
+  {
+    id: "sql-duplicate-key-constraint",
+    errorMessage: "ERROR: duplicate key value violates unique constraint",
+    language: "SQL",
+    category: "ConstraintError",
+    explanation: "You're trying to INSERT or UPDATE a row with a value that already exists in a column with a UNIQUE constraint (like a primary key or unique index). The database rejects the duplicate value.",
+    causes: [
+      "Inserting a row with a primary key that already exists",
+      "Duplicate value in a unique email/username column",
+      "Race condition in concurrent inserts",
+      "Re-running a migration or seed script"
+    ],
+    solutions: [
+      "Use INSERT ... ON CONFLICT (PostgreSQL) or INSERT ... ON DUPLICATE KEY UPDATE (MySQL)",
+      "Check for existing records before inserting: `SELECT 1 FROM users WHERE email = $1`",
+      "Use UUIDs instead of sequential IDs for primary keys",
+      "Wrap concurrent inserts in a transaction with proper locking",
+      "For migrations: check if data exists before re-seeding"
+    ],
+    codeExample: `-- ❌ Bad - will fail if email exists\nINSERT INTO users (email, name) VALUES ('alice@example.com', 'Alice');\n\n-- ✅ Good - upsert (PostgreSQL)\nINSERT INTO users (email, name)\nVALUES ('alice@example.com', 'Alice')\nON CONFLICT (email) DO UPDATE SET name = EXCLUDED.name;\n\n-- ✅ Good - upsert (MySQL)\nINSERT INTO users (email, name)\nVALUES ('alice@example.com', 'Alice')\nON DUPLICATE KEY UPDATE name = VALUES(name);`,
+    relatedErrors: ["sql-not-null-constraint", "sql-foreign-key-constraint"]
   }
 ];
