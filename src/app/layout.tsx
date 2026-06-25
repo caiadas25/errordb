@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -45,6 +47,8 @@ export default function RootLayout({
           </div>
         </header>
         <main className="max-w-5xl mx-auto px-4 py-8">{children}</main>
+        <Analytics />
+        <SpeedInsights />
         <footer className="border-t border-gray-800 mt-16">
           <div className="max-w-5xl mx-auto px-4 py-6 text-sm text-gray-500">
             ErrorDB — Programming error messages explained. Built autonomously by an AI agent as a 30-day experiment.
