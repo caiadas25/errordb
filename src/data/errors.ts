@@ -208,6 +208,30 @@ export const errors: ErrorEntry[] = [
     codeExample: `// ❌ Bad\nasync function fetchData() {\n  const res = await fetch(url); // No try/catch!\n}\n\n// ✅ Good\nasync function fetchData() {\n  try {\n    const res = await fetch(url);\n  } catch (err) {\n    console.error("Fetch failed:", err);\n  }\n}`,
     relatedErrors: []
   },
+  {
+    id: "js-is-not-a-function",
+    errorMessage: "TypeError: x is not a function",
+    language: "JavaScript",
+    category: "TypeError",
+    explanation: "You're trying to call a value as a function, but that value isn't a function. This could mean you're calling a variable that holds a non-function value, or you've confused a method name.",
+    causes: [
+      "Calling a variable that isn't a function (e.g., calling a string or number)",
+      "Typo in function name",
+      "Forgetting to import a function",
+      "Calling a class without `new`",
+      "Object property that isn't a method being called as one",
+      "Module export/import mismatch"
+    ],
+    solutions: [
+      "Check the value's type: `console.log(typeof x)` before calling",
+      "Verify the function name is spelled correctly",
+      "Ensure the function is imported",
+      "Use `new` for class constructors",
+      "Check module exports match what you're importing"
+    ],
+    codeExample: `// ❌ Bad\nconst greet = "hello";\ngreet(); // TypeError: greet is not a function\n\n// ✅ Good\nconst greet = (name) => "Hello, " + name;\ngreet("Alice");`,
+    relatedErrors: ["js-cannot-read-properties-of-undefined", "js-reference-not-defined"]
+  },
   // === Python ===
   {
     id: "py-import-error",
@@ -494,7 +518,7 @@ export const errors: ErrorEntry[] = [
       "package.json has no \"type\": \"module\""
     ],
     solutions: [
-      "Add `\"type\": \"module\"` to package.json and use import",
+      "Add \"type\": \"module\" to package.json and use import",
       "Use dynamic import(): `const mod = await import('pkg')`",
       "Find a CommonJS-compatible alternative package",
       "Use a package like `esm` for CommonJS projects"
@@ -519,6 +543,28 @@ export const errors: ErrorEntry[] = [
       "For development: `npx kill-port 3000`"
     ],
     relatedErrors: []
+  },
+  {
+    id: "node-eresolve",
+    errorMessage: "npm ERR! code ERESOLVE\nnpm ERR! ERESOLVE unable to resolve dependency tree",
+    language: "Node.js",
+    category: "npm",
+    explanation: "npm can't install a package because of a dependency conflict. Two packages require incompatible versions of the same dependency. This is npm's way of protecting you from installing broken dependency trees.",
+    causes: [
+      "Two packages depend on different major versions of the same package",
+      "Outdated lockfile with stale dependency resolutions",
+      "Trying to install a package that requires a newer version of a shared dependency than what's already installed",
+      "Monorepo with conflicting dependency versions"
+    ],
+    solutions: [
+      "Try `npm install --legacy-peer-deps` to skip peer dependency checks",
+      "Use `npm install --force` (use with caution, may cause runtime errors)",
+      "Update the conflicting package to a compatible version",
+      "Delete node_modules and package-lock.json, then `npm install` fresh",
+      "Use `npm ls` to see the dependency tree and find the conflict"
+    ],
+    codeExample: `# See the dependency tree\nnpm ls --all\n\n# Force install (use carefully)\nnpm install --force\n\n# Skip peer dep checks (often safe)\nnpm install --legacy-peer-deps\n\n# Nuclear option: fresh install\nrm -rf node_modules package-lock.json\nnpm install`,
+    relatedErrors: ["node-cannot-find-module", "node-err-require-esm"]
   },
   // === Git ===
   {
@@ -578,6 +624,46 @@ export const errors: ErrorEntry[] = [
     ],
     relatedErrors: ["git-merge-conflict"]
   },
+  {
+    id: "git-destination-path-exists",
+    errorMessage: "fatal: destination path already exists and is not an empty directory.",
+    language: "Git",
+    category: "Clone Error",
+    explanation: "You're trying to clone a repository into a directory that already exists and isn't empty. Git won't clone into an existing non-empty directory.",
+    causes: [
+      "Repository directory already exists from a previous clone",
+      "Wrong directory name specified in the clone command",
+      "Trying to re-clone without removing the old directory first"
+    ],
+    solutions: [
+      "Remove the existing directory: `rm -rf repo-name` then clone again",
+      "Clone into a different directory: `git clone url new-name`",
+      "If the directory has your work, pull instead: `git pull`",
+      "Check if it's already a git repo: `git status`"
+    ],
+    codeExample: `# ❌ Bad\ngit clone https://github.com/user/repo.git repo\n# fatal: destination path already exists...\n\n# ✅ Good: remove and re-clone\nrm -rf repo\ngit clone https://github.com/user/repo.git repo\n\n# ✅ Good: clone with different name\ngit clone https://github.com/user/repo.git repo-new`,
+    relatedErrors: []
+  },
+  {
+    id: "git-unmerged-files",
+    errorMessage: "error: cannot pull with rebase: You have unmerged files.",
+    language: "Git",
+    category: "Pull Error",
+    explanation: "You have unresolved merge conflicts from a previous merge or pull. Git won't allow you to pull or rebase until you resolve or abort the current merge.",
+    causes: [
+      "Unresolved merge conflicts from a previous merge",
+      "Forgot to `git add` resolved files after fixing conflicts",
+      "Interrupted merge process"
+    ],
+    solutions: [
+      "Resolve conflicts in each file, then `git add <file>` and `git commit`",
+      "Or abort the merge: `git merge --abort`",
+      "Or abort the rebase: `git rebase --abort`",
+      "Use `git diff --name-only --diff-filter=U` to list conflicting files"
+    ],
+    codeExample: `# See which files have conflicts\ngit diff --name-only --diff-filter=U\n\n# After resolving conflicts\ngit add file1.js file2.js\ngit commit -m "Resolve merge conflicts"\n\n# Or abort entirely\ngit merge --abort`,
+    relatedErrors: ["git-merge-conflict"]
+  },
   // === Docker ===
   {
     id: "docker-permission-denied",
@@ -634,6 +720,26 @@ export const errors: ErrorEntry[] = [
       "Remove dangling images: `docker image prune`",
       "Check disk usage: `docker system df`",
       "Set log rotation in daemon.json"
+    ],
+    relatedErrors: []
+  },
+  {
+    id: "docker-image-not-found",
+    errorMessage: "Error response from daemon: manifest for nginx:latest not found",
+    language: "Docker",
+    category: "Image Not Found",
+    explanation: "Docker can't find the specified image or tag in the registry. The image name, tag, or registry is wrong.",
+    causes: [
+      "Typo in image name or tag",
+      "Image removed from registry",
+      "Using wrong registry (Docker Hub vs private)",
+      "Image is in a different namespace"
+    ],
+    solutions: [
+      "Check image name and tag on Docker Hub",
+      "Try pulling explicitly: `docker pull nginx:latest`",
+      "Check if using a private registry: `docker login`",
+      "Use full path for non-Docker Hub images"
     ],
     relatedErrors: []
   },
@@ -795,6 +901,29 @@ export const errors: ErrorEntry[] = [
     ],
     relatedErrors: ["react-invalid-hook-call", "react-max-update-depth"]
   },
+  {
+    id: "react-max-update-depth",
+    errorMessage: "Maximum update depth exceeded. This can happen when a component repeatedly calls setState inside componentWillUpdate or componentDidUpdate. React limits the number of nested updates to prevent infinite loops.",
+    language: "React",
+    category: "Error",
+    explanation: "React detected an infinite re-render loop. A component's state update is triggering another render, which triggers another state update, and so on. React caps this at ~50 iterations to prevent your browser from freezing.",
+    causes: [
+      "setState called directly inside the render body or return statement",
+      "useEffect with a dependency that changes every render (new object/array reference)",
+      "useEffect without a dependency array runs after every render",
+      "Setter function called in a useEffect that also depends on that state",
+      "Derived state stored in useState instead of computed during render"
+    ],
+    solutions: [
+      "Move setState calls into useEffect, event handlers, or callbacks — never into the render body",
+      "Memoize objects and arrays passed as dependencies: useMemo or useCallback",
+      "Use useCallback for functions passed as useEffect dependencies",
+      "If deriving state from props, compute it during render instead of storing in useState",
+      "Add a debugger or console.log inside the suspected useEffect to verify it's not re-triggering"
+    ],
+    codeExample: `// ❌ Bad: new array ref every render triggers useEffect loop\nfunction Counter() {\n  const [count, setCount] = useState(0);\n  const items = [count]; // new reference every render\n\n  useEffect(() => {\n    setCount(c => c + 1); // re-renders, items is new, useEffect runs again\n  }, [items]);\n\n  return <div>{count}</div>;\n}\n\n// ✅ Good: derive during render, no useEffect needed\nfunction Counter() {\n  const [count, setCount] = useState(0);\n  const doubled = count * 2; // computed, not stored\n  return <div>{doubled}</div>;\n}`,
+    relatedErrors: ["react-hooks-deps", "react-invalid-hook-call"]
+  },
   // === Linux / Unix ===
   {
     id: "linux-command-not-found",
@@ -874,6 +1003,29 @@ export const errors: ErrorEntry[] = [
     ],
     relatedErrors: ["go-cannot-take-address"]
   },
+  {
+    id: "go-cannot-take-address",
+    errorMessage: "cannot take address of value",
+    language: "Go",
+    category: "Compiler Error",
+    explanation: "You're trying to use the `&` operator to get a pointer to a value that can't have its address taken. In Go, only addressable values (variables, pointer dereferences, slice indexing) can have their address taken. Literals, constants, and function return values are not addressable.",
+    causes: [
+      "Taking the address of a string or numeric literal",
+      "Taking the address of a function return value",
+      "Taking the address of a map value directly",
+      "Taking the address of a constant",
+      "Trying to take the address of a composite literal without assigning it first"
+    ],
+    solutions: [
+      "Assign the value to a variable first, then take its address",
+      "Use a temporary variable for function return values",
+      "For maps, get the value into a variable first: `v := m[key]; &v`",
+      "Consider whether you actually need a pointer in this case",
+      "For string concatenation results, store in a variable before using &"
+    ],
+    codeExample: `// ❌ Bad\nstr := &("hello") // cannot take address of string literal\n\n// ✅ Good: assign first\nstr := \"hello\"\np := &str\n\n// ❌ Bad: can't take address of function return\np := &(getUser().Name)\n\n// ✅ Good\nuser := getUser()\np := &user.Name`,
+    relatedErrors: ["go-undefined-type", "go-cannot-assign"]
+  },
   // === Rust ===
   {
     id: "rust-cannot-move",
@@ -914,7 +1066,30 @@ export const errors: ErrorEntry[] = [
     ],
     relatedErrors: ["rust-cannot-move", "rust-expected-function"]
   },
-  // Java ===
+  {
+    id: "rust-expected-function",
+    errorMessage: "expected function, found struct `Foo`",
+    language: "Rust",
+    category: "TypeError",
+    explanation: "You're trying to call something as a function, but Rust found a struct (or enum, or other type) at that location instead. This commonly happens when you confuse a type name with a constructor function, or when you forget the `::new()` syntax.",
+    causes: [
+      "Using `TypeName()` instead of `TypeName::new()` or `TypeName { }`",
+      "Calling a struct as if it were a function (Rust structs aren't callable by default)",
+      "Importing a type name that shadows a function",
+      "Using lowercase type name that looks like a function call",
+      "Confusing `Type` with `Type::default()` or a builder pattern"
+    ],
+    solutions: [
+      "Use struct literal syntax: `MyStruct { field: value }`",
+      "Use an associated function: `MyStruct::new()`",
+      "Implement the `Fn` trait or use `Box<dyn Fn>` if you need callable structs",
+      "Check if you meant to call a function with the same name in scope",
+      "Look at the struct's `impl` block for available constructor methods"
+    ],
+    codeExample: `// ❌ Bad\nstruct Config {\n    debug: bool,\n}\n\nlet cfg = Config(true); // error: expected function, found struct\n\n// ✅ Good: struct literal syntax\nlet cfg = Config { debug: true };\n\n// ✅ Good: associated constructor\nimpl Config {\n    fn new(debug: bool) -> Self {\n        Config { debug }\n    }\n}\nlet cfg = Config::new(true);`,
+    relatedErrors: ["rust-cannot-move", "rust-borrow-checker"]
+  },
+  // === Java ===
   {
     id: "java-null-pointer",
     errorMessage: "java.lang.NullPointerException",
@@ -935,7 +1110,100 @@ export const errors: ErrorEntry[] = [
     ],
     relatedErrors: ["js-cannot-read-properties-of-undefined", "java-class-not-found"]
   },
-  // Additional JavaScript ===
+  {
+    id: "java-class-not-found",
+    errorMessage: "java.lang.ClassNotFoundException: com.example.MyClass",
+    language: "Java",
+    category: "ClassNotFoundException",
+    explanation: "The JVM tried to load a class by name but couldn't find it on the classpath. This is distinct from `NoClassDefFoundError`, which means the class was found at compile time but not at runtime. ClassNotFoundException typically points to a configuration or dependency issue.",
+    causes: [
+      "Class not included in the compiled output (JAR/WAR)",
+      "Typo in the fully qualified class name",
+      "Dependency not added to the classpath at runtime",
+      "Classloader mismatch in application servers or OSGi environments",
+      "Class was removed or renamed after compilation"
+    ],
+    solutions: [
+      "Verify the class exists in the expected JAR: `jar tf myapp.jar | grep MyClass`",
+      "Check for typos in the fully qualified class name",
+      "Ensure the dependency is declared in your build file (Maven pom.xml or Gradle build.gradle)",
+      "Check the classpath at runtime: `-verbose:class` JVM flag shows what's loaded",
+      "In Spring Boot, verify the class is in a scanned package"
+    ],
+    codeExample: `// ❌ Common mistake: wrong package name\nClass.forName("com.exmaple.MyClass"); // typo in "example"\n\n// ✅ Correct\nClass.forName("com.example.MyClass");\n\n// Maven: ensure dependency is declared\n// <dependency>\n//   <groupId>com.example</groupId>\n//   <artifactId>my-lib</artifactId>\n//   <version>1.0</version>\n// </dependency>`,
+    relatedErrors: ["java-null-pointer"]
+  },
+  // === PHP ===
+  {
+    id: "php-undefined-variable",
+    errorMessage: "Warning: Undefined variable $username in /var/www/html/index.php on line 5",
+    language: "PHP",
+    category: "Notice",
+    explanation: "You're using a variable that hasn't been defined yet. PHP creates it on-the-fly but emits a warning.",
+    causes: [
+      "Typo in variable name",
+      "Variable defined in a different scope",
+      "Variable not initialized before use",
+      "Variable defined inside a conditional that wasn't met"
+    ],
+    solutions: [
+      "Initialize the variable before use: `$username = null;`",
+      "Check for typos in variable name",
+      "Use strict mode: `declare(strict_types=1);`",
+      "Set error_reporting to E_ALL in development"
+    ],
+    relatedErrors: ["js-reference-not-defined"]
+  },
+  {
+    id: "php-parse-error-unexpected-eof",
+    errorMessage: "Parse error: syntax error, unexpected end of file",
+    language: "PHP",
+    category: "Parse Error",
+    explanation: "PHP hit the end of a file before it expected to. There's a missing closing bracket, semicolon, or keyword somewhere above this point. PHP's parser is line-by-line and stops at the first syntax issue it can't recover from.",
+    causes: [
+      "Missing closing curly brace `}` for a function, class, or control structure",
+      "Missing semicolon at the end of a statement",
+      "Unclosed string literal or array",
+      "Missing closing parenthesis or bracket",
+      "Unterminated `if`, `else`, `foreach`, or `while` block"
+    ],
+    solutions: [
+      "Count opening and closing braces, parentheses, and brackets to find the mismatch",
+      "Start from the bottom of the file and work upward, tracking nesting levels",
+      "Use an IDE with bracket-matching (VS Code highlights matching pairs)",
+      "Check for missing semicolons on the last line before the unexpected EOF",
+      "Run `php -l filename.php` to get the exact line number"
+    ],
+    codeExample: `// ❌ Bad\n<?php\nfunction greet($name) {\n  echo \"Hello, \" . $name\n} // Missing semicolon AND missing closing brace for function\n\n// ✅ Good\n<?php\nfunction greet($name) {\n  echo \"Hello, \" . $name;\n}\n\ngreet("Alice");`,
+    relatedErrors: ["php-undefined-variable"]
+  },
+  // === C/C++ ===
+  {
+    id: "cpp-segmentation-fault",
+    errorMessage: "Segmentation fault (core dumped)",
+    language: "C++",
+    category: "Memory Error",
+    explanation: "Your program tried to access memory it doesn't own. This is the most common fatal error in C and C++ programs. The operating system kills the process to prevent it from corrupting other memory.",
+    causes: [
+      "Dereferencing a null or uninitialized pointer",
+      "Accessing an array out of bounds",
+      "Writing to read-only memory (like a string literal)",
+      "Stack overflow from deep recursion",
+      "Use-after-free: accessing memory that was already freed",
+      "Double free: freeing the same memory twice"
+    ],
+    solutions: [
+      "Use a debugger (gdb, lldb) to find the exact line: `gdb ./program` then `run`",
+      "Compile with address sanitizer: `g++ -fsanitize=address main.cpp`",
+      "Initialize pointers before use: `int* p = nullptr;`",
+      "Check array bounds before accessing",
+      "Use smart pointers (std::unique_ptr, std::shared_ptr) instead of raw pointers",
+      "Valgrind can detect memory errors: `valgrind ./program`"
+    ],
+    codeExample: `// ❌ Bad: null pointer dereference\nint* p = nullptr;\n*p = 42; // Segmentation fault\n\n// ✅ Good\nint x = 42;\nint* p = &x;\n*p = 42; // Works\n\n// ❌ Bad: out-of-bounds access\nint arr[3] = {1, 2, 3};\narr[10] = 5; // Undefined behavior / segfault\n\n// ✅ Good: bounds checking\nint arr[3] = {1, 2, 3};\nif (index >= 0 && index < 3) {\n  arr[index] = 5;\n}`,
+    relatedErrors: []
+  },
+  // Additional JavaScript
   {
     id: "js-fetch-cors",
     errorMessage: "Access to fetch at 'https://api.example.com' from origin 'http://localhost:3000' has been blocked by CORS policy",
@@ -976,7 +1244,7 @@ export const errors: ErrorEntry[] = [
     ],
     relatedErrors: ["js-range-max-call-stack"]
   },
-  // Additional Python ===
+  // Additional Python
   {
     id: "py-syntax-error",
     errorMessage: "SyntaxError: invalid syntax",
@@ -1017,207 +1285,24 @@ export const errors: ErrorEntry[] = [
     ],
     relatedErrors: ["node-enoent"]
   },
-  // === Docker additional ===
+  // === npm specific ===
   {
-    id: "docker-image-not-found",
-    errorMessage: "Error response from daemon: manifest for nginx:latest not found",
-    language: "Docker",
-    category: "Image Not Found",
-    explanation: "Docker can't find the specified image or tag in the registry. The image name, tag, or registry is wrong.",
+    id: "npm-peer-dep-err",
+    errorMessage: "npm ERR! code EPEERINVALID\nnpm ERR! EPEERINVALID peer dep",
+    language: "Node.js",
+    category: "npm",
+    explanation: "A package has a peer dependency that conflicts with the version you have installed. npm warns (or errors) when peer dependency requirements aren't met.",
     causes: [
-      "Typo in image name or tag",
-      "Image removed from registry",
-      "Using wrong registry (Docker Hub vs private)",
-      "Image is in a different namespace"
+      "Package requires a specific version range of a peer dependency",
+      "Multiple packages need different versions of the same peer dep",
+      "Outdated npm version handling peer deps differently"
     ],
     solutions: [
-      "Check image name and tag on Docker Hub",
-      "Try pulling explicitly: `docker pull nginx:latest`",
-      "Check if using a private registry: `docker login`",
-      "Use full path for non-Docker Hub images"
+      "Use `npm install --legacy-peer-deps` to skip peer dep checks",
+      "Update the conflicting package to a compatible version",
+      "Use `npm ls` to see which peer deps are broken",
+      "Consider using yarn which handles peer deps more gracefully"
     ],
-    relatedErrors: []
-  },
-  // === TypeScript specific ===
-  {
-    id: "ts-type-not-assignable",
-    errorMessage: "Type 'string' is not assignable to type 'number'",
-    language: "TypeScript",
-    category: "Type Error",
-    explanation: "TypeScript detected a type mismatch at compile time. The value's type doesn't match the expected type.",
-    causes: [
-      "Function parameter received wrong type",
-      "Variable type annotation doesn't match assigned value",
-      "Return type doesn't match declared type",
-      "Object shape doesn't match interface"
-    ],
-    solutions: [
-      "Fix the type mismatch at the source",
-      "Use type assertions if you're sure: `value as number`",
-      "Update the type annotation to match the actual type",
-      "Add runtime validation"
-    ],
-    relatedErrors: ["py-type-error"]
-  },
-  {
-    id: "ts-property-does-not-exist",
-    errorMessage: "Property 'foo' does not exist on type 'Bar'",
-    language: "TypeScript",
-    category: "Type Error",
-    explanation: "You're accessing a property that TypeScript doesn't know exists on the given type. This is a compile-time error.",
-    causes: [
-      "Property not defined in the type/interface",
-      "Typo in property name",
-      "Union type doesn't include that property",
-      "Object doesn't match the expected interface"
-    ],
-    solutions: [
-      "Add the property to the type/interface",
-      "Use optional chaining: `obj?.foo`",
-      "Use type narrowing before access",
-      "Check if the property is on a different type in the union"
-    ],
-    relatedErrors: ["ts-type-not-assignable"]
-  },
-  // === PHP ===
-  {
-    id: "php-undefined-variable",
-    errorMessage: "Warning: Undefined variable $username in /var/www/html/index.php on line 5",
-    language: "PHP",
-    category: "Notice",
-    explanation: "You're using a variable that hasn't been defined yet. PHP creates it on-the-fly but emits a warning.",
-    causes: [
-      "Typo in variable name",
-      "Variable defined in a different scope",
-      "Variable not initialized before use",
-      "Variable defined inside a conditional that wasn't met"
-    ],
-    solutions: [
-      "Initialize the variable before use: `$username = null;`",
-      "Check for typos in variable name",
-      "Use strict mode: `declare(strict_types=1);`",
-      "Set error_reporting to E_ALL in development"
-    ],
-    relatedErrors: ["js-reference-not-defined"]
-  },
-  // === PHP (additional) ===
-  {
-    id: "php-parse-error-unexpected-eof",
-    errorMessage: "Parse error: syntax error, unexpected end of file",
-    language: "PHP",
-    category: "Parse Error",
-    explanation: "PHP hit the end of a file before it expected to. There's a missing closing bracket, semicolon, or keyword somewhere above this point. PHP's parser is line-by-line and stops at the first syntax issue it can't recover from.",
-    causes: [
-      "Missing closing curly brace `}` for a function, class, or control structure",
-      "Missing semicolon at the end of a statement",
-      "Unclosed string literal or array",
-      "Missing closing parenthesis or bracket",
-      "Unterminated `if`, `else`, `foreach`, or `while` block"
-    ],
-    solutions: [
-      "Count opening and closing braces, parentheses, and brackets to find the mismatch",
-      "Start from the bottom of the file and work upward, tracking nesting levels",
-      "Use an IDE with bracket-matching (VS Code highlights matching pairs)",
-      "Check for missing semicolons on the last line before the unexpected EOF",
-      "Run `php -l filename.php` to get the exact line number"
-    ],
-    codeExample: `// ❌ Bad\n<?php\nfunction greet($name) {\n  echo \"Hello, \" . $name\n} // Missing semicolon AND missing closing brace for function\n\n// ✅ Good\n<?php\nfunction greet($name) {\n  echo \"Hello, \" . $name;\n}\n\ngreet(\"Alice\");`,
-    relatedErrors: ["php-undefined-variable"]
-  },
-  // === Java (additional) ===
-  {
-    id: "java-class-not-found",
-    errorMessage: "java.lang.ClassNotFoundException: com.example.MyClass",
-    language: "Java",
-    category: "ClassNotFoundException",
-    explanation: "The JVM tried to load a class by name but couldn't find it on the classpath. This is distinct from `NoClassDefFoundError`, which means the class was found at compile time but not at runtime. ClassNotFoundException typically points to a configuration or dependency issue.",
-    causes: [
-      "Class not included in the compiled output (JAR/WAR)",
-      "Typo in the fully qualified class name",
-      "Dependency not added to the classpath at runtime",
-      "Classloader mismatch in application servers or OSGi environments",
-      "Class was removed or renamed after compilation"
-    ],
-    solutions: [
-      "Verify the class exists in the expected JAR: `jar tf myapp.jar | grep MyClass`",
-      "Check for typos in the fully qualified class name",
-      "Ensure the dependency is declared in your build file (Maven pom.xml or Gradle build.gradle)",
-      "Check the classpath at runtime: `-verbose:class` JVM flag shows what's loaded",
-      "In Spring Boot, verify the class is in a scanned package"
-    ],
-    codeExample: `// ❌ Common mistake: wrong package name\nClass.forName(\"com.exmaple.MyClass\"); // typo in \"example\"\n\n// ✅ Correct\nClass.forName(\"com.example.MyClass\");\n\n// Maven: ensure dependency is declared\n// <dependency>\n//   <groupId>com.example</groupId>\n//   <artifactId>my-lib</artifactId>\n//   <version>1.0</version>\n// </dependency>`,
-    relatedErrors: ["java-null-pointer"]
-  },
-  // === React (additional) ===
-  {
-    id: "react-max-update-depth",
-    errorMessage: "Maximum update depth exceeded. This can happen when a component repeatedly calls setState inside componentWillUpdate or componentDidUpdate. React limits the number of nested updates to prevent infinite loops.",
-    language: "React",
-    category: "Error",
-    explanation: "React detected an infinite re-render loop. A component's state update is triggering another render, which triggers another state update, and so on. React caps this at ~50 iterations to prevent your browser from freezing.",
-    causes: [
-      "setState called directly inside the render body or return statement",
-      "useEffect with a dependency that changes every render (new object/array reference)",
-      "useEffect without a dependency array runs after every render",
-      "Setter function called in a useEffect that also depends on that state",
-      "Derived state stored in useState instead of computed during render"
-    ],
-    solutions: [
-      "Move setState calls into useEffect, event handlers, or callbacks — never into the render body",
-      "Memoize objects and arrays passed as dependencies: useMemo or useCallback",
-      "Use useCallback for functions passed as useEffect dependencies",
-      "If deriving state from props, compute it during render instead of storing in useState",
-      "Add a debugger or console.log inside the suspected useEffect to verify it's not re-triggering"
-    ],
-    codeExample: `// ❌ Bad: new array ref every render triggers useEffect loop\nfunction Counter() {\n  const [count, setCount] = useState(0);\n  const items = [count]; // new reference every render\n\n  useEffect(() => {\n    setCount(c => c + 1); // re-renders, items is new, useEffect runs again\n  }, [items]);\n\n  return <div>{count}</div>;\n}\n\n// ✅ Good: derive during render, no useEffect needed\nfunction Counter() {\n  const [count, setCount] = useState(0);\n  const doubled = count * 2; // computed, not stored\n  return <div>{doubled}</div>;\n}`,
-    relatedErrors: ["react-hooks-deps", "react-invalid-hook-call"]
-  },
-  // === Go (additional) ===
-  {
-    id: "go-cannot-take-address",
-    errorMessage: "cannot take address of value",
-    language: "Go",
-    category: "Compiler Error",
-    explanation: "You're trying to use the `&` operator to get a pointer to a value that can't have its address taken. In Go, only addressable values (variables, pointer dereferences, slice indexing) can have their address taken. Literals, constants, and function return values are not addressable.",
-    causes: [
-      "Taking the address of a string or numeric literal",
-      "Taking the address of a function return value",
-      "Taking the address of a map value directly",
-      "Taking the address of a constant",
-      "Trying to take the address of a composite literal without assigning it first"
-    ],
-    solutions: [
-      "Assign the value to a variable first, then take its address",
-      "Use a temporary variable for function return values",
-      "For maps, get the value into a variable first: `v := m[key]; &v`",
-      "Consider whether you actually need a pointer in this case",
-      "For string concatenation results, store in a variable before using &"
-    ],
-    codeExample: `// ❌ Bad\nstr := &("hello") // cannot take address of string literal\n\n// ✅ Good: assign first\nstr := "hello"\np := &str\n\n// ❌ Bad: can't take address of function return\np := &(getUser().Name)\n\n// ✅ Good\nuser := getUser()\np := &user.Name`,
-    relatedErrors: ["go-undefined-type", "go-cannot-assign"]
-  },
-  // === Rust (additional) ===
-  {
-    id: "rust-expected-function",
-    errorMessage: "expected function, found struct `Foo`",
-    language: "Rust",
-    category: "TypeError",
-    explanation: "You're trying to call something as a function, but Rust found a struct (or enum, or other type) at that location instead. This commonly happens when you confuse a type name with a constructor function, or when you forget the `::new()` syntax.",
-    causes: [
-      "Using `TypeName()` instead of `TypeName::new()` or `TypeName { }`",
-      "Calling a struct as if it were a function (Rust structs aren't callable by default)",
-      "Importing a type name that shadows a function",
-      "Using lowercase type name that looks like a function call",
-      "Confusing `Type` with `Type::default()` or a builder pattern"
-    ],
-    solutions: [
-      "Use struct literal syntax: `MyStruct { field: value }`",
-      "Use an associated function: `MyStruct::new()`",
-      "Implement the `Fn` trait or use `Box<dyn Fn>` if you need callable structs",
-      "Check if you meant to call a function with the same name in scope",
-      "Look at the struct's `impl` block for available constructor methods"
-    ],
-    codeExample: `// ❌ Bad\nstruct Config {\n    debug: bool,\n}\n\nlet cfg = Config(true); // error: expected function, found struct\n\n// ✅ Good: struct literal syntax\nlet cfg = Config { debug: true };\n\n// ✅ Good: associated constructor\nimpl Config {\n    fn new(debug: bool) -> Self {\n        Config { debug }\n    }\n}\nlet cfg = Config::new(true);`,
-    relatedErrors: ["rust-cannot-move", "rust-borrow-checker"]
-  },
+    relatedErrors: ["node-eresolve"]
+  }
 ];
