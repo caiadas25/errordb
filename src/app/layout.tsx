@@ -5,11 +5,11 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "ErrorDB — Programming Error Messages Explained",
   description:
-    "Searchable database of programming error messages. Plain-English explanations, common causes, and working fixes for JavaScript, Python, Node.js, Git, Docker, SQL, and more.",
+    "Searchable database of programming error messages. Plain-English explanations, common causes, and working fixes for JavaScript, TypeScript, Python, Node.js, React, Java, Go, Rust, Git, Docker, SQL, and more.",
   openGraph: {
     title: "ErrorDB — Programming Error Messages Explained",
     description:
-      "Plain-English explanations, causes, and fixes for programming errors across JavaScript, Python, Node.js, React, Git, Docker, SQL, and more.",
+      "Plain-English explanations, causes, and fixes for programming errors across JavaScript, TypeScript, Python, Node.js, React, Java, Go, Rust, Git, Docker, SQL, and more.",
     siteName: "ErrorDB",
     type: "website",
   },

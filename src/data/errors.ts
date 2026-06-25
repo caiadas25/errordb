@@ -114,7 +114,7 @@ export const errors: ErrorEntry[] = [
     relatedErrors: ["js-reference-not-defined"]
   },
   {
-    id: "js Assignment to constant",
+    id: "js-assignment-to-constant",
     errorMessage: "TypeError: Assignment to constant variable",
     language: "JavaScript",
     category: "TypeError",
@@ -1304,5 +1304,236 @@ export const errors: ErrorEntry[] = [
       "Consider using yarn which handles peer deps more gracefully"
     ],
     relatedErrors: ["node-eresolve"]
+  },
+  // === Day 5 new additions: high-search-volume errors ===
+  {
+    id: "ts-type-not-assignable",
+    errorMessage: "Type 'string' is not assignable to type 'number'",
+    language: "TypeScript",
+    category: "TypeError",
+    explanation: "TypeScript's type checker found a type mismatch. You're trying to assign a value of one type to a variable or parameter expecting a different type.",
+    causes: [
+      "Passing a string to a function or variable typed as number",
+      "Incorrect type annotation on a variable",
+      "Function return type doesn't match the actual return value",
+      "Object property types don't match the interface definition",
+      "Using a union type without narrowing first"
+    ],
+    solutions: [
+      "Convert the value to the correct type: `Number(value)` or `parseInt(value)`",
+      "Update the type annotation to match the actual data",
+      "Use type assertions if you're sure of the type: `value as number`",
+      "Use a type guard to narrow the type before assignment",
+      "Check if the API returns the expected type"
+    ],
+    codeExample: `// ❌ Bad\nconst count: number = "42"; // Type 'string' is not assignable to type 'number'\n\n// ✅ Good\nconst count: number = 42;\nconst count: number = Number("42");\nconst count: number = parseInt("42", 10);`,
+    relatedErrors: ["ts-object-is-possibly-null", "js-cannot-read-properties-of-undefined"]
+  },
+  {
+    id: "js-syntax-error-import",
+    errorMessage: "SyntaxError: Cannot use import statement outside a module",
+    language: "JavaScript",
+    category: "SyntaxError",
+    explanation: "You're using ES module syntax (import/export) in a file that JavaScript is treating as a CommonJS script. This happens when the file isn't configured as an ES module.",
+    causes: [
+      "Missing \"type\": \"module\" in package.json",
+      "Using import/export in a .js file without ESM configuration",
+      "Running a Node.js script without the --experimental-modules flag (older Node)",
+      "Using ESM syntax in a file bundled by a tool expecting CommonJS",
+      "Babel or TypeScript not configured for ESM output"
+    ],
+    solutions: [
+      "Add \"type\": \"module\" to your package.json",
+      "Rename the file to .mjs to treat it as an ES module",
+      "Use require() instead of import for CommonJS projects",
+      "Configure your bundler (webpack, esbuild, etc.) to handle ES modules",
+      "Update Node.js to version 12+ for native ESM support"
+    ],
+    codeExample: `// ❌ Bad (in a CommonJS project)\nimport express from 'express';\n\n// ✅ Good (CommonJS)\nconst express = require('express');\n\n// ✅ Good (ES Module - add "type": "module" to package.json)\nimport express from 'express';`,
+    relatedErrors: ["node-err-require-esm", "node-module-not-found"]
+  },
+  {
+    id: "js-cannot-destructure",
+    errorMessage: "TypeError: Cannot destructure property 'x' of 'y' as it is undefined",
+    language: "JavaScript",
+    category: "TypeError",
+    explanation: "You're trying to destructure (unpack) properties from an object that is undefined or null. The destructuring syntax expects a valid object on the right side.",
+    causes: [
+      "Destructuring a function return value that returns undefined",
+      "Async data not yet loaded when destructuring occurs",
+      "Destructuring an object property that doesn't exist",
+      "Passing undefined to a function that destructures its parameters",
+      "Using destructuring in a callback where the argument is missing"
+    ],
+    solutions: [
+      "Add a fallback with default value: `const { x } = obj || {}`",
+      "Use optional chaining before destructuring: `const x = obj?.x`",
+      "Ensure the data is loaded before destructuring",
+      "Add a null check before the destructuring line",
+      "Provide default values in destructuring: `const { x = 'default' } = obj`"
+    ],
+    codeExample: `// ❌ Bad\nfunction greet({ name, age }) {\n  return \`\${name} is \${age}\`;\n}\ngreet(undefined); // TypeError: Cannot destructure\n\n// ✅ Good\nfunction greet({ name = 'Guest', age = 0 } = {}) {\n  return \`\${name} is \${age}\`;\n}\n\ngreet({ name: 'Alice', age: 30 }); // "Alice is 30"\ngreet(); // "Guest is 0"`,
+    relatedErrors: ["js-cannot-read-properties-of-undefined", "js-cannot-set-properties-of-undefined"]
+  },
+  {
+    id: "react-element-type-invalid",
+    errorMessage: "Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: undefined",
+    language: "React",
+    category: "RenderError",
+    explanation: "React received an undefined component when rendering. This usually means a component import is wrong, a component isn't exported properly, or a render function returns undefined.",
+    causes: [
+      "Importing a component that doesn't exist in the module",
+      "Using a default export without .default (mixed module systems)",
+      "Circular import dependencies causing undefined at render time",
+      "Conditional rendering that evaluates to undefined instead of null",
+      "Component file exports the component with the wrong name"
+    ],
+    solutions: [
+      "Check the import path and ensure the component exists",
+      "Verify the export type: default export vs named export",
+      "Use React.lazy with proper fallback for code splitting",
+      "Ensure conditional renders return null instead of undefined",
+      "Check for circular dependencies in your import chain"
+    ],
+    codeExample: `// ❌ Bad - importing named export as default\nimport MyComponent from './MyComponent'; // but it's exported as: export function MyComponent()\n\n// ✅ Good - match the export type\nimport { MyComponent } from './MyComponent';\n\n// ❌ Bad - conditional returns undefined\nconst App = () => condition && <Child />; // returns false when condition is false\n\n// ✅ Good - explicit null\nconst App = () => condition ? <Child /> : null;`,
+    relatedErrors: ["react-invalid-hook-call", "react-hooks-deps"]
+  },
+  {
+    id: "java-stackoverflow",
+    errorMessage: "java.lang.StackOverflowError",
+    language: "Java",
+    category: "StackOverflowError",
+    explanation: "The JVM ran out of stack space. This almost always means infinite recursion or extremely deep call stacks.",
+    causes: [
+      "Infinite recursion: method A calls method B which calls method A",
+      "Missing base case in a recursive function",
+      "toString() methods calling each other in a cycle",
+      "Infinite loop with deep method calls",
+      "Circular object references in serialization"
+    ],
+    solutions: [
+      "Add a base case to stop recursion",
+      "Convert recursion to iteration using a loop and stack data structure",
+      "Increase stack size: `java -Xss2m MainClass`",
+      "Check toString(), equals(), and hashCode() for circular references",
+      "Use tail-call optimization where possible (Java doesn't optimize, but design around it)"
+    ],
+    codeExample: `// ❌ Bad - infinite recursion\npublic int factorial(int n) {\n  return n * factorial(n); // never stops!\n}\n\n// ✅ Good - with base case\npublic int factorial(int n) {\n  if (n <= 1) return 1; // base case\n  return n * factorial(n - 1);\n}\n\n// ✅ Good - iterative approach\npublic int factorial(int n) {\n  int result = 1;\n  for (int i = 2; i <= n; i++) {\n    result *= i;\n  }\n  return result;\n}`,
+    relatedErrors: ["java-null-pointer", "js-range-max-call-stack"]
+  },
+  {
+    id: "react-hydration-failed",
+    errorMessage: "Hydration failed because the initial UI does not match what was rendered on the server",
+    language: "React",
+    category: "HydrationError",
+    explanation: "React tried to hydrate (make interactive) the server-rendered HTML, but the server output doesn't match what the client would render. This is a Next.js / React SSR issue.",
+    causes: [
+      "Using browser-only APIs (window, document, localStorage) during SSR",
+      "Date/time rendering that differs between server and client",
+      "Using Math.random() or other non-deterministic values in render",
+      "Conditional rendering based on client-only state",
+      "Extensions or browser plugins modifying the DOM before hydration"
+    ],
+    solutions: [
+      "Wrap browser-only code in useEffect (runs only on client)",
+      "Use next/dynamic with { ssr: false } for client-only components",
+      "Use suppressHydrationWarning on elements that intentionally differ",
+      "Ensure date/time rendering is deterministic (use fixed timezone)",
+      "Check for browser extensions injecting content into the page"
+    ],
+    codeExample: `// ❌ Bad - window is undefined on server\nconst theme = window.localStorage.getItem('theme');\n\n// ✅ Good - only access on client\nimport { useState, useEffect } from 'react';\nconst [theme, setTheme] = useState('light');\nuseEffect(() => {\n  setTheme(window.localStorage.getItem('theme') || 'light');\n}, []);`,
+    relatedErrors: ["react-invalid-hook-call", "js-cannot-read-properties-of-undefined"]
+  },
+  {
+    id: "js-unhandled-rejection",
+    errorMessage: "UnhandledPromiseRejectionWarning: Error: [your error here]",
+    language: "Node.js",
+    category: "PromiseError",
+    explanation: "A Promise was rejected and nothing caught the error. In older Node.js versions this was a warning; in Node.js 15+ it crashes the process.",
+    causes: [
+      "Missing .catch() on a Promise chain",
+      "Async function without try/catch",
+      "Returning a rejected promise without handling it",
+      "Using .then() without a rejection handler",
+      "Event listener that throws inside an async callback"
+    ],
+    solutions: [
+      "Add .catch() to Promise chains: `promise.catch(console.error)`",
+      "Wrap async code in try/catch blocks",
+      "Use async/await with try/catch for cleaner error handling",
+      "Add a global handler: `process.on('unhandledRejection', (err) => {})`",
+      "Use the --unhandled-rejections=warn flag during development"
+    ],
+    codeExample: `// ❌ Bad - no error handling\nfetchData().then(data => process(data));\n\n// ❌ Bad - async without try/catch\nasync function doWork() {\n  const data = await fetchData(); // if this throws, nothing catches it\n}\n\n// ✅ Good\nfetchData()\n  .then(data => process(data))\n  .catch(err => console.error('Failed:', err));\n\n// ✅ Good\nasync function doWork() {\n  try {\n    const data = await fetchData();\n    process(data);\n  } catch (err) {\n    console.error('Failed:', err);\n  }\n}`,
+    relatedErrors: ["js-promise-rejected", "js-out-of-memory"]
+  },
+  {
+    id: "node-err-module-not-found",
+    errorMessage: "ERR_MODULE_NOT_FOUND: Cannot find package 'x' imported from 'y'",
+    language: "Node.js",
+    category: "ESM",
+    explanation: "Node.js ESM loader can't find the specified package. This is the ES module equivalent of MODULE_NOT_FOUND and is common when working with native ES modules in Node.js.",
+    causes: [
+      "Package not installed (missing from node_modules)",
+      "Using 'type': 'module' in package.json but package only supports CommonJS",
+      "Missing .js extension in import path (required in ESM)",
+      "Package not listed as a dependency",
+      "node_modules not installed or corrupted"
+    ],
+    solutions: [
+      "Install the package: `npm install <package-name>`",
+      "Add file extensions to relative imports: `import { x } from './utils.js'`",
+      "Check that the package supports ES modules",
+      "Run `npm install` to rebuild node_modules",
+      "Use createRequire for CommonJS packages: `import { createRequire } from 'module'`"
+    ],
+    codeExample: `// ❌ Bad - missing .js extension in ESM\nimport { helper } from './utils';\n\n// ✅ Good - include extension in ESM\nimport { helper } from './utils.js';\n\n// ✅ Good - use createRequire for CommonJS packages\nimport { createRequire } from 'module';\nconst require = createRequire(import.meta.url);\nconst pkg = require('some-cjs-package');`,
+    relatedErrors: ["node-err-require-esm", "node-module-not-found"]
+  },
+  {
+    id: "sql-table-doesnt-exist",
+    errorMessage: "relation \"users\" does not exist",
+    language: "SQL",
+    category: "TableError",
+    explanation: "The database can't find the table you're querying. Either the table hasn't been created, you're querying the wrong schema, or there's a typo in the table name.",
+    causes: [
+      "Table hasn't been created yet (missing migration)",
+      "Typo in the table name",
+      "Querying the wrong database or schema",
+      "Table was dropped or renamed",
+      "Using unquoted identifiers that get case-folded (PostgreSQL lowercases unquoted names)"
+    ],
+    solutions: [
+      "Run your database migrations: `npx prisma migrate dev` or `alembic upgrade head`",
+      "Check the table name for typos",
+      "Verify you're connected to the correct database: `\\c database_name`",
+      "List tables: `\\dt` in psql, `SHOW TABLES;` in MySQL",
+      "For PostgreSQL, check if the table is in a specific schema: `SELECT * FROM schema_name.table_name`"
+    ],
+    codeExample: `-- ❌ Table doesn't exist\nSELECT * FROM users;\n\n-- Check what tables exist\n\\dt                    -- PostgreSQL\nSHOW TABLES;           -- MySQL\n\n-- Create the table\nCREATE TABLE users (\n  id SERIAL PRIMARY KEY,\n  email VARCHAR(255) NOT NULL UNIQUE,\n  name VARCHAR(255)\n);`,
+    relatedErrors: ["sql-syntax-error", "sql-duplicate-key"]
+  },
+  {
+    id: "py-name-error",
+    errorMessage: "NameError: name 'x' is not defined",
+    language: "Python",
+    category: "NameError",
+    explanation: "You're using a variable or function name that hasn't been defined in the current scope. Python doesn't have variable hoisting, so names must be defined before use.",
+    causes: [
+      "Using a variable before it's assigned",
+      "Typo in the variable or function name",
+      "Variable defined in a different scope (local vs global)",
+      "Forgetting to import a module or function",
+      "Using a built-in that was shadowed or removed"
+    ],
+    solutions: [
+      "Define the variable before using it",
+      "Check for typos in the name",
+      "Ensure the variable is in the correct scope",
+      "Import the required module or function",
+      "Use `locals()` or `dir()` to debug available names"
+    ],
+    codeExample: `# ❌ Bad\nprint(username) # NameError: name 'username' is not defined\n\n# ✅ Good\nusername = "alice"\nprint(username)\n\n# ❌ Bad - scope issue\ndef greet():\n    print(name) # NameError if name not defined before greet()\n\nname = "alice"\ngreet() # Works now`,
+    relatedErrors: ["py-import-error", "js-reference-not-defined"]
   }
 ];

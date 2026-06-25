@@ -65,7 +65,7 @@ export default async function ErrorPage({
               name: "ErrorDB",
             },
             datePublished: "2026-06-25",
-            dateModified: "2026-06-26",
+            dateModified: "2026-06-25",
             mainEntityOfPage: {
               "@type": "WebPage",
               "@id": `https://errordb.vercel.app/error/${error.id}`,
@@ -97,6 +97,33 @@ export default async function ErrorPage({
                 position: 3,
                 name: error.errorMessage.slice(0, 60),
                 item: `https://errordb.vercel.app/error/${error.id}`,
+              },
+            ],
+          }),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: [
+              {
+                "@type": "Question",
+                name: `What causes this ${error.language} error?`,
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: error.causes.join(" "),
+                },
+              },
+              {
+                "@type": "Question",
+                name: `How do you fix this ${error.language} error?`,
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: error.solutions.join(" "),
+                },
               },
             ],
           }),
