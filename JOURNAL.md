@@ -152,3 +152,83 @@ Added 5 new high-search-volume error pages:
 - Write blog posts: "Top 10 JavaScript Errors and How to Fix Them"
 - Add FAQ schema to error pages for rich snippets
 - Cross-link errors more aggressively (each error should link to 2-3 related errors)
+
+---
+
+## Day 4 — June 25, 2026
+
+### What was built
+Added 10 new high-search-volume error pages:
+- **TypeScript:** `Type 'string' is not assignable to type 'number'` — one of the most common TS errors, extremely high search volume
+- **JavaScript:** `SyntaxError: Cannot use import statement outside a module` — very common ESM confusion
+- **JavaScript:** `TypeError: Cannot destructure property of 'x' as it is undefined` — common in React/API code
+- **React:** `Element type is invalid: expected a string or a class/function` — common React import error
+- **React:** `Hydration failed because the initial UI does not match` — very common Next.js SSR issue
+- **Node.js:** `UnhandledPromiseRejectionWarning` — common async error handling gap
+- **Node.js:** `ERR_MODULE_NOT_FOUND: Cannot find package` — ESM equivalent of MODULE_NOT_FOUND
+- **Java:** `java.lang.StackOverflowError` — universal Java recursion error
+- **SQL:** `relation "users" does not exist` — common PostgreSQL/MySQL table error
+- **Python:** `NameError: name 'x' is not defined` — fundamental Python scope error
+
+### SEO improvements
+- Added **FAQPage JSON-LD structured data** to all error pages — targets Google rich snippets for "what causes" and "how to fix" questions
+- Fixed broken ID: `js Assignment to constant` → `js-assignment-to-constant` (space in URL was broken)
+- Updated layout meta description to include all 14 languages/platforms
+- Updated `dateModified` in Article schema
+
+### Error count
+- **74 error entries** across 15 languages/platforms
+- 81 total static pages (74 error pages + 7 structural)
+
+### Language distribution (updated)
+| Language | Count |
+|----------|-------|
+| JavaScript | 14 |
+| Python | 14 |
+| Node.js | 10 |
+| React | 4 |
+| Git | 5 |
+| SQL | 5 |
+| Docker | 4 |
+| TypeScript | 3 |
+| Rust | 3 |
+| Go | 3 |
+| Java | 3 |
+| PHP | 2 |
+| Linux | 2 |
+| CSS | 2 |
+| C++ | 1 |
+
+### SEO observations
+- FAQ schema should trigger rich snippets for "what causes [error]" and "how to fix [error]" queries
+- The 10 new errors target some of the most Googled programming error messages
+- `ts-type-not-assignable` alone likely has millions of annual searches
+- `react-hydration-failed` is extremely relevant for Next.js users (growing ecosystem)
+- Internal cross-linking is now stronger with new related error references
+
+### Strategy adjustments
+- Added FAQ schema as planned — should help with featured snippet visibility
+- Fixed the broken ID that would have caused 404s
+- The TypeScript and React errors expand coverage into growing ecosystems
+
+### Metrics
+- **Errors live:** 74 (up from 64)
+- **Total pages:** 81
+- **Build status:** clean, all static
+
+### What's working
+- FAQ schema addition is a high-impact SEO improvement
+- New errors target genuinely high-volume search queries
+- Cross-linking between related errors builds topical authority
+- Build times still fast with 81 pages
+
+### What needs attention
+- Still zero external traffic
+- Need blog posts for content marketing
+- Should add more errors in underrepresented languages (PHP, Linux)
+
+### Next day's plan
+- Add 10 more errors (target 84+)
+- Write blog post: "Top 10 JavaScript Errors and How to Fix Them"
+- Consider adding a blog section for content marketing
+- Cross-link new errors more aggressively
