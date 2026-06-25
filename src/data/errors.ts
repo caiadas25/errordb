@@ -774,7 +774,7 @@ export const errors: ErrorEntry[] = [
       "Never call hooks inside conditions, loops, or nested functions",
       "Use React DevTools to check component tree"
     ],
-    relatedErrors: ["react-hooks-deps"]
+    relatedErrors: ["react-hooks-deps", "react-max-update-depth"]
   },
   {
     id: "react-hooks-deps",
@@ -793,7 +793,7 @@ export const errors: ErrorEntry[] = [
       "Move the value inside the effect if it shouldn't trigger re-runs",
       "Suppress with eslint-disable if genuinely safe"
     ],
-    relatedErrors: ["react-invalid-hook-call"]
+    relatedErrors: ["react-invalid-hook-call", "react-max-update-depth"]
   },
   // === Linux / Unix ===
   {
@@ -854,7 +854,7 @@ export const errors: ErrorEntry[] = [
       "Break import cycles by restructuring packages",
       "Run `go mod tidy` to clean up dependencies"
     ],
-    relatedErrors: []
+    relatedErrors: ["go-cannot-take-address"]
   },
   {
     id: "go-cannot-assign",
@@ -872,7 +872,7 @@ export const errors: ErrorEntry[] = [
       "Check types match",
       "Use make() for maps before assigning"
     ],
-    relatedErrors: []
+    relatedErrors: ["go-cannot-take-address"]
   },
   // === Rust ===
   {
@@ -893,7 +893,7 @@ export const errors: ErrorEntry[] = [
       "Restructure to avoid moving"
     ],
     codeExample: `// ❌ Bad\nlet s1 = String::from("hello");\nlet s2 = s1;\nprintln!("{}", s1); // Error: s1 was moved\n\n// ✅ Good\nlet s1 = String::from("hello");\nlet s2 = s1.clone();\nprintln!("{}", s1); // Works: s1 is still valid`,
-    relatedErrors: ["rust-borrow-checker"]
+    relatedErrors: ["rust-borrow-checker", "rust-expected-function"]
   },
   {
     id: "rust-borrow-checker",
@@ -912,7 +912,7 @@ export const errors: ErrorEntry[] = [
       "Use indices instead of iterators for mutation",
       "Restructure code to separate read and write phases"
     ],
-    relatedErrors: ["rust-cannot-move"]
+    relatedErrors: ["rust-cannot-move", "rust-expected-function"]
   },
   // Java ===
   {
@@ -933,7 +933,7 @@ export const errors: ErrorEntry[] = [
       "Initialize objects in constructor or at declaration",
       "Use Objects.requireNonNull() for validation"
     ],
-    relatedErrors: ["js-cannot-read-properties-of-undefined"]
+    relatedErrors: ["js-cannot-read-properties-of-undefined", "java-class-not-found"]
   },
   // Additional JavaScript ===
   {
@@ -1099,5 +1099,125 @@ export const errors: ErrorEntry[] = [
       "Set error_reporting to E_ALL in development"
     ],
     relatedErrors: ["js-reference-not-defined"]
+  },
+  // === PHP (additional) ===
+  {
+    id: "php-parse-error-unexpected-eof",
+    errorMessage: "Parse error: syntax error, unexpected end of file",
+    language: "PHP",
+    category: "Parse Error",
+    explanation: "PHP hit the end of a file before it expected to. There's a missing closing bracket, semicolon, or keyword somewhere above this point. PHP's parser is line-by-line and stops at the first syntax issue it can't recover from.",
+    causes: [
+      "Missing closing curly brace `}` for a function, class, or control structure",
+      "Missing semicolon at the end of a statement",
+      "Unclosed string literal or array",
+      "Missing closing parenthesis or bracket",
+      "Unterminated `if`, `else`, `foreach`, or `while` block"
+    ],
+    solutions: [
+      "Count opening and closing braces, parentheses, and brackets to find the mismatch",
+      "Start from the bottom of the file and work upward, tracking nesting levels",
+      "Use an IDE with bracket-matching (VS Code highlights matching pairs)",
+      "Check for missing semicolons on the last line before the unexpected EOF",
+      "Run `php -l filename.php` to get the exact line number"
+    ],
+    codeExample: `// ❌ Bad\n<?php\nfunction greet($name) {\n  echo \"Hello, \" . $name\n} // Missing semicolon AND missing closing brace for function\n\n// ✅ Good\n<?php\nfunction greet($name) {\n  echo \"Hello, \" . $name;\n}\n\ngreet(\"Alice\");`,
+    relatedErrors: ["php-undefined-variable"]
+  },
+  // === Java (additional) ===
+  {
+    id: "java-class-not-found",
+    errorMessage: "java.lang.ClassNotFoundException: com.example.MyClass",
+    language: "Java",
+    category: "ClassNotFoundException",
+    explanation: "The JVM tried to load a class by name but couldn't find it on the classpath. This is distinct from `NoClassDefFoundError`, which means the class was found at compile time but not at runtime. ClassNotFoundException typically points to a configuration or dependency issue.",
+    causes: [
+      "Class not included in the compiled output (JAR/WAR)",
+      "Typo in the fully qualified class name",
+      "Dependency not added to the classpath at runtime",
+      "Classloader mismatch in application servers or OSGi environments",
+      "Class was removed or renamed after compilation"
+    ],
+    solutions: [
+      "Verify the class exists in the expected JAR: `jar tf myapp.jar | grep MyClass`",
+      "Check for typos in the fully qualified class name",
+      "Ensure the dependency is declared in your build file (Maven pom.xml or Gradle build.gradle)",
+      "Check the classpath at runtime: `-verbose:class` JVM flag shows what's loaded",
+      "In Spring Boot, verify the class is in a scanned package"
+    ],
+    codeExample: `// ❌ Common mistake: wrong package name\nClass.forName(\"com.exmaple.MyClass\"); // typo in \"example\"\n\n// ✅ Correct\nClass.forName(\"com.example.MyClass\");\n\n// Maven: ensure dependency is declared\n// <dependency>\n//   <groupId>com.example</groupId>\n//   <artifactId>my-lib</artifactId>\n//   <version>1.0</version>\n// </dependency>`,
+    relatedErrors: ["java-null-pointer"]
+  },
+  // === React (additional) ===
+  {
+    id: "react-max-update-depth",
+    errorMessage: "Maximum update depth exceeded. This can happen when a component repeatedly calls setState inside componentWillUpdate or componentDidUpdate. React limits the number of nested updates to prevent infinite loops.",
+    language: "React",
+    category: "Error",
+    explanation: "React detected an infinite re-render loop. A component's state update is triggering another render, which triggers another state update, and so on. React caps this at ~50 iterations to prevent your browser from freezing.",
+    causes: [
+      "setState called directly inside the render body or return statement",
+      "useEffect with a dependency that changes every render (new object/array reference)",
+      "useEffect without a dependency array runs after every render",
+      "Setter function called in a useEffect that also depends on that state",
+      "Derived state stored in useState instead of computed during render"
+    ],
+    solutions: [
+      "Move setState calls into useEffect, event handlers, or callbacks — never into the render body",
+      "Memoize objects and arrays passed as dependencies: useMemo or useCallback",
+      "Use useCallback for functions passed as useEffect dependencies",
+      "If deriving state from props, compute it during render instead of storing in useState",
+      "Add a debugger or console.log inside the suspected useEffect to verify it's not re-triggering"
+    ],
+    codeExample: `// ❌ Bad: new array ref every render triggers useEffect loop\nfunction Counter() {\n  const [count, setCount] = useState(0);\n  const items = [count]; // new reference every render\n\n  useEffect(() => {\n    setCount(c => c + 1); // re-renders, items is new, useEffect runs again\n  }, [items]);\n\n  return <div>{count}</div>;\n}\n\n// ✅ Good: derive during render, no useEffect needed\nfunction Counter() {\n  const [count, setCount] = useState(0);\n  const doubled = count * 2; // computed, not stored\n  return <div>{doubled}</div>;\n}`,
+    relatedErrors: ["react-hooks-deps", "react-invalid-hook-call"]
+  },
+  // === Go (additional) ===
+  {
+    id: "go-cannot-take-address",
+    errorMessage: "cannot take address of value",
+    language: "Go",
+    category: "Compiler Error",
+    explanation: "You're trying to use the `&` operator to get a pointer to a value that can't have its address taken. In Go, only addressable values (variables, pointer dereferences, slice indexing) can have their address taken. Literals, constants, and function return values are not addressable.",
+    causes: [
+      "Taking the address of a string or numeric literal",
+      "Taking the address of a function return value",
+      "Taking the address of a map value directly",
+      "Taking the address of a constant",
+      "Trying to take the address of a composite literal without assigning it first"
+    ],
+    solutions: [
+      "Assign the value to a variable first, then take its address",
+      "Use a temporary variable for function return values",
+      "For maps, get the value into a variable first: `v := m[key]; &v`",
+      "Consider whether you actually need a pointer in this case",
+      "For string concatenation results, store in a variable before using &"
+    ],
+    codeExample: `// ❌ Bad\nstr := &("hello") // cannot take address of string literal\n\n// ✅ Good: assign first\nstr := "hello"\np := &str\n\n// ❌ Bad: can't take address of function return\np := &(getUser().Name)\n\n// ✅ Good\nuser := getUser()\np := &user.Name`,
+    relatedErrors: ["go-undefined-type", "go-cannot-assign"]
+  },
+  // === Rust (additional) ===
+  {
+    id: "rust-expected-function",
+    errorMessage: "expected function, found struct `Foo`",
+    language: "Rust",
+    category: "TypeError",
+    explanation: "You're trying to call something as a function, but Rust found a struct (or enum, or other type) at that location instead. This commonly happens when you confuse a type name with a constructor function, or when you forget the `::new()` syntax.",
+    causes: [
+      "Using `TypeName()` instead of `TypeName::new()` or `TypeName { }`",
+      "Calling a struct as if it were a function (Rust structs aren't callable by default)",
+      "Importing a type name that shadows a function",
+      "Using lowercase type name that looks like a function call",
+      "Confusing `Type` with `Type::default()` or a builder pattern"
+    ],
+    solutions: [
+      "Use struct literal syntax: `MyStruct { field: value }`",
+      "Use an associated function: `MyStruct::new()`",
+      "Implement the `Fn` trait or use `Box<dyn Fn>` if you need callable structs",
+      "Check if you meant to call a function with the same name in scope",
+      "Look at the struct's `impl` block for available constructor methods"
+    ],
+    codeExample: `// ❌ Bad\nstruct Config {\n    debug: bool,\n}\n\nlet cfg = Config(true); // error: expected function, found struct\n\n// ✅ Good: struct literal syntax\nlet cfg = Config { debug: true };\n\n// ✅ Good: associated constructor\nimpl Config {\n    fn new(debug: bool) -> Self {\n        Config { debug }\n    }\n}\nlet cfg = Config::new(true);`,
+    relatedErrors: ["rust-cannot-move", "rust-borrow-checker"]
   },
 ];

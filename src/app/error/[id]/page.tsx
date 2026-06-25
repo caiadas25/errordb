@@ -64,6 +64,41 @@ export default async function ErrorPage({
               "@type": "Organization",
               name: "ErrorDB",
             },
+            datePublished: "2026-06-25",
+            dateModified: "2026-06-26",
+            mainEntityOfPage: {
+              "@type": "WebPage",
+              "@id": `https://errordb.vercel.app/error/${error.id}`,
+            },
+          }),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              {
+                "@type": "ListItem",
+                position: 1,
+                name: "All Errors",
+                item: "https://errordb.vercel.app",
+              },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: error.language,
+                item: `https://errordb.vercel.app/#${error.language.toLowerCase()}`,
+              },
+              {
+                "@type": "ListItem",
+                position: 3,
+                name: error.errorMessage.slice(0, 60),
+                item: `https://errordb.vercel.app/error/${error.id}`,
+              },
+            ],
           }),
         }}
       />
