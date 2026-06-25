@@ -1646,5 +1646,217 @@ export const errors: ErrorEntry[] = [
     ],
     codeExample: `-- ❌ Bad - will fail if email exists\nINSERT INTO users (email, name) VALUES ('alice@example.com', 'Alice');\n\n-- ✅ Good - upsert (PostgreSQL)\nINSERT INTO users (email, name)\nVALUES ('alice@example.com', 'Alice')\nON CONFLICT (email) DO UPDATE SET name = EXCLUDED.name;\n\n-- ✅ Good - upsert (MySQL)\nINSERT INTO users (email, name)\nVALUES ('alice@example.com', 'Alice')\nON DUPLICATE KEY UPDATE name = VALUES(name);`,
     relatedErrors: ["sql-not-null-constraint", "sql-foreign-key-constraint"]
+  },
+  // === High-volume additions ===
+  {
+    id: "react-rendered-more-hooks",
+    errorMessage: "React Hook rules violated: Rendered more hooks than during the previous render",
+    language: "React",
+    category: "HooksError",
+    explanation: "The number of hooks called between renders changed. React requires hooks to be called in the same order every time. Conditional logic, early returns, or loops before hooks cause this.",
+    causes: [
+      "Calling hooks inside if/else conditions or loops",
+      "An early return before all hooks are called",
+      "Dynamically adding/removing hooks based on props or state",
+      "Using hooks inside a callback or nested function"
+    ],
+    solutions: [
+      "Move all hooks to the top of the component, before any early returns",
+      "Never call hooks conditionally — use a flag variable instead",
+      "Extract conditional logic into separate components that each call their own hooks",
+      "Use the React Rules of Hooks linter plugin to catch violations"
+    ],
+    codeExample: `// ❌ Bad - early return before hooks\nfunction Profile({ userId }) {\n  if (!userId) return null;\n  const user = useUser(userId); // Hook called conditionally!\n  return <div>{user.name}</div>;\n}\n\n// ✅ Good - hooks first, conditional render later\nfunction Profile({ userId }) {\n  const user = useUser(userId);\n  if (!userId) return null;\n  return <div>{user.name}</div>;\n}`,
+    relatedErrors: ["react-invalid-hook-call", "react-infinite-loop"]
+  },
+  {
+    id: "ts-type-not-assignable",
+    errorMessage: "Type 'string' is not assignable to type 'number'",
+    language: "TypeScript",
+    category: "TypeError",
+    explanation: "TypeScript detected a type mismatch. You're passing a value of one type where a different type is expected. This is a compile-time error that prevents bugs.",
+    causes: [
+      "Function parameter type doesn't match the value being passed",
+      "Object property type doesn't match the assigned value",
+      "Implicit type conversion issues",
+      "API response type doesn't match the expected interface"
+    ],
+    solutions: [
+      "Check the function/variable type annotation and fix the mismatch",
+      "Use type assertion if you're sure about the type: `value as number`",
+      "Add runtime validation before assignment",
+      "Update the type definition to match the actual data shape"
+    ],
+    codeExample: `// ❌ Bad\nfunction add(a: number, b: number) { return a + b; }\nadd("1", "2"); // Error: Type 'string' is not assignable to type 'number'\n\n// ✅ Good\nadd(1, 2);\n\n// ✅ Good - parse first\nadd(parseInt("1"), parseInt("2"));`,
+    relatedErrors: ["js-object-is-possibly-null", "ts-cannot-find-module"]
+  },
+  {
+    id: "git-unrelated-histories",
+    errorMessage: "fatal: refusing to merge unrelated histories",
+    language: "Git",
+    category: "Merge Error",
+    explanation: "Git is refusing to merge two branches that don't share a common ancestor commit. This happens when you try to merge branches from different repositories or when the repository was re-initialized.",
+    causes: [
+      "Merging branches from two different git repositories",
+      "Running `git init` inside an existing project and making initial commits",
+      "Force-pushed a completely different commit history",
+      "Merging after squashing or rewriting history"
+    ],
+    solutions: [
+      "Use `git merge --allow-unrelated-histories branch-name` to force the merge",
+      "Set up a proper remote and pull before merging",
+      "For new repos, clone instead of init + add remote",
+      "Use `git rebase` to establish a shared history first"
+    ],
+    codeExample: `# ❌ Bad - merge without common ancestor\ngit merge origin/main\n# fatal: refusing to merge unrelated histories\n\n# ✅ Good - allow unrelated histories\ngit merge --allow-unrelated-histories origin/main\n\n# ✅ Better - pull with allow-unrelated for initial setup\ngit pull origin main --allow-unrelated-histories`,
+    relatedErrors: ["git-detached-head", "git-push-rejected"]
+  },
+  {
+    id: "docker-daemon-not-running",
+    errorMessage: "Cannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docker daemon running?",
+    language: "Docker",
+    category: "ConnectionError",
+    explanation: "The Docker client can't communicate with the Docker daemon. The daemon process isn't running, your user doesn't have permission, or the socket path is wrong.",
+    causes: [
+      "Docker service is not started",
+      "User is not in the docker group (permission denied)",
+      "Docker Desktop is not running (macOS/Windows)",
+      "Socket file is missing or Docker was installed incorrectly"
+    ],
+    solutions: [
+      "Start Docker: `sudo systemctl start docker`",
+      "Add user to docker group: `sudo usermod -aG docker $USER` then log out/in",
+      "On macOS/Windows: open Docker Desktop",
+      "Verify Docker is installed: `docker --version`"
+    ],
+    codeExample: `# Check if Docker is running\nsudo systemctl status docker\n\n# Start Docker if it's not running\nsudo systemctl start docker\n\n# Add yourself to docker group (avoids sudo)\nsudo usermod -aG docker $USER\n# Log out and back in for group change to take effect`,
+    relatedErrors: ["docker-permission-denied", "docker-port-in-use"]
+  },
+  {
+    id: "python-syntax-error-eol",
+    errorMessage: "SyntaxError: EOL while scanning string literal",
+    language: "Python",
+    category: "SyntaxError",
+    explanation: "Python reached the end of a line while still reading a string. The string was never properly closed with a matching quote character.",
+    causes: [
+      "Missing closing quote on a string",
+      "Using the wrong quote type to close (mixing single and double quotes)",
+      "A backslash at the end of a line escapes the newline, joining strings unintentionally",
+      "String spanning multiple lines without triple quotes"
+    ],
+    solutions: [
+      "Add the missing closing quote character",
+      "Use triple quotes for multi-line strings: `\"\"\"text\"\"\"`",
+      "Check for mismatched quote types (single vs double)",
+      "Remove trailing backslashes unless you intentionally want line continuation"
+    ],
+    codeExample: `# ❌ Bad - missing closing quote\nmessage = "Hello, world\nprint(message)\n\n# ❌ Bad - mixed quotes\ntext = "It's broken'\n\n# ✅ Good\ntext = "It's working"\ntext = 'It\\'s working'\nmulti = """This spans\nmultiple lines"""`,
+    relatedErrors: ["js-unexpected-token", "js-unexpected-end-of-input"]
+  },
+  {
+    id: "react-cannot-update-state",
+    errorMessage: "Can't perform a React state update on an unmounted component",
+    language: "React",
+    category: "MemoryWarning",
+    explanation: "You're trying to update state on a component that has already been removed from the DOM. React no longer warns about this (since React 18), but it indicates a memory leak from uncleaned subscriptions.",
+    causes: [
+      "Missing cleanup in useEffect (no return function to unsubscribe)",
+      "Async operation completes after component unmounts (fetch, setTimeout)",
+      "Event listener not removed on unmount",
+      "Subscription not cancelled on unmount"
+    ],
+    solutions: [
+      "Return a cleanup function from useEffect",
+      "Use AbortController for fetch requests",
+      "Use mounted flag or AbortSignal to guard state updates",
+      "Use libraries like SWR or React Query that handle cleanup automatically"
+    ],
+    codeExample: `// ❌ Bad - no cleanup\nuseEffect(() => {\n  fetch('/api/data').then(res => res.json()).then(data => {\n    setData(data); // May run after unmount!\n  });\n}, []);\n\n// ✅ Good - with AbortController\nuseEffect(() => {\n  const controller = new AbortController();\n  fetch('/api/data', { signal: controller.signal })\n    .then(res => res.json())\n    .then(data => setData(data))\n    .catch(() => {}); // Ignore AbortError\n  return () => controller.abort();\n}, []);`,
+    relatedErrors: ["react-infinite-loop", "react-rendered-more-hooks"]
+  },
+  {
+    id: "docker-no-space-left",
+    errorMessage: "no space left on device",
+    language: "Docker",
+    category: "DiskSpace",
+    explanation: "The Docker host has run out of disk space. Docker images, stopped containers, build cache, and volumes accumulate over time and consume significant space.",
+    causes: [
+      "Docker images not cleaned up after builds",
+      "Stopped containers accumulating",
+      "Build cache growing over time",
+      "Volumes holding large data"
+    ],
+    solutions: [
+      "Prune everything: `docker system prune -a --volumes`",
+      "Remove unused images: `docker image prune -a`",
+      "Remove stopped containers: `docker container prune`",
+      "Check disk usage: `docker system df`",
+      "Set up Docker BuildKit with `--no-cache` for CI builds"
+    ],
+    codeExample: `# Check what's using space\ndocker system df\n\n# Remove everything unused\ndocker system prune -a --volumes\n\n# Remove only stopped containers\ndocker container prune\n\n# Remove dangling images\ndocker image prune\n\n# Nuclear option: remove all unused data\ndocker system prune -a --volumes --filter "until=24h"`,
+    relatedErrors: ["docker-port-in-use", "docker-image-not-found"]
+  },
+  {
+    id: "git-branch-not-found",
+    errorMessage: "error: pathspec 'main' did not match any file(s) known to git",
+    language: "Git",
+    category: "BranchError",
+    explanation: "Git can't find the branch you're trying to checkout or switch to. The branch name is wrong, or the branch doesn't exist locally or on the remote.",
+    causes: [
+      "Typo in branch name (case-sensitive)",
+      "Branch exists on remote but not locally (need to fetch first)",
+      "Default branch name changed (master vs main)",
+      "Repository has no commits yet"
+    ],
+    solutions: [
+      "List local branches: `git branch`",
+      "List remote branches: `git branch -r`",
+      "Fetch and checkout: `git fetch origin && git checkout main`",
+      "If repo has no commits, make one first: `git commit --allow-empty -m 'init'`"
+    ],
+    codeExample: `# Check what branches exist\ngit branch -a\n\n# Fetch remote branches and checkout\ngit fetch origin\ngit checkout main\n\n# If you see master instead of main\ngit checkout master\n\n# Rename if needed\ngit branch -m master main`,
+    relatedErrors: ["git-detached-head", "git-unrelated-histories"]
+  },
+  {
+    id: "react-keys-warning",
+    errorMessage: "Warning: Each child in a list should have a unique \"key\" prop",
+    language: "React",
+    category: "Warning",
+    explanation: "React needs a stable, unique key for each element in a list to efficiently track which items changed, were added, or removed. Without keys, React falls back to index-based tracking which causes bugs during reordering or filtering.",
+    causes: [
+      "Using array index as key when list can be reordered",
+      "Not providing a key at all",
+      "Using non-unique values as keys (e.g., duplicate IDs)",
+      "Using Math.random() as key (changes every render)"
+    ],
+    solutions: [
+      "Use a stable, unique identifier: `item.id` or `item.uuid`",
+      "For static lists without unique IDs, array index is acceptable",
+      "Never use Math.random() as a key",
+      "Generate IDs at creation time, not render time"
+    ],
+    codeExample: `// ❌ Bad - using index (causes bugs on reorder)\n{items.map((item, i) => <li key={i}>{item.name}</li>)}\n\n// ❌ Bad - Math.random() changes every render\n{items.map(item => <li key={Math.random()}>{item.name}</li>)}\n\n// ✅ Good - stable unique ID\n{items.map(item => <li key={item.id}>{item.name}</li>)}`,
+    relatedErrors: ["react-rendered-more-hooks", "react-infinite-loop"]
+  },
+  {
+    id: "python-typeerror-none",
+    errorMessage: "TypeError: argument of type 'NoneType' is not iterable",
+    language: "Python",
+    category: "TypeError",
+    explanation: "You're trying to use the `in` operator or iterate over a value that is `None`. Python can't check membership or loop over None.",
+    causes: [
+      "Function returns None implicitly (missing return statement)",
+      "Variable was never assigned a value",
+      "Dictionary lookup returns None instead of raising KeyError",
+      "API response or database query returned None"
+    ],
+    solutions: [
+      "Check for None before iterating: `if result is not None:`",
+      "Ensure functions always return a value",
+      "Use `or []` as a default: `for item in (result or []):`",
+      "Set default values for variables"
+    ],
+    codeExample: `# ❌ Bad - function returns None implicitly\ndef get_users():\n  users = db.query("SELECT * FROM users")\n  # Missing return!\n\nfor user in get_users():  # TypeError: NoneType is not iterable\n  print(user)\n\n# ✅ Good\ndef get_users():\n  return db.query("SELECT * FROM users") or []\n\n# ✅ Good - guard against None\nusers = get_users()\nif users:\n  for user in users:\n    print(user)`,
+    relatedErrors: ["js-cannot-read-properties-of-undefined", "python-keyerror"]
   }
 ];
