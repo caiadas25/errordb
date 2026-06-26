@@ -2,6 +2,27 @@
 
 Searchable database of programming error messages. Plain-English explanations, common causes, and working fixes.
 
+## Sprint B — June 27, 2026 (Growth Sprint — Quick Wins)
+
+### What was done
+- Added 3 C# error entries (first C# entries):
+  - `csharp-nullreference` — "System.NullReferenceException" (most common C# error)
+  - `csharp-index-out-of-range` — "IndexOutOfRangeException" (array bounds)
+  - `csharp-task-cancelled` — "TaskCanceledException" (async timeouts)
+- All include causes, solutions, code examples, and cross-links
+
+### Current stats
+- **Total errors:** 119 (was 116)
+- **C# errors:** 3 (was 0)
+- **Languages covered:** 19 (was 18)
+
+### Keywords targeted
+- "C# NullReferenceException fix" (new error page)
+- "C# IndexOutOfRangeException" (new error page)
+- "C# TaskCanceledException" (new error page)
+
+---
+
 ## Sprint G — June 27, 2026 (Growth Sprint — Quick Wins)
 
 ### What was done
