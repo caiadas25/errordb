@@ -2043,4 +2043,69 @@ export const errors: ErrorEntry[] = [
     ],
     relatedErrors: ["kotlin-null-pointer"]
   },
+  // === Swift ===
+  {
+    id: "swift-implicitly-unwrapped-optional",
+    errorMessage: "Unexpectedly found nil while implicitly unwrapping an Optional value",
+    language: "Swift",
+    category: "RuntimeError",
+    explanation: "You're force-unwrapping an optional (!) that contains nil. This crashes your app at runtime.",
+    causes: [
+      "Force-unwrapping a variable with `!` that hasn't been assigned a value",
+      "Outlets connected in Interface Builder that haven't loaded yet",
+      "API response missing an expected field",
+      "Optional chain result that resolved to nil"
+    ],
+    solutions: [
+      "Use optional binding: `if let value = optional { ... }`",
+      "Use guard statement: `guard let value = optional else { return }`",
+      "Use the nil-coalescing operator: `optional ?? defaultValue`",
+      "Use optional chaining: `optional?.property`",
+      "Avoid using `!` unless you're certain the value exists"
+    ],
+    codeExample: `// ❌ Bad - force unwrap crashes if nil\nlet name = user!.name\n\n// ✅ Good - optional binding\nif let name = user?.name {\n  print(name)\n}\n\n// ✅ Good - nil coalescing\nlet name = user?.name ?? "Unknown"`,
+    relatedErrors: ["js-cannot-read-properties-of-undefined"]
+  },
+  {
+    id: "swift-index-out-of-range",
+    errorMessage: "Index out of range",
+    language: "Swift",
+    category: "RuntimeError",
+    explanation: "You're trying to access an array element at an index that doesn't exist. Swift arrays are zero-indexed.",
+    causes: [
+      "Accessing an array element with an index >= array.count",
+      "Off-by-one errors in loops",
+      "Using an index from user input without bounds checking",
+      "Empty array access"
+    ],
+    solutions: [
+      "Check bounds first: `if index < array.count`",
+      "Use optional subscript: `array[safe: index]`",
+      "Use `array.indices` for safe iteration",
+      "Use `first`, `last`, or `randomElement()` instead of direct indexing"
+    ],
+    codeExample: `// ❌ Bad - crashes if index is out of bounds\nlet value = array[5]\n\n// ✅ Good - bounds check\nif index < array.count {\n  let value = array[index]\n}\n\n// ✅ Good - safe subscript extension\nextension Array {\n  subscript(safe index: Int) -> Element? {\n    return indices.contains(index) ? self[index] : nil\n  }\n}`,
+    relatedErrors: ["js-cannot-read-properties-of-undefined", "python-index-out-of-range"]
+  },
+  {
+    id: "swift-exit-code-1-compilation",
+    errorMessage: "Command failed due to signal: Segmentation fault: 11",
+    language: "Swift",
+    category: "CompilationError",
+    explanation: "The Swift compiler crashed (segfault). This is a compiler bug, not your code — though complex generics or very large files can trigger it.",
+    causes: [
+      "Compiler bug in the Swift compiler itself",
+      "Extremely complex generic type inference",
+      "Very large source files with many type constraints",
+      "Using nightly or beta Xcode versions"
+    ],
+    solutions: [
+      "Update to the latest stable Xcode/Swift toolchain",
+      "Simplify complex generic types",
+      "Split large files into smaller ones",
+      "File a bug report at bugs.swift.org with a minimal reproduction",
+      "Try adding explicit type annotations to help the compiler"
+    ],
+    relatedErrors: ["kotlin-unresolved-reference"]
+  },
 ];
