@@ -1422,6 +1422,75 @@ export const errors: ErrorEntry[] = [
     relatedErrors: ["java-null-pointer", "js-range-max-call-stack"]
   },
   {
+    id: "java-out-of-memory",
+    errorMessage: "java.lang.OutOfMemoryError: Java heap space",
+    language: "Java",
+    category: "OutOfMemoryError",
+    explanation: "The JVM ran out of memory in the heap space. This happens when the application allocates more objects than the JVM can handle with the configured maximum heap size.",
+    causes: [
+      "Loading very large datasets into memory (e.g., large files, big result sets)",
+      "Memory leaks: objects held in collections/variables that are never released",
+      "Infinite loops creating new objects without cleanup",
+      "Insufficient JVM heap size for the application's workload",
+      "Bitmaps or images too large for available memory"
+    ],
+    solutions: [
+      "Increase heap size: `java -Xmx4g MainClass`",
+      "Use streaming/pagination instead of loading everything into memory",
+      "Profile with VisualVM or JProfiler to find memory leaks",
+      "Use WeakReference or SoftReference for cache objects",
+      "Process data in batches instead of all at once"
+    ],
+    codeExample: `// ❌ Bad - loading entire file into memory\nbyte[] data = Files.readAllBytes(largeFile.toPath());\n\n// ✅ Good - streaming approach\ntry (BufferedReader reader = Files.newBufferedReader(largeFile.toPath())) {\n  String line;\n  while ((line = reader.readLine()) != null) {\n    process(line);\n  }\n}\n\n// ✅ Good - increase heap\n// java -Xmx8g -jar myapp.jar`,
+    relatedErrors: ["java-stackoverflow", "java-gc-overhead-limit"]
+  },
+  {
+    id: "java-out-of-memory-metaspace",
+    errorMessage: "java.lang.OutOfMemoryError: Metaspace",
+    language: "Java",
+    category: "OutOfMemoryError",
+    explanation: "The JVM ran out of Metaspace memory, which stores class metadata. This is different from heap space — it means too many classes have been loaded, typically due to classloader leaks.",
+    causes: [
+      "Dynamic class generation (CGLIB, proxies, scripting engines) without unloading",
+      "Classloader leak in hot-reload scenarios (e.g., re-deploying in an app server)",
+      "Too many JSP pages compiled at runtime",
+      "Memory profiling agents loading extra classes",
+      "Frameworks that generate classes at runtime (Hibernate, Spring CGLIB proxies)"
+    ],
+    solutions: [
+      "Increase Metaspace: `java -XX:MaxMetaspaceSize=512m MainClass`",
+      "Fix classloader leaks — ensure proper cleanup on undeploy",
+      "Reduce dynamic class generation (use caching for proxies)",
+      "Check for duplicate class definitions",
+      "Restart the application periodically in development"
+    ],
+    codeExample: `// ❌ Bad - creating new classloaders without cleanup\nfor (int i = 0; i < 1000; i++) {\n  ClassLoader cl = new URLClassLoader(urls);\n  Class<?> clazz = cl.loadClass(\"com.example.MyClass\");\n}\n\n// ✅ Good - reuse classloaders\n// Or set Metaspace limit:\n// java -XX:MaxMetaspaceSize=512m -jar app.jar`,
+    relatedErrors: ["java-out-of-memory", "java-class-not-found"]
+  },
+  {
+    id: "java-concurrent-modification",
+    errorMessage: "java.util.ConcurrentModificationException",
+    language: "Java",
+    category: "ConcurrentModificationException",
+    explanation: "A collection was modified while being iterated over using a for-each loop or Iterator. This is a safety mechanism to detect concurrent access that could produce unpredictable results.",
+    causes: [
+      "Removing elements from a collection inside a for-each loop",
+      "Adding elements to a list while iterating over it",
+      "Another thread modifying the collection during iteration",
+      "Using an iterator's remove() method inconsistently",
+      "Modifying the collection in a method called during iteration"
+    ],
+    solutions: [
+      "Use Iterator.remove() instead of Collection.remove() during iteration",
+      "Use a copy of the collection for modification: `new ArrayList<>(list)`",
+      "Use ConcurrentHashMap or CopyOnWriteArrayList for multi-threaded access",
+      "Use removeIf() (Java 8+) to safely remove during iteration",
+      "Use streams with collect to filter instead of modifying in place"
+    ],
+    codeExample: `// ❌ Bad - modifying during iteration\nfor (String item : list) {\n  if (item.startsWith(\"bad\")) {\n    list.remove(item); // ConcurrentModificationException!\n  }\n}\n\n// ✅ Good - use Iterator\nIterator<String> it = list.iterator();\nwhile (it.hasNext()) {\n  if (it.next().startsWith(\"bad\")) {\n    it.remove(); // safe\n  }\n}\n\n// ✅ Good - use removeIf (Java 8+)\nlist.removeIf(item -> item.startsWith(\"bad\"));`,
+    relatedErrors: ["java-null-pointer", "java-array-index-out-of-bounds"]
+  },
+  {
     id: "react-hydration-failed",
     errorMessage: "Hydration failed because the initial UI does not match what was rendered on the server",
     language: "React",

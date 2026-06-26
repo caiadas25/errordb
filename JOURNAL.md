@@ -2,6 +2,28 @@
 
 Searchable database of programming error messages. Plain-English explanations, common causes, and working fixes.
 
+## Sprint F — June 27, 2026 (Growth Sprint — Quick Wins)
+
+### What was done
+- Added 3 high-volume Java errors:
+  - `java-out-of-memory` — "java.lang.OutOfMemoryError: Java heap space"
+  - `java-out-of-memory-metaspace` — "java.lang.OutOfMemoryError: Metaspace"
+  - `java-concurrent-modification` — "java.util.ConcurrentModificationException"
+- All errors include causes, solutions, code examples, and cross-links
+
+### Current stats
+- **Total errors:** 113 (was 110)
+- **Java errors:** 6 (was 3)
+- **Languages covered:** 19
+
+### Keywords targeted
+- "java out of memory error heap space fix" (new error page)
+- "java out of memory metaspace" (new error page)
+- "ConcurrentModificationException java fix" (new error page)
+- "java OutOfMemoryError causes and solutions" (blog content)
+
+---
+
 ## Sprint A — June 26, 2026 (Growth Sprint — Quick Wins)
 
 ### What was done
