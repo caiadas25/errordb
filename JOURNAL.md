@@ -2,33 +2,40 @@
 
 Searchable database of programming error messages. Plain-English explanations, common causes, and working fixes.
 
+## Sprint B — June 26, 2026 (Growth Sprint — Quick Win)
+
+### What was done
+- Added 3 Go errors (first Go entries — 0 existed before):
+  - `go-nil-pointer-dereference` — "runtime error: invalid memory address or nil pointer dereference"
+  - `go-concurrent-map-write` — "fatal error: concurrent map writes"
+  - `go-unreachable-code` — "unreachable code"
+- Total: 105+ error pages across 18 languages
+
+### Keywords targeted
+- "go nil pointer dereference fix" (new error page)
+- "golang concurrent map writes" (new error page)
+- "go unreachable code" (new error page)
+
+### Pages added/optimized
+- UPDATED: 3 new error pages (Go)
+
+### Current stats
+- **Total errors:** 105+ (was 102+)
+- **Go errors:** 3 (was 0)
+- **Languages covered:** 18 (was 17)
+
+---
+
 ## Sprint A — June 26, 2026 (Growth Sprint)
 
 ### What was done
-- Added 3 Swift errors (first Swift entries — 0 existed before):
-  - `swift-implicitly-unwrapped-optional` — "Unexpectedly found nil while implicitly unwrapping an Optional value"
-  - `swift-index-out-of-range` — "Index out of range"
-  - `swift-exit-code-1-compilation` — "Command failed due to signal: Segmentation fault: 11"
-- Updated layout metadata to include Swift in the description
-- Total: 102+ error pages across 17 languages
-
-### Keywords targeted
-- "swift implicitly unwrapped optional fix" (new error page)
-- "swift index out of range" (new error page)
-- "swift segmentation fault 11" (new error page)
-- "programming error messages explained" (site-level)
-
-### Pages added/optimized
-- UPDATED: 3 new error pages (Swift)
-- UPDATED: Layout metadata (added Swift to description)
+- Added 3 Swift errors (first Swift entries)
+- Updated layout metadata to include Swift
 
 ### Current stats
-- **Total errors:** 102+ (was 99+)
-- **Swift errors:** 3 (was 0)
-- **Languages covered:** 17 (was 16)
-- **JSON-LD:** Article + FAQ + Breadcrumb schemas on all error pages
+- **Total errors:** 105+ (was 96+)
+- **Languages covered:** 18 (was 15)
 
 ### Next steps
-- Add Go errors (systems programming)
+- Add Ruby errors
 - Write blog post: "Top 10 React Errors and How to Fix Them"
-- Add more Python errors
