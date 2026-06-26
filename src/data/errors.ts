@@ -2214,4 +2214,110 @@ func greet() string {
 }`,
     relatedErrors: ["kotlin-unresolved-reference"]
   },
+  // === Ruby ===
+  {
+    id: "ruby-no-method-error",
+    errorMessage: "NoMethodError: undefined method `foo' for nil:NilClass",
+    language: "Ruby",
+    category: "NoMethodError",
+    explanation: "You're calling a method on `nil` when the object doesn't have that method. This is one of the most common Ruby errors, especially when dealing with optional data or method chaining.",
+    causes: [
+      "Calling a method on a variable that is nil",
+      "Method chaining where an intermediate method returns nil",
+      "Missing data from a database query or API call",
+      "Typo in the method name"
+    ],
+    solutions: [
+      "Use the safe navigation operator: `obj&.foo`",
+      "Add a nil check before calling the method: `obj.foo if obj`",
+      "Use `try` in Rails: `obj.try(:foo)`",
+      "Initialize variables with default values"
+    ],
+    codeExample: `# ❌ Bad\nuser = User.find_by(email: "missing@example.com")\nputs user.name  # NoMethodError: undefined method 'name' for nil:NilClass\n\n# ✅ Good\nuser = User.find_by(email: "missing@example.com")\nputs user&.name  # Returns nil safely\n\n# ✅ Good\nuser = User.find_by(email: "missing@example.com")\nif user\n  puts user.name\nend`,
+    relatedErrors: ["ruby-type-error"]
+  },
+  {
+    id: "ruby-type-error",
+    errorMessage: "TypeError: no implicit conversion of Symbol into Integer",
+    language: "Ruby",
+    category: "TypeError",
+    explanation: "You're trying to use the wrong type where a specific type is expected. This commonly happens when accessing arrays with symbols or mixing up method argument types.",
+    causes: [
+      "Accessing an array with a symbol key instead of an integer index",
+      "Passing wrong argument types to a method",
+      "Trying to concatenate incompatible types",
+      "Mixing up hashes and arrays"
+    ],
+    solutions: [
+      "Check the expected type and use the correct one",
+      "Use `.class` to inspect the object type",
+      "Convert types explicitly: `symbol.to_s`, `string.to_sym`",
+      "Read the error backtrace to find the exact line"
+    ],
+    codeExample: `# ❌ Bad\narr = [1, 2, 3]\narr[:first]  # TypeError: no implicit conversion of Symbol into Integer\n\n# ✅ Good\narr = [1, 2, 3]\narr[0]  # => 1\n\n# ✅ Good\narr = [1, 2, 3]\narr.first  # => 1`,
+    relatedErrors: ["ruby-argument-error"]
+  },
+  {
+    id: "ruby-syntax-error",
+    errorMessage: "SyntaxError: unexpected keyword_end",
+    language: "Ruby",
+    category: "SyntaxError",
+    explanation: "The Ruby parser found a syntax error in your code. This usually means a missing or extra keyword (end, def, class, if, etc.) or incorrect indentation.",
+    causes: [
+      "Missing `end` keyword to close a block",
+      "Extra `end` keyword without matching opening keyword",
+      "Missing comma between arguments",
+      "Incorrect string interpolation syntax"
+    ],
+    solutions: [
+      "Check that every `def`, `class`, `module`, `if`, `unless`, `do` has a matching `end`",
+      "Use a code editor with bracket/keyword matching",
+      "Count opening and closing keywords manually",
+      "Check for typos in keyword names"
+    ],
+    codeExample: `# ❌ Bad\ndef greet(name)\n  puts "Hello, #{name}"\n  # Missing 'end'\n\n# ✅ Good\ndef greet(name)\n  puts "Hello, #{name}"\nend`,
+    relatedErrors: ["ruby-load-error"]
+  },
+  {
+    id: "ruby-load-error",
+    errorMessage: "LoadError: cannot load such file -- some_library",
+    language: "Ruby",
+    category: "LoadError",
+    explanation: "Ruby can't find the file or library you're trying to load. This commonly happens with missing gems, incorrect require paths, or gems that aren't installed.",
+    causes: [
+      "The gem is not installed (missing from Gemfile or not yet bundled)",
+      "The require path is incorrect (typo or wrong module name)",
+      "The gem name differs from the require name",
+      "Load path not configured correctly"
+    ],
+    solutions: [
+      "Run `bundle install` to install missing gems",
+      "Check the gem's documentation for the correct require path",
+      "Add the gem to your Gemfile if not present",
+      "Try `gem install gem_name` for non-Bundler projects"
+    ],
+    codeExample: `# ❌ Bad\nrequire 'rails'  # LoadError if Rails gem not installed\n\n# ✅ Good\n# Make sure gem is in Gemfile:\n# gem 'rails'\n# Then run: bundle install\n\n# Some gems have different require names:\nrequire 'active_support'  # Not 'rails'\nrequire 'pry'             # The gem is called 'pry-byebug'`,
+    relatedErrors: ["ruby-name-error"]
+  },
+  {
+    id: "ruby-name-error",
+    errorMessage: "NameError: uninitialized constant SomeClass",
+    language: "Ruby",
+    category: "NameError",
+    explanation: "Ruby can't find the constant, class, or module you're referencing. This is different from NoMethodError — it means the name itself doesn't exist in the current scope.",
+    causes: [
+      "Class or module hasn't been required/loaded yet",
+      "Typo in the class or constant name",
+      "Wrong namespace or module scope",
+      "Trying to use a variable as a constant (first letter capitalized)"
+    ],
+    solutions: [
+      "Ensure the file containing the class is required",
+      "Check the spelling and capitalization of the constant",
+      "Use the fully qualified name: `::Module::ClassName`",
+      "Don't capitalize local variables (Ruby treats them as constants)"
+    ],
+    codeExample: `# ❌ Bad\nclass MyService\n  def call\n    User.all  # NameError if User model file not loaded\n  end\nend\n\n# ✅ Bad (common gotcha)\nmy_variable = 42\nputs My_Variable  # NameError: uninitialized constant My_Variable\n# Ruby thinks My_Variable is a constant!\n\n# ✅ Good\nclass MyService\n  def call\n    ::User.all  # Use fully qualified name\n  end\nend`,
+    relatedErrors: ["ruby-no-method-error"]
+  },
 ];
