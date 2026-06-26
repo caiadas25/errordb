@@ -1858,5 +1858,121 @@ export const errors: ErrorEntry[] = [
     ],
     codeExample: `# ❌ Bad - function returns None implicitly\ndef get_users():\n  users = db.query("SELECT * FROM users")\n  # Missing return!\n\nfor user in get_users():  # TypeError: NoneType is not iterable\n  print(user)\n\n# ✅ Good\ndef get_users():\n  return db.query("SELECT * FROM users") or []\n\n# ✅ Good - guard against None\nusers = get_users()\nif users:\n  for user in users:\n    print(user)`,
     relatedErrors: ["js-cannot-read-properties-of-undefined", "python-keyerror"]
+  },
+  // === Sprint A: TypeScript errors (high search volume) ===
+  {
+    id: "ts-property-does-not-exist",
+    errorMessage: "Property 'foo' does not exist on type 'Bar'",
+    language: "TypeScript",
+    category: "TypeError",
+    explanation: "TypeScript can't find the property you're accessing on the given type. The property name is wrong, the type definition is missing it, or the value could be a different type than expected.",
+    causes: [
+      "Typo in the property name",
+      "Property exists at runtime but isn't declared in the type/interface",
+      "Value is a union type and the property only exists on some branches",
+      "Object was typed as `any` but the type annotation is wrong",
+      "Using optional chaining on a property that isn't optional in the type"
+    ],
+    solutions: [
+      "Check the property name for typos",
+      "Add the property to the interface/type definition",
+      "Use type narrowing before accessing the property",
+      "Use optional chaining: `obj?.foo`",
+      "Update the type to use an index signature: `[key: string]: unknown`"
+    ],
+    codeExample: `// ❌ Bad\ninterface User {\n  name: string;\n  email: string;\n}\nconst user: User = { name: 'Alice', email: 'a@b.com' };\nconsole.log(user.age); // Property 'age' does not exist on type 'User'\n\n// ✅ Good - add to interface\ninterface User {\n  name: string;\n  email: string;\n  age?: number;\n}\nconsole.log(user.age); // OK, age is optional`,
+    relatedErrors: ["ts-type-not-assignable", "js-cannot-read-properties-of-undefined"]
+  },
+  {
+    id: "ts-cannot-find-module",
+    errorMessage: "Cannot find module 'foo' or its corresponding type declarations",
+    language: "TypeScript",
+    category: "ModuleError",
+    explanation: "TypeScript can't locate the module you're trying to import. Either the package isn't installed, it lacks TypeScript type declarations, or the import path is wrong.",
+    causes: [
+      "Package not installed (missing from node_modules)",
+      "Package doesn't include TypeScript types (@types package needed)",
+      "Import path is wrong (typo, wrong directory)",
+      "Module resolution settings in tsconfig.json don't cover the path",
+      "Using require() instead of import in an ESM project"
+    ],
+    solutions: [
+      "Install the package: `npm install package-name`",
+      "Install types: `npm install -D @types/package-name`",
+      "Check the import path for typos",
+      "Add path aliases in tsconfig.json: `\"paths\": { \"@/*\": [\"./src/*\"] }`",
+      "Create a declaration file: `declare module 'foo'`"
+    ],
+    codeExample: `// ❌ Bad - types not installed\nimport express from 'express';\n// Cannot find module 'express' or its corresponding type declarations\n\n// ✅ Good - install types\n// npm install -D @types/express\nimport express from 'express';\n\n// ✅ Good - declare unknown module\n// src/types/foo.d.ts\ndeclare module 'foo' {\n  export function doSomething(): void;\n}`,
+    relatedErrors: ["node-module-not-found", "node-cannot-find-module"]
+  },
+  {
+    id: "ts-object-possibly-undefined",
+    errorMessage: "Object is possibly 'undefined'",
+    language: "TypeScript",
+    category: "TypeError",
+    explanation: "TypeScript detected that a value could be `undefined` at runtime, and you're trying to access a property or method without checking first. This is stricter than JavaScript — TypeScript catches potential runtime errors at compile time.",
+    causes: [
+      "Accessing a property on an optional parameter or variable",
+      "Array.find() or similar method that can return undefined",
+      "Function that returns T | undefined",
+      "DOM querySelector that might not find an element",
+      "Object property access without nullish check"
+    ],
+    solutions: [
+      "Add a null check: `if (obj !== undefined)`",
+      "Use optional chaining: `obj?.property`",
+      "Use non-null assertion: `obj!.property` (only if you're sure)",
+      "Use default values: `const val = obj?.property ?? defaultValue`",
+      "Use a type guard function"
+    ],
+    codeExample: `// ❌ Bad\nconst el = document.getElementById('app');\nel.innerHTML = 'Hello'; // Object is possibly 'undefined'\n\n// ✅ Good - null check\nconst el = document.getElementById('app');\nif (el) {\n  el.innerHTML = 'Hello';\n}\n\n// ✅ Good - optional chaining + nullish coalescing\nconst text = el?.textContent ?? 'default';`,
+    relatedErrors: ["ts-object-is-possibly-null", "js-cannot-read-properties-of-undefined"]
+  },
+  {
+    id: "ts-expected-n-args",
+    errorMessage: "Expected X arguments, but got Y",
+    language: "TypeScript",
+    category: "TypeError",
+    explanation: "You're calling a function with a different number of arguments than its type signature declares. This catches bugs where you forget required parameters or pass too many.",
+    causes: [
+      "Missing required parameters in function call",
+      "Using spread operator that expands to wrong number of args",
+      "Function overloads don't match the call signature",
+      "Calling a bound function with different arity",
+      "Rest parameters counted differently than expected"
+    ],
+    solutions: [
+      "Check the function signature and provide all required arguments",
+      "Use optional parameters in the definition: `function foo(a: string, b?: number)`",
+      "Add default values: `function foo(a: string, b = 0)`",
+      "Check for function overloads that match your use case",
+      "Use spread carefully: `func(...args)` where args has correct length"
+    ],
+    codeExample: `// ❌ Bad\nfunction greet(name: string, age: number): string {\n  return \`\${name} is \${age}\`;\n}\ngreet('Alice'); // Expected 2 arguments, but got 1\n\n// ✅ Good - optional param\ngreet('Alice', 30); // OK\ngreet('Alice'); // Now it works if age is optional`,
+    relatedErrors: ["ts-type-not-assignable", "js-cannot-read-properties-of-undefined"]
+  },
+  {
+    id: "ts-implicitly-any",
+    errorMessage: "Parameter 'x' implicitly has an 'any' type",
+    language: "TypeScript",
+    category: "TypeError",
+    explanation: "TypeScript can't infer the type of a parameter and defaults to `any`, but your configuration (usually `noImplicitAny: true`) requires explicit type annotations. This is one of the most common TypeScript errors for developers new to the language.",
+    causes: [
+      "Function parameter without a type annotation",
+      "Callback parameter in forEach/map/filter without type",
+      "Destructured parameter without type",
+      "TypeScript strict mode enabled with `noImplicitAny: true`",
+      "Imported function without type definitions"
+    ],
+    solutions: [
+      "Add explicit type annotation: `function foo(x: string)`",
+      "Type callback parameters: `arr.map((item: ItemType) => ...)`",
+      "Type destructured params: `({ name, age }: { name: string; age: number })`",
+      "Enable TypeScript auto-inference where possible",
+      "Install @types packages for third-party libraries"
+    ],
+    codeExample: `// ❌ Bad - noImplicitAny: true\ngreet(name) {  // Parameter 'name' implicitly has an 'any' type\n  return \`Hello, \${name}\`;\n}\n\n// ✅ Good - explicit type\ngreet(name: string): string {\n  return \`Hello, \${name}\`;\n}\n\n// ✅ Good - typed callback\nusers.map((user: { name: string; age: number }) => user.name);`,
+    relatedErrors: ["ts-type-not-assignable", "ts-property-does-not-exist"]
   }
 ];
