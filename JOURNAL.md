@@ -2,12 +2,22 @@
 
 Searchable database of programming error messages. Plain-English explanations, common causes, and working fixes.
 
-## Sprint H — June 26, 2026 (Growth Sprint — Quick Win)
+## Sprint I — June 26, 2026 (Growth Sprint — Quick Win)
 
 ### What was done
-- Added 3 Rust error entries (high-growth language):
-  - `rust-lifetime-mismatch` — "explicit lifetime required" (E0621)
-  - `rust-mutability` — "cannot borrow as mutable" (E0596)
+- Added 3 Swift error entries (high-growth mobile language):
+  - `swift-value-type` — "Cannot assign to property: 'self' is immutable"
+  - `swift-optional-binding` — "Value of optional type must be unwrapped"
+  - `swift-cannot-invoke` — "Cannot invoke initializer for type"
+- Added 1 PHP error entry:
+  - `php-memory-exhausted` — "Allowed memory size of X bytes exhausted"
+- Total: 126+ errors across 19 languages
+
+### Keywords targeted
+- "swift cannot assign to property self is immutable" (new error page)
+- "swift value of optional type must be unwrapped" (new error page)
+- "swift cannot invoke initializer" (new error page)
+- "php allowed memory size exhausted" (new error page)
   - `rust-unwrap-none` — "called unwrap() on None" (panic)
 - All include causes, solutions, code examples, cross-links
 

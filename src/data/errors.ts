@@ -2625,4 +2625,92 @@ func greet() string {
     codeExample: `// ❌ Bad — panics if value is None\nlet name = config.get("name").unwrap();\n\n// ✅ Good — handle None explicitly\nmatch config.get("name") {\n    Some(name) => println!(\"Name: {}\", name),\n    None => println!(\"Name not found\"),\n}\n\n// ✅ Good — use a default\nlet name = config.get("name").unwrap_or(&"Anonymous".to_string());`,
     relatedErrors: ["rust-cannot-move", "rust-expected-function"]
   },
+  // === Swift ===
+  {
+    id: "swift-value-type",
+    errorMessage: "Cannot assign to property: 'self' is immutable",
+    language: "Swift",
+    category: "Compile Error",
+    explanation: "You're trying to modify a property of a struct (value type) from a method that isn't marked `mutating`. In Swift, structs are value types — methods can't modify them unless explicitly marked as mutating.",
+    causes: [
+      "Calling a non-mutating method on a struct property from within a struct method",
+      "Trying to change a `let` constant property",
+      "Attempting to modify a property in an immutable context (like a computed property getter)",
+      "Working with structs inside a `let` binding"
+    ],
+    solutions: [
+      "Mark the method as `mutating`: `mutating func update() { ... }`",
+      "Change `let` to `var` for the variable being modified",
+      "Use a `class` (reference type) instead of a `struct` if mutation is needed",
+      "Return a new instance instead of mutating: `func updated() -> Self`"
+    ],
+    codeExample: `// ❌ Bad\nstruct Counter {\n    var count = 0\n    func increment() {\n        count += 1 // Error: cannot assign to property\n    }\n}\n\n// ✅ Good — mark as mutating\nstruct Counter {\n    var count = 0\n    mutating func increment() {\n        count += 1\n    }\n}`,
+    relatedErrors: ["swift-optional-binding", "swift-cannot-invoke"]
+  },
+  {
+    id: "swift-optional-binding",
+    errorMessage: "Value of optional type must be unwrapped to a value of type",
+    language: "Swift",
+    category: "Type Error",
+    explanation: "You're trying to use an Optional value directly where a non-optional is expected. Swift forces you to explicitly handle the possibility that an Optional might be nil, preventing nil-related crashes.",
+    causes: [
+      "Using an optional variable without unwrapping it first",
+      "Passing an Optional where a non-optional parameter is expected",
+      "Forcing an optional value into a non-optional context",
+      "Returning an Optional from a function that doesn't expect one"
+    ],
+    solutions: [
+      "Use optional binding: `if let value = optional { ... }`",
+      "Use guard: `guard let value = optional else { return }`",
+      "Use nil coalescing: `let value = optional ?? defaultValue`",
+      "Force unwrap (carefully!): `let value = optional!` — only when you're sure it's not nil"
+    ],
+    codeExample: `// ❌ Bad\nlet name: String? = "Alice"\nprint(name.count) // Error: optional must be unwrapped\n\n// ✅ Good — optional binding\nif let name = name {\n    print(name.count) // 5\n}\n\n// ✅ Good — nil coalescing\nlet count = (name ?? "Unknown").count`,
+    relatedErrors: ["swift-value-type", "swift-cannot-invoke"]
+  },
+  {
+    id: "swift-cannot-invoke",
+    errorMessage: "Cannot invoke initializer for type with an argument list of type",
+    language: "Swift",
+    category: "Compile Error",
+    explanation: "You're trying to create an instance of a type (initialize it) but the arguments don't match any of its available initializers. Swift is strict about type matching in function and initializer calls.",
+    causes: [
+      "Passing wrong argument types to an initializer",
+      "Passing wrong number of arguments",
+      "Missing required argument labels (Swift uses external parameter names)",
+      "The type doesn't have a custom initializer accepting those parameters"
+    ],
+    solutions: [
+      "Check the initializer's parameter types and labels in the documentation",
+      "Add or correct argument labels: `Type(label: value)` instead of `Type(value)`",
+      "Use the correct types — Swift won't implicitly convert types like `Int` to `String`",
+      "Define a custom initializer if needed"
+    ],
+    codeExample: `// ❌ Bad\nstruct User {\n    var name: String\n    var age: Int\n}\nlet user = User("Alice", 30) // Error: missing labels\n\n// ✅ Good — include argument labels\nlet user = User(name: "Alice", age: 30)\n\n// ✅ Good — define custom init without labels\nstruct User {\n    var name: String\n    var age: Int\n    init(_ name: String, _ age: Int) {\n        self.name = name\n        self.age = age\n    }\n}`,
+    relatedErrors: ["swift-value-type", "swift-optional-binding"]
+  },
+  // === PHP ===
+  {
+    id: "php-memory-exhausted",
+    errorMessage: "Allowed memory size of X bytes exhausted (tried to allocate Y bytes)",
+    language: "PHP",
+    category: "Fatal Error",
+    explanation: "Your script tried to use more memory than PHP is configured to allow. This commonly happens when processing large datasets, loading huge files, or when code creates unbounded data structures.",
+    causes: [
+      "Loading an entire large file into memory (e.g., file_get_contents on a GB file)",
+      "Processing millions of rows without chunking",
+      "Memory leak in a loop (accumulating data without releasing it)",
+      "Infinite recursion or very deep call stack",
+      "Loading large images or DOM documents"
+    ],
+    solutions: [
+      "Increase memory limit: `ini_set('memory_limit', '512M');`",
+      "Process data in chunks instead of loading everything at once",
+      "Use generators (`yield`) for large datasets",
+      "Use SplFixedArray instead of regular arrays for known-size datasets",
+      "Free variables when done: `$var = null;`"
+    ],
+    codeExample: `// ❌ Bad — loads entire file\n$data = file_get_contents('huge_file.csv');\n$lines = explode("\\n", $data);\n\n// ✅ Good — process line by line\n$handle = fopen('huge_file.csv', 'r');\nwhile (($line = fgetcsv($handle)) !== false) {\n    process_line($line);\n}\nfclose($handle);`,
+    relatedErrors: ["php-undefined-variable", "php-fatal-error-out-of-memory"]
+  },
 ];
