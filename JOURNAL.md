@@ -2,7 +2,30 @@
 
 Searchable database of programming error messages. Plain-English explanations, common causes, and working fixes.
 
-## Sprint F — June 27, 2026 (Growth Sprint — Quick Wins)
+## Sprint G — June 27, 2026 (Growth Sprint — Quick Wins)
+
+### What was done
+- Added 5 new error entries:
+  - `cpp-segmentation-fault` — "Segmentation fault (core dumped)" (C++)
+  - `cpp-uninitialized-variable` — "warning: 'variable' is used uninitialized" (C++)
+  - `php-undefined-variable` — "Notice: Undefined variable: variable_name" (PHP)
+  - `php-undefined-array-key` — "Warning: Undefined array key" (PHP)
+  - `php-fatal-error-out-of-memory` — "Fatal error: Allowed memory size exhausted" (PHP)
+- All errors include causes, solutions, code examples, and cross-links
+
+### Current stats
+- **Total errors:** 116 (was 111)
+- **C++ errors:** 3 (was 1)
+- **PHP errors:** 5 (was 2)
+- **Languages covered:** 18 (unchanged)
+
+### Keywords targeted
+- "C++ segmentation fault fix" (new error page)
+- "PHP undefined variable notice" (new error page)
+- "PHP out of memory fatal error" (new error page)
+- "C++ uninitialized variable warning" (new error page)
+
+---
 
 ### What was done
 - Added 3 high-volume Java errors:

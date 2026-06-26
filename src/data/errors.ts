@@ -2389,4 +2389,110 @@ func greet() string {
     codeExample: `# ❌ Bad\nclass MyService\n  def call\n    User.all  # NameError if User model file not loaded\n  end\nend\n\n# ✅ Bad (common gotcha)\nmy_variable = 42\nputs My_Variable  # NameError: uninitialized constant My_Variable\n# Ruby thinks My_Variable is a constant!\n\n# ✅ Good\nclass MyService\n  def call\n    ::User.all  # Use fully qualified name\n  end\nend`,
     relatedErrors: ["ruby-no-method-error"]
   },
+  // === C++ ===
+  {
+    id: "cpp-segmentation-fault",
+    errorMessage: "Segmentation fault (core dumped)",
+    language: "C++",
+    category: "Runtime Error",
+    explanation: "A segmentation fault (segfault) occurs when your program tries to access memory it doesn't own. This is the C++ equivalent of a null pointer dereference — the OS kills your process to prevent memory corruption.",
+    causes: [
+      "Dereferencing a null or uninitialized pointer",
+      "Accessing an array out of bounds",
+      "Using a pointer after freeing the memory it points to (dangling pointer)",
+      "Writing to read-only memory (e.g., modifying a string literal)",
+      "Stack overflow from infinite recursion"
+    ],
+    solutions: [
+      "Use a debugger (gdb, lldb) to find the exact line causing the segfault",
+      "Initialize all pointers before use",
+      "Use smart pointers (std::unique_ptr, std::shared_ptr) instead of raw pointers",
+      "Check array bounds before accessing elements",
+      "Use AddressSanitizer: compile with -fsanitize=address"
+    ],
+    codeExample: `// ❌ Bad\nint* ptr = nullptr;\n*ptr = 42;  // Segmentation fault!\n\n// ✅ Good\nint value = 42;\nint* ptr = &value;\nstd::cout << *ptr;  // Works\n\n// ✅ Better — use smart pointers\nauto ptr = std::make_unique<int>(42);\nstd::cout << *ptr;  // Works, auto-cleanup`,
+    relatedErrors: ["cpp-uninitialized-variable"]
+  },
+  {
+    id: "cpp-uninitialized-variable",
+    errorMessage: "warning: 'variable' is used uninitialized in this function",
+    language: "C++",
+    category: "Warning",
+    explanation: "Using a variable before initializing it leads to undefined behavior. The variable contains whatever garbage value was left in that memory location.",
+    causes: [
+      "Declaring a variable without assigning a value",
+      "Conditional initialization where not all branches set the value",
+      "Using a variable declared in a different scope"
+    ],
+    solutions: [
+      "Always initialize variables at declaration: `int x = 0;`",
+      "Use std::optional for variables that may not have a value",
+      "Enable compiler warnings: -Wall -Wextra"
+    ],
+    codeExample: `// ❌ Bad\nint count;\nif (condition) {\n  count = 10;\n}\nstd::cout << count;  // Undefined behavior if condition is false\n\n// ✅ Good\nint count = 0;\nif (condition) {\n  count = 10;\n}\nstd::cout << count;  // Always defined`,
+    relatedErrors: ["cpp-segmentation-fault"]
+  },
+  // === PHP ===
+  {
+    id: "php-undefined-variable",
+    errorMessage: "Notice: Undefined variable: variable_name",
+    language: "PHP",
+    category: "Notice",
+    explanation: "You're trying to use a variable that hasn't been defined in the current scope. PHP creates the variable with a null value but throws a notice.",
+    causes: [
+      "Typo in variable name",
+      "Variable defined in a different scope (e.g., inside a function but used outside)",
+      "Variable not initialized before use",
+      "Using a variable from an included file that doesn't exist"
+    ],
+    solutions: [
+      "Initialize the variable before use: `$variable = null;`",
+      "Check variable scoping (local vs global)",
+      "Use `isset()` to check if a variable exists before using it",
+      "Enable strict error reporting in development"
+    ],
+    codeExample: `// ❌ Bad\nfunction greet() {\n  $name = 'Alice';\n}\necho $name;  // Undefined variable\n\n// ✅ Good\nfunction greet() {\n  global $name;\n  $name = 'Alice';\n}\necho $name;  // Works\n\n// ✅ Better\n$name = 'Alice';\necho $name;  // No need for global`,
+    relatedErrors: ["php-undefined-array-key"]
+  },
+  {
+    id: "php-undefined-array-key",
+    errorMessage: "Warning: Undefined array key \"key_name\"",
+    language: "PHP",
+    category: "Warning",
+    explanation: "You're trying to access an array key that doesn't exist. PHP 8+ throws a warning instead of silently returning null.",
+    causes: [
+      "Accessing a key that was never set",
+      "Typo in the key name",
+      "JSON response missing expected keys",
+      "Array was not decoded properly"
+    ],
+    solutions: [
+      "Use isset() or array_key_exists() before accessing",
+      "Use the null coalescing operator: $arr['key'] ?? 'default'",
+      "Use array_fill_keys() to initialize expected keys"
+    ],
+    codeExample: `// ❌ Bad\necho $data['name'];  // Warning if 'name' key doesn't exist\n\n// ✅ Good\n$name = isset($data['name']) ? $data['name'] : 'Unknown';\n\n// ✅ Better (PHP 7+)\n$name = $data['name'] ?? 'Unknown';\n\n// ✅ Best\necho $data['name'] ?? 'Unknown';`,
+    relatedErrors: ["php-undefined-variable"]
+  },
+  {
+    id: "php-fatal-error-out-of-memory",
+    errorMessage: "Fatal error: Allowed memory size of 134217728 bytes exhausted",
+    language: "PHP",
+    category: "Fatal Error",
+    explanation: "Your script tried to allocate more memory than PHP's memory_limit allows. This usually means you're loading a huge file into memory or have an infinite loop creating objects.",
+    causes: [
+      "Loading a large file entirely into memory (e.g., file_get_contents on a huge file)",
+      "Infinite loop creating objects or appending to arrays",
+      "Processing very large datasets without pagination",
+      "Memory leak from circular references (pre-PHP 8)"
+    ],
+    solutions: [
+      "Increase memory_limit in php.ini or with ini_set('memory_limit', '256M')",
+      "Process large files line by line (fgetcsv instead of file_get_contents)",
+      "Add pagination to database queries",
+      "Use generators (yield) for large datasets"
+    ],
+    codeExample: `// ❌ Bad — loads entire file into memory\n$content = file_get_contents('huge_file.csv');\n\n// ✅ Good — process line by line\n$handle = fopen('huge_file.csv', 'r');\nwhile (($line = fgetcsv($handle)) !== false) {\n  processLine($line);\n}\nfclose($handle);`,
+    relatedErrors: ["php-undefined-variable"]
+  },
 ];
