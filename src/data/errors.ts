@@ -2777,4 +2777,69 @@ func greet() string {
     codeExample: `// ❌ Bad\nfinal items = [1, 2, 3];\nprint(items[5]); // RangeError!\n\n// ✅ Good — bounds check\nif (index < items.length) {\n  print(items[index]);\n}\n\n// ✅ Good — use safe access\nprint(items.elementAtOrNull(5)); // prints null`,
     relatedErrors: ["dart-null-check", "dart-type-cast-error"]
   },
+  // === Kotlin ===
+  {
+    id: "kotlin-null-pointer",
+    errorMessage: "kotlin.KotlinNullPointerException",
+    language: "Kotlin",
+    category: "NullPointerException",
+    explanation: "You tried to access a nullable reference that was null. This typically happens when you force-unwrap a nullable type using the `!!` operator, or when Java interop returns null where Kotlin expected non-null.",
+    causes: [
+      "Using the `!!` (non-null assertion) operator on a null value",
+      "Java interop method returning null where Kotlin expects non-null",
+      "Uninitialized lateinit variable accessed before assignment",
+      "Platform type ambiguity from Java code"
+    ],
+    solutions: [
+      "Use safe calls: `obj?.property` instead of `obj!!.property`",
+      "Use the Elvis operator: `val name = obj?.name ?: \"default\"`",
+      "Use `let` for null-safe operations: `obj?.let { doSomething(it) }`",
+      "Check `::variable.isInitialized` before using lateinit vars",
+      "Use `@Nullable` / `@NonNull` annotations for Java interop boundaries"
+    ],
+    codeExample: "// Kotlin\\nval name: String? = null\\n\\n// ❌ Bad\\nprintln(name!!.length) // KotlinNullPointerException\\n\\n// ✅ Good — safe call\\nprintln(name?.length) // prints null\\n\\n// ✅ Good — Elvis operator\\nprintln(name?.length ?: 0) // prints 0\\n\\n// ✅ Good — let block\\nname?.let { println(it.length) }",
+    relatedErrors: ["kotlin-type-mismatch", "kotlin-lateinit"]
+  },
+  {
+    id: "kotlin-type-mismatch",
+    errorMessage: "Type mismatch: inferred type is String but Int was expected",
+    language: "Kotlin",
+    category: "Type Mismatch",
+    explanation: "Kotlin's type system detected that you're passing a value of the wrong type to a function or variable. Kotlin is strongly typed and won't implicitly convert between incompatible types.",
+    causes: [
+      "Passing a String where an Int (or other type) is expected",
+      "JSON deserialization returning the wrong type",
+      "Function parameter type doesn't match the argument",
+      "Incorrect use of generics or type parameters"
+    ],
+    solutions: [
+      "Explicitly convert types: `str.toInt()`, `num.toString()`",
+      "Use safe conversion: `str.toIntOrNull() ?: 0`",
+      "Verify the expected type from the function signature",
+      "Use type-checking before conversion: `if (x is Int) { ... }`"
+    ],
+    codeExample: "// Kotlin\\nval input: String = \"42\"\\nval num: Int = input // Type mismatch!\\n\\n// ✅ Good — explicit conversion\\nval num: Int = input.toInt()\\n\\n// ✅ Good — safe conversion\\nval num: Int = input.toIntOrNull() ?: 0\\n\\n// ✅ Good — type check\\nif (input is Int) {\\n  val num: Int = input\\n}",
+    relatedErrors: ["kotlin-null-pointer", "kotlin-no-such-element"]
+  },
+  {
+    id: "kotlin-lateinit",
+    errorMessage: "kotlin.UninitializedPropertyAccessException: lateinit property has not been initialized",
+    language: "Kotlin",
+    category: "UninitializedPropertyAccessException",
+    explanation: "You declared a variable with the `lateinit` modifier but tried to access it before it was assigned a value. Kotlin tracks the initialization state of lateinit properties at runtime.",
+    causes: [
+      "Accessing a lateinit var before it's been assigned",
+      "Initialization happening in a different coroutine/thread",
+      "Conditional initialization where one code path doesn't set the value",
+      "Dependency injection not completing before access"
+    ],
+    solutions: [
+      "Check initialization: `if (::property.isInitialized) { ... }`",
+      "Use nullable type instead of lateinit: `var name: String? = null`",
+      "Ensure initialization happens in all code paths",
+      "Use `by lazy` for lazy initialization that's always safe"
+    ],
+    codeExample: "// Kotlin\\nclass MyFragment {\\n  private lateinit var binding: FragmentBinding\\n\\n  // ❌ Bad — may crash\\n  fun doWork() = binding.root // UninitializedPropertyAccessException\\n\\n  // ✅ Good — check first\\n  fun doWork() {\\n    if (::binding.isInitialized) {\\n      binding.root\\n    }\\n  }\\n}",
+    relatedErrors: ["kotlin-null-pointer"]
+  },
 ];

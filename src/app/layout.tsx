@@ -7,7 +7,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "ErrorDB — Programming Error Messages Explained",
   description:
-    "Searchable database of programming error messages. Plain-English explanations, common causes, and working fixes for JavaScript, TypeScript, Python, Ruby, Node.js, React, Java, Go, Rust, Kotlin, Swift, Git, Docker, SQL, and more.",
+    "Searchable database of programming error messages. Plain-English explanations, common causes, and working fixes for JavaScript, TypeScript, Python, Ruby, Node.js, React, Java, Go, Rust, Kotlin, Swift, C#, C++, Dart, PHP, Git, Docker, SQL, and more.",
   openGraph: {
     title: "ErrorDB — Programming Error Messages Explained",
     description:
