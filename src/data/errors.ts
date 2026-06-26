@@ -2713,4 +2713,68 @@ func greet() string {
     codeExample: `// ❌ Bad — loads entire file\n$data = file_get_contents('huge_file.csv');\n$lines = explode("\\n", $data);\n\n// ✅ Good — process line by line\n$handle = fopen('huge_file.csv', 'r');\nwhile (($line = fgetcsv($handle)) !== false) {\n    process_line($line);\n}\nfclose($handle);`,
     relatedErrors: ["php-undefined-variable", "php-fatal-error-out-of-memory"]
   },
+  // === Dart / Flutter ===
+  {
+    id: "dart-type-cast-error",
+    errorMessage: "type 'X' is not a subtype of type 'Y' in type cast",
+    language: "Dart",
+    category: "TypeError",
+    explanation: "You're trying to cast an object to a type it doesn't actually belong to. Dart is a strongly typed language and won't allow implicit type conversions that lose information.",
+    causes: [
+      "Casting a JSON response to a specific type when the data doesn't match",
+      "Using the cast operator `as` on an incompatible type",
+      "Passing the wrong type to a function that expects a specific type",
+      "Deserializing data without checking the actual runtime type"
+    ],
+    solutions: [
+      "Use `is` operator to check type before casting: `if (obj is String) { ... }`",
+      "Use `tryCast()` instead of `as` for safe casting: `obj.tryCast<String>()`",
+      "Validate JSON data before casting: check key existence and value types",
+      "Use pattern matching with switch expressions in Dart 3"
+    ],
+    codeExample: `// ❌ Bad\nfinal name = data['name'] as String; // Throws if null or wrong type\n\n// ✅ Good — safe cast\nfinal name = data['name'] as String? ?? 'Unknown';\n\n// ✅ Good — type check first\nif (data['name'] is String) {\n  final name = data['name'] as String;\n  print(name);\n}`,
+    relatedErrors: ["dart-null-check", "dart-cannot-invoke"]
+  },
+  {
+    id: "dart-null-check",
+    errorMessage: "Null check operator used on a null value",
+    language: "Dart",
+    category: "Runtime Error",
+    explanation: "You used the `!` (null check) operator on a variable that is null at runtime. Dart's sound null safety means this error only happens when you explicitly force-unwrap a nullable value using `!`.",
+    causes: [
+      "Using `!` on a nullable variable that happens to be null",
+      "State not yet initialized when accessed (e.g., in initState before async load completes)",
+      "API response missing expected fields",
+      "Widget disposed before async operation completes"
+    ],
+    solutions: [
+      "Use null-aware operators: `??` (default), `?.` (optional chaining)",
+      "Use `if` null checks before using the value",
+      "Use `late` keyword with initialization guarantee, or `late` with `final` and ensure initialization",
+      "Handle null states in the UI with loading/error states"
+    ],
+    codeExample: `// ❌ Bad\nfinal String name = user!.name; // Crashes if user is null\n\n// ✅ Good — null-aware operators\nfinal String name = user?.name ?? 'Anonymous';\n\n// ✅ Good — explicit check\nif (user != null) {\n  print(user!.name);\n}`,
+    relatedErrors: ["dart-type-cast-error", "dart-index-out-of-range"]
+  },
+  {
+    id: "dart-index-out-of-range",
+    errorMessage: "RangeError (index): Invalid value: Not in inclusive range 0..X-1: Y",
+    language: "Dart",
+    category: "RangeError",
+    explanation: "You're trying to access a list element at an index that doesn't exist. The index Y is outside the valid range of 0 to (length - 1).",
+    causes: [
+      "Accessing a list element with an index >= list.length",
+      "Using a negative index (Dart lists don't support negative indexing)",
+      "Off-by-one error in a loop: using `<=` instead of `<` for the upper bound",
+      "Accessing an empty list"
+    ],
+    solutions: [
+      "Check list bounds before accessing: `if (index < list.length)`",
+      "Use `elementAtOrNull(index)` for safe access (returns null if out of bounds)",
+      "Use `list.isEmpty` check before accessing elements",
+      "Review loop conditions: use `< list.length` not `<= list.length`"
+    ],
+    codeExample: `// ❌ Bad\nfinal items = [1, 2, 3];\nprint(items[5]); // RangeError!\n\n// ✅ Good — bounds check\nif (index < items.length) {\n  print(items[index]);\n}\n\n// ✅ Good — use safe access\nprint(items.elementAtOrNull(5)); // prints null`,
+    relatedErrors: ["dart-null-check", "dart-type-cast-error"]
+  },
 ];
