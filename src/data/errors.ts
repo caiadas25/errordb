@@ -1974,5 +1974,73 @@ export const errors: ErrorEntry[] = [
     ],
     codeExample: `// ❌ Bad - noImplicitAny: true\ngreet(name) {  // Parameter 'name' implicitly has an 'any' type\n  return \`Hello, \${name}\`;\n}\n\n// ✅ Good - explicit type\ngreet(name: string): string {\n  return \`Hello, \${name}\`;\n}\n\n// ✅ Good - typed callback\nusers.map((user: { name: string; age: number }) => user.name);`,
     relatedErrors: ["ts-type-not-assignable", "ts-property-does-not-exist"]
-  }
+  },
+  // === Kotlin ===
+  {
+    id: "kotlin-null-pointer",
+    errorMessage: "kotlinNullPointerException: Attempt to invoke virtual method on a null object reference",
+    language: "Kotlin",
+    category: "NullPointerException",
+    explanation: "You're trying to call a method or access a property on a null reference. Kotlin's null safety system is designed to prevent this, but it can still happen with nullable types, platform types from Java interop, or force-unwrapping.",
+    causes: [
+      "Calling a method on a nullable variable without null-checking",
+      "Force-unwrapping with `!!` operator on a null value",
+      "Platform types from Java code that Kotlin treats as nullable",
+      "Uninitialized lateinit variable accessed before assignment",
+      "Returning null from a function typed as non-null"
+    ],
+    solutions: [
+      "Use safe call operator: `obj?.method()`",
+      "Use let block: `obj?.let { it.method() }`",
+      "Use Elvis operator for defaults: `obj ?: defaultValue`",
+      "Remove `!!` and handle null explicitly",
+      "Use `lateinit` only when you're sure it will be initialized"
+    ],
+    codeExample: `// ❌ Bad\nval name: String? = null\nprintln(name!!.length) // NullPointerException\n\n// ✅ Good - safe call\nval name: String? = null\nprintln(name?.length) // prints null\n\n// ✅ Good - Elvis operator\nval length = name?.length ?: 0 // prints 0`,
+    relatedErrors: ["kotlin-type-mismatch"]
+  },
+  {
+    id: "kotlin-type-mismatch",
+    errorMessage: "Type mismatch: inferred type is String but Int was expected",
+    language: "Kotlin",
+    category: "TypeMismatch",
+    explanation: "The type you provided doesn't match what was expected. Kotlin is strongly typed, so you can't pass a String where an Int is expected without explicit conversion.",
+    causes: [
+      "Passing wrong type to a function parameter",
+      "Assigning a value of wrong type to a variable",
+      "Implicit conversion not supported (Kotlin doesn't do this)",
+      "Null value passed to non-null parameter",
+      "Platform type ambiguity from Java interop"
+    ],
+    solutions: [
+      "Use explicit conversion: `str.toInt()`, `num.toString()`",
+      "Check the function signature for expected types",
+      "Use nullable types if null is a valid value",
+      "Add null checks before passing values"
+    ],
+    codeExample: `// ❌ Bad\nval num: Int = "42" // Type mismatch\n\n// ✅ Good\nval num: Int = "42".toInt()\n\n// ✅ Good - safe conversion\nval num: Int? = "abc".toIntOrNull() // null`,
+    relatedErrors: ["kotlin-null-pointer"]
+  },
+  {
+    id: "kotlin-unresolved-reference",
+    errorMessage: "Unresolved reference: foo",
+    language: "Kotlin",
+    category: "CompileError",
+    explanation: "The compiler can't find the variable, function, class, or property you're referencing. This is Kotlin's equivalent of 'Cannot find symbol'.",
+    causes: [
+      "Typo in the name of a variable or function",
+      "Missing import statement",
+      "The symbol is defined in a different module that isn't imported",
+      "Accessing a private member from outside its scope",
+      "Using a platform type that hasn't been imported from Java"
+    ],
+    solutions: [
+      "Check for typos in the name",
+      "Add the missing import: `import com.example.Foo`",
+      "Ensure the module/dependency is included in build.gradle",
+      "Check visibility modifiers (public, internal, private)",
+      "Use IDE auto-import feature"
+    ],
+    relatedErrors: ["kotlin-null-pointer"]
+  },
 ];

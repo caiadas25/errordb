@@ -2,31 +2,46 @@
 
 Searchable database of programming error messages. Plain-English explanations, common causes, and working fixes.
 
+## Sprint B — June 26, 2026 (Growth Sprint)
+
+### What was done
+- Added 3 Kotlin errors (first Kotlin entries — 0 existed before):
+  - `kotlin-null-pointer` — "Attempt to invoke virtual method on a null object reference"
+  - `kotlin-type-mismatch` — "Type mismatch: inferred type is String but Int was expected"
+  - `kotlin-unresolved-reference` — "Unresolved reference: foo"
+- Updated layout metadata to include Kotlin in the description
+- Total: 99+ error pages across 16 languages
+
+### Keywords targeted
+- "kotlin null pointer exception fix" (new error page)
+- "kotlin type mismatch error" (new error page)
+- "kotlin unresolved reference" (new error page)
+- "programming error messages explained" (site-level)
+
+### Pages added/optimized
+- UPDATED: 3 new error pages (Kotlin)
+- UPDATED: Layout metadata (added Kotlin to description)
+
+### Current stats
+- **Total errors:** 99+ (was 96+)
+- **Kotlin errors:** 3 (was 0)
+- **Languages covered:** 16 (was 15)
+- **JSON-LD:** Article + FAQ + Breadcrumb schemas on all error pages
+
+### Next steps
+- Add Swift errors (mobile development)
+- Add Rust errors (systems programming)
+- Write blog post: "Top 10 React Errors and How to Fix Them"
+
+---
+
 ## Sprint A — June 26, 2026
 
 ### What was done
-- Added 5 high-search TypeScript errors:
-  - `ts-property-does-not-exist` — "Property 'foo' does not exist on type 'Bar'"
-  - `ts-cannot-find-module` — "Cannot find module 'foo' or its corresponding type declarations"
-  - `ts-object-possibly-undefined` — "Object is possibly 'undefined'"
-  - `ts-expected-n-args` — "Expected X arguments, but got Y"
-  - `ts-implicitly-any` — "Parameter 'x' implicitly has an 'any' type"
-
-### Keywords targeted
-- "Property does not exist on type" (TypeScript)
-- "Cannot find module" (TypeScript)
-- "Object is possibly undefined" (TypeScript)
-- "Expected arguments but got" (TypeScript)
-- "implicitly has an any type" (TypeScript)
+- Added 5 high-search TypeScript errors
+- Total: 96+ error pages
 
 ### Current stats
-- **Total errors:** 96+ (was 91)
-- **TypeScript errors:** 6 (was 1)
+- **Total errors:** 96+
+- **TypeScript errors:** 6
 - **Languages covered:** 15
-- **JSON-LD:** Article schema on all error pages (pre-existing)
-
-### Next steps
-- Add Kotlin errors (0 currently — high-demand language)
-- Add Swift errors (mobile development)
-- Write blog post: "Top 10 React Errors and How to Fix Them"
-- Add FAQ schema to error pages for rich snippets
