@@ -2,6 +2,20 @@
 
 Searchable database of programming error messages. Plain-English explanations, common causes, and working fixes.
 
+## Sprint II — June 26, 2026 (Growth Sprint — Quick Win)
+
+### What was done
+- Added 3 Dart/Flutter error entries (high-growth mobile framework):
+  - `dart-type-cast-error` — "type X is not a subtype of type Y in type cast"
+  - `dart-null-check` — "Null check operator used on a null value"
+  - `dart-index-out-of-range` — "RangeError (index): Invalid value"
+- Total: 130+ errors across 20 languages
+
+### Keywords targeted
+- "dart type cast error" (new error page)
+- "flutter null check operator used on a null value" (new error page)
+- "dart rangeerror invalid value" (new error page)
+
 ## Sprint I — June 26, 2026 (Growth Sprint — Quick Win)
 
 ### What was done
