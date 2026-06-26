@@ -2495,4 +2495,70 @@ func greet() string {
     codeExample: `// ❌ Bad — loads entire file into memory\n$content = file_get_contents('huge_file.csv');\n\n// ✅ Good — process line by line\n$handle = fopen('huge_file.csv', 'r');\nwhile (($line = fgetcsv($handle)) !== false) {\n  processLine($line);\n}\nfclose($handle);`,
     relatedErrors: ["php-undefined-variable"]
   },
+  // === C# ===
+  {
+    id: "csharp-nullreference",
+    errorMessage: "System.NullReferenceException: Object reference not set to an instance of an object.",
+    language: "C#",
+    category: "NullReferenceException",
+    explanation: "You're trying to use an object that is null. This is the most common C# exception and usually means an object wasn't initialized, a method returned null, or a cast failed.",
+    causes: [
+      "Using a variable before assigning a value (default is null for reference types)",
+      "A method returned null but you didn't check for it",
+      "Casting a null object to a specific type",
+      "Accessing a property on a null collection element",
+      "Entity Framework navigation property not loaded"
+    ],
+    solutions: [
+      "Use null-conditional operator: `obj?.Property`",
+      "Use null-coalescing operator: `value ?? defaultValue`",
+      "Initialize objects at declaration: `var list = new List<string>();`",
+      "Check for null before use: `if (obj != null)`",
+      "Enable nullable reference types in .csproj: `<Nullable>enable</Nullable>`"
+    ],
+    codeExample: `// ❌ Bad\nstring name = null;\nConsole.WriteLine(name.Length);  // NullReferenceException\n\n// ✅ Good — null check\nstring name = GetName();\nif (name != null) {\n    Console.WriteLine(name.Length);\n}\n\n// ✅ Better — null-conditional\nConsole.WriteLine(name?.Length ?? 0);\n\n// ✅ Best — enable nullable reference types\nstring name = GetName() ?? "Unknown";`,
+    relatedErrors: ["csharp-index-out-of-range"]
+  },
+  {
+    id: "csharp-index-out-of-range",
+    errorMessage: "System.IndexOutOfRangeException: Index was outside the bounds of the array.",
+    language: "C#",
+    category: "IndexOutOfRangeException",
+    explanation: "You're trying to access an array element at an index that doesn't exist. Arrays are zero-indexed, so the last valid index is Length - 1.",
+    causes: [
+      "Off-by-one error: using `arr.Length` as an index instead of `arr.Length - 1`",
+      "Loop condition uses `<=` instead of `<`",
+      "Empty array with no elements",
+      "Collection modified during iteration"
+    ],
+    solutions: [
+      "Always check array length before accessing by index",
+      "Use `for (int i = 0; i < arr.Length; i++)` (not `<=`)",
+      "Use LINQ methods like `.FirstOrDefault()` instead of indexing",
+      "Use `List<T>` instead of arrays when size is dynamic"
+    ],
+    codeExample: `// ❌ Bad\nint[] arr = { 1, 2, 3 };\nConsole.WriteLine(arr[3]);  // IndexOutOfRangeException!\n\n// ✅ Good\nint[] arr = { 1, 2, 3 };\nif (arr.Length > 3) {\n    Console.WriteLine(arr[3]);\n}\n\n// ✅ Better — use LINQ\nvar arr = new[] { 1, 2, 3 };\nint? third = arr.ElementAtOrDefault(3);  // returns null\nConsole.WriteLine(third ?? 0);`,
+    relatedErrors: ["csharp-nullreference"]
+  },
+  {
+    id: "csharp-task-cancelled",
+    errorMessage: "System.Threading.Tasks.TaskCanceledException: A task was canceled.",
+    language: "C#",
+    category: "TaskCanceledException",
+    explanation: "An async task was canceled via a CancellationToken, or it timed out. This is common in HTTP calls and database queries with timeouts.",
+    causes: [
+      "CancellationToken was triggered before the task completed",
+      "HttpClient timeout expired (default is 100 seconds)",
+      "Database query timeout exceeded",
+      "Task.Wait() or Task.Result called on a canceled task"
+    ],
+    solutions: [
+      "Check if the task was canceled before accessing results",
+      "Increase HttpClient timeout: `client.Timeout = TimeSpan.FromMinutes(5)`",
+      "Handle OperationCanceledException in try-catch blocks",
+      "Don't call .Result on tasks — use await instead"
+    ],
+    codeExample: `// ❌ Bad\nvar response = await client.GetAsync(url);  // May throw if canceled\n\n// ✅ Good\ntry {\n    var response = await client.GetAsync(url, cancellationToken);\n    response.EnsureSuccessStatusCode();\n} catch (OperationCanceledException) {\n    Console.WriteLine("Request was canceled or timed out");\n}\n\n// ✅ Better — configure timeout\nclient.Timeout = TimeSpan.FromSeconds(30);`,
+    relatedErrors: ["csharp-nullreference"]
+  },
 ];
