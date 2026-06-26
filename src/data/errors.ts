@@ -2108,4 +2108,110 @@ export const errors: ErrorEntry[] = [
     ],
     relatedErrors: ["kotlin-unresolved-reference"]
   },
+  // === Go ===
+  {
+    id: "go-nil-pointer-dereference",
+    errorMessage: "runtime error: invalid memory address or nil pointer dereference",
+    language: "Go",
+    category: "RuntimeError",
+    explanation: "You're trying to use a pointer that points to nil. This happens when you dereference a pointer before it's been assigned a value.",
+    causes: [
+      "Dereferencing a pointer that was never initialized",
+      "Using a nil interface value",
+      "Calling a method on a nil pointer",
+      "Uninitialized struct pointer",
+      "Failed error check (ignoring nil return)"
+    ],
+    solutions: [
+      "Always check if a pointer is nil before dereferencing: `if ptr != nil { ... }`",
+      "Use the address-of operator to initialize: `ptr = &value`",
+      "Use error returns: always check errors from functions that return pointers",
+      "Use the `new()` function to allocate zero-valued storage",
+      "Initialize struct pointers with `&StructName{}`"
+    ],
+    codeExample: `// ❌ Bad
+var user *User
+fmt.Println(user.Name) // panic: nil pointer dereference
+
+// ✅ Good
+var user *User
+if user != nil {
+    fmt.Println(user.Name)
+}
+
+// ✅ Good - initialize the pointer
+user = &User{Name: "Alice"}
+fmt.Println(user.Name)`,
+    relatedErrors: ["js-cannot-read-properties-of-undefined", "swift-implicitly-unwrapped-optional"]
+  },
+  {
+    id: "go-concurrent-map-write",
+    errorMessage: "fatal error: concurrent map writes",
+    language: "Go",
+    category: "RuntimeError",
+    explanation: "Multiple goroutines are writing to the same map simultaneously. Go maps are not safe for concurrent use.",
+    causes: [
+      "Multiple goroutines writing to the same map without synchronization",
+      "Missing mutex protection on shared map",
+      "Using map as a channel-like communication mechanism",
+      "Racing conditions in concurrent code"
+    ],
+    solutions: [
+      "Use `sync.Mutex` to protect map access",
+      "Use `sync.Map` for concurrent-safe maps",
+      "Use channels instead of shared maps for goroutine communication",
+      "Use `sync.RWMutex` for read-heavy workloads"
+    ],
+    codeExample: `// ❌ Bad - will crash under concurrent writes
+m := make(map[string]int)
+go func() { m["a"] = 1 }()
+go func() { m["b"] = 2 }()
+
+// ✅ Good - use a mutex
+var mu sync.Mutex
+m := make(map[string]int)
+go func() {
+    mu.Lock()
+    m["a"] = 1
+    mu.Unlock()
+}()
+
+// ✅ Good - use sync.Map
+var m sync.Map
+m.Store("a", 1)`,
+    relatedErrors: ["js-cannot-set-properties-of-undefined"]
+  },
+  {
+    id: "go-unreachable-code",
+    errorMessage: "unreachable code",
+    language: "Go",
+    category: "CompileError",
+    explanation: "The Go compiler detected code that can never be executed. This typically happens after a return statement, break, continue, or in an infinite loop.",
+    causes: [
+      "Statements after a return, break, or continue",
+      "Code in a branch that's always false",
+      "Code after an infinite for loop",
+      "Unreachable error handling after a panic"
+    ],
+    solutions: [
+      "Remove the unreachable code",
+      "Check if the logic before it is correct",
+      "If the code should be reachable, restructure the control flow",
+      "Use the `go vet` tool to catch these issues"
+    ],
+    codeExample: `// ❌ Bad
+func greet() string {
+    return "hello"
+    fmt.Println("this never runs") // unreachable
+}
+
+// ✅ Good
+func greet() string {
+    if false {
+        fmt.Println("never runs")
+    }
+    return "hello"
+}`,
+    relatedErrors: ["kotlin-unresolved-reference"]
+  },
 ];
