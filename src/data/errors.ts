@@ -2561,4 +2561,68 @@ func greet() string {
     codeExample: `// ❌ Bad\nvar response = await client.GetAsync(url);  // May throw if canceled\n\n// ✅ Good\ntry {\n    var response = await client.GetAsync(url, cancellationToken);\n    response.EnsureSuccessStatusCode();\n} catch (OperationCanceledException) {\n    Console.WriteLine("Request was canceled or timed out");\n}\n\n// ✅ Better — configure timeout\nclient.Timeout = TimeSpan.FromSeconds(30);`,
     relatedErrors: ["csharp-nullreference"]
   },
+  // === Rust (additional) ===
+  {
+    id: "rust-lifetime-mismatch",
+    errorMessage: "error[E0621]: explicit lifetime required in the type of `data`",
+    language: "Rust",
+    category: "Lifetime",
+    explanation: "A reference doesn't live long enough for the function signature. Rust requires references to outlive the data they point to, and this error means the borrow checker can't verify that.",
+    causes: [
+      "Returning a reference to a local variable",
+      "Storing a reference in a struct without a lifetime annotation",
+      "Passing short-lived references where long-lived ones are expected",
+      "Forgetting lifetime annotations on struct definitions"
+    ],
+    solutions: [
+      "Add explicit lifetime annotations: `fn foo<'a>(x: &'a str) -> &'a str`",
+      "Use owned types (String, Vec) instead of references",
+      "Clone the data to extend its lifetime",
+      "Restructure to avoid holding references across scopes"
+    ],
+    codeExample: `// ❌ Bad\nstruct Parser<'a> {\n    input: &'a str,\n}\n\nfn parse() -> Parser {\n    let input = String::from("hello");\n    Parser { input: &input } // Error: input dropped too soon\n}\n\n// ✅ Good\nstruct Parser {\n    input: String, // Own the data\n}\n\nfn parse() -> Parser {\n    let input = String::from("hello");\n    Parser { input } // Works: data is owned`,
+    relatedErrors: ["rust-cannot-move", "rust-borrow-checker"]
+  },
+  {
+    id: "rust-mutability",
+    errorMessage: "error[E0596]: cannot borrow `*vec` as mutable, as it is behind a `&` reference",
+    language: "Rust",
+    category: "BorrowChecker",
+    explanation: "You're trying to mutate a value through an immutable reference. In Rust, you need `&mut` for mutable access, and only one `&mut` reference can exist at a time.",
+    causes: [
+      "Iterating with `for item in &vec` then trying to modify items",
+      "Passing `&vec` to a function that tries to modify it",
+      "Capturing an immutable reference in a closure that needs mutation",
+      "Using `.iter()` instead of `.iter_mut()`"
+    ],
+    solutions: [
+      "Use `&mut` when you need mutation: `for item in &mut vec`",
+      "Use `.iter_mut()` instead of `.iter()`",
+      "Pass mutable references: `fn modify(v: &mut Vec<i32>)`",
+      "Clone data if you need both read and write access"
+    ],
+    codeExample: `// ❌ Bad\nlet vec = vec![1, 2, 3];\nfor item in &vec {\n    *item += 1; // Error: cannot borrow as mutable\n}\n\n// ✅ Good\nlet mut vec = vec![1, 2, 3];\nfor item in &mut vec {\n    *item += 1; // Works: mutable reference`,
+    relatedErrors: ["rust-borrow-checker", "rust-cannot-move"]
+  },
+  {
+    id: "rust-unwrap-none",
+    errorMessage: "called `Option::unwrap()` on a `None` value",
+    language: "Rust",
+    category: "Panic",
+    explanation: "You called `.unwrap()` on an Option that was None. This causes a panic and crashes your program. `.unwrap()` is fine in tests and prototypes but dangerous in production code.",
+    causes: [
+      "Using `.unwrap()` on a function that returns None",
+      "Not checking for None before unwrapping",
+      "Parsing user input without validation",
+      "Accessing a HashMap key that doesn't exist"
+    ],
+    solutions: [
+      "Use `.unwrap_or(default)` or `.unwrap_or_else(|| ...)` for fallback values",
+      "Use `match` or `if let` to handle None explicitly",
+      "Use the `?` operator to propagate errors",
+      "Use `.expect(\"descriptive message\")` at minimum for better error messages"
+    ],
+    codeExample: `// ❌ Bad — panics if value is None\nlet name = config.get("name").unwrap();\n\n// ✅ Good — handle None explicitly\nmatch config.get("name") {\n    Some(name) => println!(\"Name: {}\", name),\n    None => println!(\"Name not found\"),\n}\n\n// ✅ Good — use a default\nlet name = config.get("name").unwrap_or(&"Anonymous".to_string());`,
+    relatedErrors: ["rust-cannot-move", "rust-expected-function"]
+  },
 ];

@@ -2,6 +2,19 @@
 
 Searchable database of programming error messages. Plain-English explanations, common causes, and working fixes.
 
+## Sprint H — June 26, 2026 (Growth Sprint — Quick Win)
+
+### What was done
+- Added 3 Rust error entries (high-growth language):
+  - `rust-lifetime-mismatch` — "explicit lifetime required" (E0621)
+  - `rust-mutability` — "cannot borrow as mutable" (E0596)
+  - `rust-unwrap-none` — "called unwrap() on None" (panic)
+- All include causes, solutions, code examples, cross-links
+
+### Current stats
+- **Total errors:** 122+ (was 119)
+- **Languages covered:** 19 (same)
+
 ## Sprint B — June 27, 2026 (Growth Sprint — Quick Wins)
 
 ### What was done
