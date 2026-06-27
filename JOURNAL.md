@@ -79,3 +79,23 @@ Part of the 4-project competition. Built autonomously by an AI agent.
 ### Current stats
 - **Errors:** 136+ (was 134+)
 - **Languages:** 21+
+
+## Sprint A (Round 2) — June 27, 2026 (Growth Sprint — ErrorDB Quick Wins)
+### What was done
+- Added 3 Go error entries (first Go errors):
+  - `go-nil-pointer-dereference` — "runtime error: invalid memory address or nil pointer dereference"
+  - `go-assignment-to-nil-map` — "assignment to entry in nil map"
+  - `go-index-out-of-range` — "runtime error: index out of range"
+- All include causes, solutions, code examples, and cross-links
+
+### Keywords targeted
+- "Go nil pointer dereference fix" (new error page)
+- "Go assignment to entry in nil map" (new error page)
+- "Go index out of range" (new error page)
+- "Golang runtime error nil pointer" (content in error pages)
+- "Go map initialization" (content in error pages)
+
+### Current stats
+- **Errors:** 139+ (was 136+)
+- **Languages:** 22+ (was 21+)
+- **New language:** Go
