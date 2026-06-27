@@ -3118,4 +3118,69 @@ func greet() string {
     codeExample: "# Install first: pip install requests\nimport requests\nresponse = requests.get('https://example.com')\n\n# Good — use try/except for optional deps\ntry:\n    import pandas as pd\nexcept ImportError:\n    print('pandas not installed. Run: pip install pandas')",
     relatedErrors: ["python-nameerror", "python-syntaxerror"]
   },
+  // === Java ===
+  {
+    id: "java-nullpointer",
+    errorMessage: "java.lang.NullPointerException",
+    language: "Java",
+    category: "NullPointerException",
+    explanation: "You're calling a method or accessing a field on a variable that is null. This is the most common runtime exception in Java and can happen anywhere a reference hasn't been initialized or was explicitly set to null.",
+    causes: [
+      "Calling a method on a null reference",
+      "Accessing an array element that hasn't been assigned",
+      "Unboxing a null wrapper type (Integer, Boolean, etc.)",
+      "Not initializing fields before use",
+      "A method returning null when you expect a value"
+    ],
+    solutions: [
+      "Add null checks: if (obj != null) before using",
+      "Use Optional<T> to handle potentially absent values",
+      "Use Objects.requireNonNull() for early null detection",
+      "Initialize collections and fields in constructors"
+    ],
+    codeExample: "// Bad — will throw NullPointerException\nString name = null;\nSystem.out.println(name.length());\n\n// Good — null check\nif (name != null) {\n    System.out.println(name.length());\n}\n\n// Good — use Objects.requireNonNull\nObjects.requireNonNull(name, \"name must not be null\");\n\n// Good — use Optional\nOptional.ofNullable(name)\n    .ifPresent(n -> System.out.println(n.length()));",
+    relatedErrors: ["java-classcastexception", "java-indexoutofboundsexception"]
+  },
+  {
+    id: "java-indexoutofboundsexception",
+    errorMessage: "java.lang.IndexOutOfBoundsException",
+    language: "Java",
+    category: "IndexOutOfBoundsException",
+    explanation: "You're trying to access an index in an array, ArrayList, or String that doesn't exist. Valid indices range from 0 to size()-1.",
+    causes: [
+      "Using an index equal to or greater than the collection size",
+      "Off-by-one error in loop conditions",
+      "Forgetting that array indices start at 0",
+      "Concurrent modification changing the size during iteration"
+    ],
+    solutions: [
+      "Check bounds before accessing: if (index < list.size())",
+      "Use enhanced for-loops (for-each) to avoid manual index management",
+      "Use list.size() - 1 for the last element instead of hardcoding",
+      "Use ConcurrentModificationException-safe iterators"
+    ],
+    codeExample: "// Bad — off by one\nList<String> items = List.of(\"a\", \"b\", \"c\");\nString item = items.get(3); // IndexOutOfBoundsException\n\n// Good — check bounds\nif (index >= 0 && index < items.size()) {\n    String item = items.get(index);\n}\n\n// Good — use for-each\nfor (String item : items) {\n    System.out.println(item);\n}",
+    relatedErrors: ["java-arraystoreexception", "java-nullpointer"]
+  },
+  {
+    id: "java-classcastexception",
+    errorMessage: "java.lang.ClassCastException",
+    language: "Java",
+    category: "ClassCastException",
+    explanation: "You're trying to cast an object to a type that it is not. This typically happens with generic collections, inheritance hierarchies, or when deserializing data.",
+    causes: [
+      "Casting an object to an incompatible type",
+      "Raw generic types losing type safety at runtime",
+      "Classloader issues where the same class is loaded by different loaders",
+      "Incorrect assumption about what a collection contains"
+    ],
+    solutions: [
+      "Use instanceof before casting: if (obj instanceof String)",
+      "Use generics properly to get compile-time type checking",
+      "Use pattern matching for instanceof (Java 16+): if (obj instanceof String s)",
+      "Verify your assumptions about data types at runtime boundaries"
+    ],
+    codeExample: "// Bad — unsafe cast\nObject obj = Integer.valueOf(42);\nString str = (String) obj; // ClassCastException\n\n// Good — check type first\nif (obj instanceof String str) {\n    System.out.println(str.length());\n}\n\n// Good — use generics\nList<String> names = new ArrayList<>();\nnames.add(\"Alice\");\n// Compiler prevents adding non-String objects",
+    relatedErrors: ["java-nullpointer", "java-nosuchmethoderror"]
+  },
 ];
