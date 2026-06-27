@@ -2044,6 +2044,70 @@ export const errors: ErrorEntry[] = [
     codeExample: `// ❌ Bad - noImplicitAny: true\ngreet(name) {  // Parameter 'name' implicitly has an 'any' type\n  return \`Hello, \${name}\`;\n}\n\n// ✅ Good - explicit type\ngreet(name: string): string {\n  return \`Hello, \${name}\`;\n}\n\n// ✅ Good - typed callback\nusers.map((user: { name: string; age: number }) => user.name);`,
     relatedErrors: ["ts-type-not-assignable", "ts-property-does-not-exist"]
   },
+  {
+    id: "ts-no-overload-matches",
+    errorMessage: "No overload matches this call",
+    language: "TypeScript",
+    category: "TypeError",
+    explanation: "None of the function overload signatures match the arguments you passed. This often happens with generic functions, event handlers, or callback APIs where the expected type is more specific than what you're providing.",
+    causes: [
+      "Passing wrong argument types to an overloaded function",
+      "Incorrect generic type inference",
+      "Callback parameter types don't match the expected signature",
+      "Using spread operator with wrong element types",
+      "Missing required properties in an object literal"
+    ],
+    solutions: [
+      "Check the function's overload signatures and match argument types",
+      "Provide explicit generic type parameters: `fn<Type>(args)`",
+      "Cast arguments to the expected type: `fn(arg as ExpectedType)`",
+      "Check that object literals have all required properties"
+    ],
+    codeExample: `// ❌ Bad\nfunction process(data: string[]): void;\nfunction process(data: Record<string, string>): void;\nprocess([1, 2, 3]); // No overload matches — number[] isn't string[]\n\n// ✅ Good — match an overload signature\nprocess(["a", "b", "c"]);`,
+    relatedErrors: ["ts-type-not-assignable", "ts-expected-n-args"]
+  },
+  {
+    id: "ts-index-signature",
+    errorMessage: "Element implicitly has an 'any' type because expression of type 'string' can't be used to index",
+    language: "TypeScript",
+    category: "TypeError",
+    explanation: "You're trying to access an object property using a dynamic key, but the object's type doesn't have an index signature that allows string indexing. TypeScript doesn't know what type the result would be.",
+    causes: [
+      "Using a variable as an object key without an index signature",
+      "Accessing a property that doesn't exist on the type",
+      "Using bracket notation with a non-literal string",
+      "Map-like objects typed as specific interfaces"
+    ],
+    solutions: [
+      "Add an index signature: `[key: string]: unknown`",
+      "Use `Record<string, ValueType>` instead of a plain interface",
+      "Use `hasOwnProperty` check before access",
+      "Use optional chaining with type assertion"
+    ],
+    codeExample: `// ❌ Bad\ninterface Config {\n  host: string;\n  port: number;\n}\nconst key = "host";\nconsole.log(config[key]); // implicit any\n\n// ✅ Good — use Record type\nconst config: Record<string, string | number> = { host: "localhost", port: 5432 };\nconsole.log(config[key]); // OK`,
+    relatedErrors: ["ts-property-does-not-exist", "ts-implicitly-any"]
+  },
+  {
+    id: "ts-cannot-invoke",
+    errorMessage: "Cannot invoke an object which is possibly 'undefined'",
+    language: "TypeScript",
+    category: "TypeError",
+    explanation: "You're trying to call a function that might be undefined. This commonly happens with optional methods, callback parameters, or values from lookups that may not find a match.",
+    causes: [
+      "Calling a function stored in a variable that might be undefined",
+      "Invoking a method that's marked as optional",
+      "Using a callback parameter without null-checking first",
+      "Function looked up from a Map or Record without guard"
+    ],
+    solutions: [
+      "Add a null check before invoking: `if (fn) fn()`",
+      "Use optional chaining: `fn?.()`",
+      "Provide a default: `(fn ?? defaultFn)()`",
+      "Use the non-null assertion only when you're certain: `fn!()`"
+    ],
+    codeExample: `// ❌ Bad\nfunction callHandler(handler?: Function) {\n  handler(); // Cannot invoke which is possibly undefined\n}\n\n// ✅ Good — guard the call\nfunction callHandler(handler?: Function) {\n  if (handler) handler();\n}\n\n// ✅ Good — optional chaining\nfunction callHandler(handler?: Function) {\n  handler?.();\n}`,
+    relatedErrors: ["ts-object-possibly-undefined", "js-cannot-read-properties-of-undefined"]
+  },
   // === Kotlin ===
   {
     id: "kotlin-null-pointer",

@@ -2,6 +2,24 @@
 
 Searchable database of programming error messages. Plain-English explanations, common causes, and working fixes.
 
+## Sprint A (Round 5) — June 27, 2026 (Growth Sprint — ErrorDB Quick Wins)
+
+### What was done
+- Added 3 TypeScript error entries (common TS errors developers search for):
+  - `ts-no-overload-matches` — "No overload matches this call" with overload signature solutions
+  - `ts-index-signature` — "Element implicitly has an 'any' type because expression of type 'string' can't be used to index" with Record type fix
+  - `ts-cannot-invoke` — "Cannot invoke an object which is possibly 'undefined'" with optional chaining fix
+- All include causes, solutions, code examples, and cross-links
+
+### Keywords targeted
+- "No overload matches this call TypeScript" (new error page)
+- "TypeScript index signature error" (new error page)
+- "Cannot invoke object possibly undefined TypeScript" (new error page)
+
+### Current stats
+- **Errors:** 151+ (was 148+)
+- **Languages covered:** 23+ (was 23+)
+
 ## Sprint C (Round 4) — June 27, 2026 (Growth Sprint — ErrorDB Quick Wins)
 
 ### What was done
