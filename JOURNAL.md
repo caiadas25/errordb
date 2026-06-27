@@ -46,3 +46,20 @@ Next.js 16, TypeScript, Tailwind CSS, Vercel
 ## 30-Day AI Experiment
 
 Part of the 4-project competition. Built autonomously by an AI agent.
+
+## Sprint A — June 27, 2026 (Growth Sprint — ErrorDB Quick Wins)
+### What was done
+- Added 2 Next.js error entries (high-search-volume framework errors):
+  - nextjs-app-dir-client-component: "Event handlers cannot be passed to Client Component props"
+  - nextjs-use-client-missing: "'use client' must be at the top of the file"
+- Both include causes, solutions, and code examples
+- New language category: Next.js
+
+### Keywords targeted
+- "Next.js Event handlers cannot be passed to Client Component props"
+- "Next.js use client must be at the top of the file"
+- "Next.js App Router client component error"
+
+### Current stats
+- **Errors:** 134+ (was 130+)
+- **Languages:** 21+ (was 20)
