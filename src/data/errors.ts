@@ -2988,4 +2988,67 @@ func greet() string {
     codeExample: "// ❌ Bad\nnums := []int{1, 2, 3}\nfmt.Println(nums[5]) // panic!\n\n// ✅ Good\nnums := []int{1, 2, 3}\nif len(nums) > 5 {\n  fmt.Println(nums[5])\n}\n\n// ✅ Good\nfor i, v := range nums {\n  fmt.Println(i, v)\n}",
     relatedErrors: ["go-nil-pointer-dereference", "go-assignment-to-nil-map"]
   },
+  {
+    id: "rust-type-mismatch",
+    errorMessage: "expected `&str`, found `&String`",
+    language: "Rust",
+    category: "TypeError",
+    explanation: "You're passing a value of one type where a different type is expected. This is common when converting between Rust's string types or numeric types.",
+    causes: [
+      "Passing &String where &str is expected (missing auto-deref)",
+      "Passing i64 where i32 is expected without casting",
+      "Returning a different type than the function signature declares",
+      "Mismatched generic type parameters"
+    ],
+    solutions: [
+      "Use .as_str() or &* to convert &String to &str",
+      "Use .to_string() or .to_owned() to convert &str to String",
+      "Cast numeric types: x as i32 or i32::from(x)",
+      "Use turbofish syntax to specify types: parse::<i32>()"
+    ],
+    codeExample: "// ❌ Bad\nfn greet(name: &str) { println!(\"Hello, {}\", name);\n}\ngreet(&String::from(\"World\")); // works but &String where &str expected\n\n// ✅ Good\nlet s = String::from(\"World\");\ngreet(&s); // Rust auto-derefs &String to &str\n\n// ✅ Good\nlet s: &str = \"World\";\ngreet(s);",
+    relatedErrors: ["rust-borrow-checker", "rust-cannot-move"]
+  },
+  {
+    id: "rust-missing-match-arm",
+    errorMessage: "non-exhaustive patterns: ... not covered",
+    language: "Rust",
+    category: "Compile Error",
+    explanation: "A match expression doesn't handle all possible values. Rust requires exhaustive pattern matching to prevent runtime surprises.",
+    causes: [
+      "A new enum variant was added without updating all match expressions",
+      "Forgot to add a catch-all _ pattern",
+      "Matching on Option without handling None",
+      "Matching on a bool without handling both true and false"
+    ],
+    solutions: [
+      "Add a catch-all arm: _ => { ... }",
+      "Handle every enum variant explicitly",
+      "Use if let for simple single-arm patterns",
+      "Use matches! macro for boolean checks"
+    ],
+    codeExample: "// ❌ Bad\nmatch direction {\n  Direction::North => go_north(),\n  Direction::South => go_south(),\n}\n\n// ✅ Good\nmatch direction {\n  Direction::North => go_north(),\n  Direction::South => go_south(),\n  Direction::East => go_east(),\n  Direction::West => go_west(),\n}\n\n// ✅ Good — catch-all\nmatch direction {\n  Direction::North => go_north(),\n  Direction::South => go_south(),\n  _ => {},\n}",
+    relatedErrors: ["rust-cannot-move", "rust-mutability"]
+  },
+  {
+    id: "rust-overflow",
+    errorMessage: "attempt to add with overflow",
+    language: "Rust",
+    category: "ArithmeticError",
+    explanation: "In debug mode, Rust panics on integer overflow. In release mode, it wraps around silently, which can cause subtle bugs.",
+    causes: [
+      "Adding two numbers that exceed the type's maximum value",
+      "Using unchecked arithmetic in debug builds",
+      "Not using saturating or wrapping arithmetic methods",
+      "Converting between numeric types incorrectly"
+    ],
+    solutions: [
+      "Use .checked_add() to handle overflow safely",
+      "Use .saturating_add() to cap at min/max values",
+      "Use .wrapping_add() for intentional overflow behavior",
+      "Use .overflowing_add() to get both result and overflow flag"
+    ],
+    codeExample: "// ❌ Bad — panics in debug mode\nlet x: u8 = 255;\nlet y = x + 1; // panic!\n\n// ✅ Good — checked arithmetic\nlet x: u8 = 255;\nmatch x.checked_add(1) {\n  Some(result) => println!(\"{}\", result),\n  None => println!(\"overflow!\"),\n}\n\n// ✅ Good — saturating arithmetic\nlet x: u8 = 255;\nlet y = x.saturating_add(1); // y = 255\n\n// ✅ Good — wrapping arithmetic\nlet x: u8 = 255;\nlet y = x.wrapping_add(1); // y = 0",
+    relatedErrors: ["rust-unwrap-none", "rust-type-mismatch"]
+  },
 ];

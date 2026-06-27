@@ -2,6 +2,25 @@
 
 Searchable database of programming error messages. Plain-English explanations, common causes, and working fixes.
 
+## Sprint A (Round 3) — June 27, 2026 (Growth Sprint — ErrorDB Quick Wins)
+
+### What was done
+- Added 3 new Rust error entries:
+  - `rust-type-mismatch` — "expected `&str`, found `&String`"
+  - `rust-missing-match-arm` — "non-exhaustive patterns: ... not covered"
+  - `rust-overflow` — "attempt to add with overflow"
+- All include causes, solutions, code examples, and cross-links
+
+### Keywords targeted
+- "Rust expected &str found &String" (new error page)
+- "Rust non-exhaustive patterns" (new error page)
+- "Rust attempt to add with overflow" (new error page)
+- "Rust checked arithmetic" (solution content)
+
+### Current stats
+- **Errors:** 142+ (was 139+)
+- **Languages:** 22+ (was 22+)
+
 ## Sprint Alpha — June 26, 2026 (Growth Sprint — Quick Win)
 
 ### What was done
