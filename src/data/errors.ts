@@ -2842,4 +2842,46 @@ func greet() string {
     codeExample: "// Kotlin\\nclass MyFragment {\\n  private lateinit var binding: FragmentBinding\\n\\n  // ❌ Bad — may crash\\n  fun doWork() = binding.root // UninitializedPropertyAccessException\\n\\n  // ✅ Good — check first\\n  fun doWork() {\\n    if (::binding.isInitialized) {\\n      binding.root\\n    }\\n  }\\n}",
     relatedErrors: ["kotlin-null-pointer"]
   },
+  // === Next.js ===
+  {
+    id: "nextjs-app-dir-client-component",
+    errorMessage: "Error: Event handlers cannot be passed to Client Component props.",
+    language: "Next.js",
+    category: "Error",
+    explanation: "You're passing a function (like an event handler) to a Server Component. Server Components cannot accept functions as props because they're serialized — functions can't be serialized.",
+    causes: [
+      "Using 'use server' instead of 'use client' at the top of the file",
+      "Parent component is a Server Component passing functions to a child",
+      "Passing event handlers to a component that isn't marked 'use client'",
+      "Using server-side data fetching functions as callbacks in client components"
+    ],
+    solutions: [
+      "Add 'use client' directive at the top of the child component file",
+      "Restructure to lift the interactive part into a Client Component",
+      "Use Server Actions instead of passing handlers from Server Components",
+      "Wrap interactive portions in a separate 'use client' component"
+    ],
+    codeExample: "// ❌ Bad — page.tsx is a Server Component\nimport { MyButton } from './MyButton'\nexport default function Page() {\n  return <MyButton onClick={() => console.log('clicked')} />\n}\n\n// ✅ Good — make the interactive part a Client Component\n'use client'\nexport function MyButton({ onClick }) {\n  return <button onClick={onClick}>Click me</button>\n}",
+    relatedErrors: ["react-hydration-failed", "react-invalid-hook-call"]
+  },
+  {
+    id: "nextjs-use-client-missing",
+    errorMessage: "Error: 'use client' must be at the top of the file, before any other code.",
+    language: "Next.js",
+    category: "Error",
+    explanation: "The 'use client' directive must appear as the very first statement in the file — before imports, before comments, before any other code.",
+    causes: [
+      "Placing 'use client' after import statements",
+      "Adding a comment or 'use strict' before 'use client'",
+      "Using 'use client' in a separate file instead of at the top of the component file",
+      "Copy-pasting with leading whitespace or BOM characters"
+    ],
+    solutions: [
+      "Place 'use client' as the absolute first line in the file",
+      "Remove any code, comments, or blank lines before 'use client'",
+      "Ensure no BOM characters precede the directive"
+    ],
+    codeExample: "// ❌ Bad\nimport { useState } from 'react'\n'use client'\n\n// ✅ Good\n'use client'\nimport { useState } from 'react'",
+    relatedErrors: ["nextjs-app-dir-client-component"]
+  },
 ];
