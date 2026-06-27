@@ -2927,4 +2927,65 @@ func greet() string {
     codeExample: "// ❌ Bad\nfunction Page() {\n  return <p>Time: {Date.now()}</p>; // Different on server vs client\n}\n\n// ✅ Good\nfunction Page() {\n  const [time, setTime] = useState('');\n  useEffect(() => setTime(String(Date.now())), []);\n  return <p>Time: {time}</p>;\n}",
     relatedErrors: ["react-hydration-failed"]
   },
+  {
+    id: "go-nil-pointer-dereference",
+    errorMessage: "runtime error: invalid memory address or nil pointer dereference",
+    language: "Go",
+    category: "Runtime Error",
+    explanation: "You're trying to use a pointer that points to nil (nothing). This happens when you access a method or field on a nil pointer, or dereference a pointer that was never assigned a value.",
+    causes: [
+      "Forgetting to check if an error was returned before using the result",
+      "Uninitialized pointer variables (var p *T gives nil)",
+      "Map or slice returns nil for missing keys",
+      "Calling methods on a nil interface value"
+    ],
+    solutions: [
+      "Always check if an error is non-nil before using the result",
+      "Use the short variable declaration `:=` with new() or make() to initialize",
+      "Use nil checks: `if p != nil { ... }`",
+      "Use the guard clause pattern: `if err != nil { return err }`"
+    ],
+    codeExample: "// ❌ Bad\nvar user *User\nfmt.Println(user.Name) // panic!\n\n// ✅ Good\nuser := new(User)\nfmt.Println(user.Name)\n\n// ✅ Good\nif user != nil {\n  fmt.Println(user.Name)\n}",
+    relatedErrors: ["go-assignment-to-nil-map", "go-invalid-receiver"]
+  },
+  {
+    id: "go-assignment-to-nil-map",
+    errorMessage: "assignment to entry in nil map",
+    language: "Go",
+    category: "Runtime Error",
+    explanation: "You're trying to assign a value to a map that is nil. In Go, you must initialize a map before writing to it. Reading from a nil map is fine (returns zero value), but writing panics.",
+    causes: [
+      "Declaring a map with `var m map[string]int` instead of `make(map[string]int)`",
+      "Forgetting to initialize a map returned from a function that returned nil",
+      "Using a map variable before it's assigned"
+    ],
+    solutions: [
+      "Use `make()` to initialize: `m := make(map[string]int)`",
+      "Use map literal: `m := map[string]int{}`",
+      "Always check if a returned map is nil before writing to it"
+    ],
+    codeExample: "// ❌ Bad\nvar scores map[string]int\nscores[\"Alice\"] = 100 // panic!\n\n// ✅ Good\nscores := make(map[string]int)\nscores[\"Alice\"] = 100\n\n// ✅ Good\nscores := map[string]int{\"Alice\": 100}",
+    relatedErrors: ["go-nil-pointer-dereference", "go-index-out-of-range"]
+  },
+  {
+    id: "go-index-out-of-range",
+    errorMessage: "runtime error: index out of range",
+    language: "Go",
+    category: "Runtime Error",
+    explanation: "You're trying to access an array, slice, or string at an index that doesn't exist. This is a common panic in Go when iterating or accessing elements.",
+    causes: [
+      "Accessing an index beyond the length of a slice or array",
+      "Off-by-one errors in loop conditions (using <= instead of <)",
+      "Using an index variable that was calculated incorrectly",
+      "Empty slice or array with no length check"
+    ],
+    solutions: [
+      "Always check the length before accessing: `if i < len(s) { ... }`",
+      "Use range-based for loops: `for i, v := range s { ... }`",
+      "Use slices for dynamic data: `s = append(s, value)`",
+      "Add bounds checking in functions that receive slices"
+    ],
+    codeExample: "// ❌ Bad\nnums := []int{1, 2, 3}\nfmt.Println(nums[5]) // panic!\n\n// ✅ Good\nnums := []int{1, 2, 3}\nif len(nums) > 5 {\n  fmt.Println(nums[5])\n}\n\n// ✅ Good\nfor i, v := range nums {\n  fmt.Println(i, v)\n}",
+    relatedErrors: ["go-nil-pointer-dereference", "go-assignment-to-nil-map"]
+  },
 ];
