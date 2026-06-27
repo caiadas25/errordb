@@ -63,3 +63,19 @@ Part of the 4-project competition. Built autonomously by an AI agent.
 ### Current stats
 - **Errors:** 134+ (was 130+)
 - **Languages:** 21+ (was 20)
+
+## Sprint B — June 27, 2026 (Growth Sprint — ErrorDB Quick Wins)
+### What was done
+- Added React useEffect missing dependency warning (most common React Hook warning)
+- Added Next.js hydration mismatch error (most common Next.js error)
+- Both with detailed causes, solutions, and code examples
+
+### Keywords targeted
+- "React Hook useEffect has a missing dependency"
+- "Hydration failed because the initial UI does not match"
+- "Next.js hydration mismatch"
+- "React useEffect dependency array"
+
+### Current stats
+- **Errors:** 136+ (was 134+)
+- **Languages:** 21+
