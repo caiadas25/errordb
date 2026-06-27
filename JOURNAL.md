@@ -2,6 +2,26 @@
 
 Searchable database of programming error messages. Plain-English explanations, common causes, and working fixes.
 
+## Sprint C (Round 4) — June 27, 2026 (Growth Sprint — ErrorDB Quick Wins)
+
+### What was done
+- Added 3 high-volume Java error entries (most common Java exceptions):
+  - `java-nullpointer` — "java.lang.NullPointerException" with Optional and null-check solutions
+  - `java-indexoutofboundsexception` — "java.lang.IndexOutOfBoundsException" with for-each alternatives
+  - `java-classcastexception` — "java.lang.ClassCastException" with instanceof pattern matching
+- All include causes, solutions, code examples, and cross-links
+
+### Keywords targeted
+- "java.lang.NullPointerException fix" (new error page — extremely high search volume)
+- "java IndexOutOfBoundsException" (new error page)
+- "java ClassCastException" (new error page)
+- "java Optional to avoid null pointer" (solution content)
+- "java instanceof pattern matching" (solution content)
+
+### Current stats
+- **Errors:** 148+ (was 145+)
+- **Languages covered:** 23+ (was 23+)
+
 ## Sprint B (Round 4) — June 27, 2026 (Growth Sprint — ErrorDB Quick Wins)
 
 ### What was done
