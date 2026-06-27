@@ -3247,4 +3247,74 @@ func greet() string {
     codeExample: "// Bad — unsafe cast\nObject obj = Integer.valueOf(42);\nString str = (String) obj; // ClassCastException\n\n// Good — check type first\nif (obj instanceof String str) {\n    System.out.println(str.length());\n}\n\n// Good — use generics\nList<String> names = new ArrayList<>();\nnames.add(\"Alice\");\n// Compiler prevents adding non-String objects",
     relatedErrors: ["java-nullpointer", "java-nosuchmethoderror"]
   },
+  // === High-Volume Error Messages ===
+  {
+    id: "js-typeerror-is-not-a-function",
+    errorMessage: "TypeError: x is not a function",
+    language: "JavaScript",
+    category: "TypeError",
+    explanation: "You're trying to call a value that isn't a function. This happens when you call something that's undefined, null, or a non-function value.",
+    causes: [
+      "Calling a variable that isn't a function",
+      "Importing a module incorrectly (default vs named export)",
+      "Calling a method that doesn't exist on an object",
+      "Forgetting to instantiate a class before calling methods",
+      "Using a property name that conflicts with a built-in method"
+    ],
+    solutions: [
+      "Verify the value is actually a function: console.log(typeof x)",
+      "Check your import statements — named vs default exports",
+      "Ensure the object has the method you're calling",
+      "Check for typos in method names",
+      "Use typeof x === 'function' before calling"
+    ],
+    codeExample: `// ❌ Bad\nconst obj = { name: 'Alice' };\nobj.greet(); // TypeError: obj.greet is not a function\n\n// ✅ Good\nconst obj = { greet: () => 'hello' };\nobj.greet(); // 'hello'\n\n// ❌ Bad — wrong import\nimport { MyComponent } from './MyComponent';\n\n// ✅ Good — default export\nimport MyComponent from './MyComponent';`,
+    relatedErrors: ["js-cannot-read-properties-of-undefined", "js-reference-not-defined"]
+  },
+  {
+    id: "ts-type-not-assignable",
+    errorMessage: "Type 'X' is not assignable to type 'Y'",
+    language: "TypeScript",
+    category: "TypeError",
+    explanation: "TypeScript detected a type mismatch between the value you're providing and the expected type. This is one of the most common TypeScript errors.",
+    causes: [
+      "Passing the wrong type to a function parameter",
+      "Assigning a value of the wrong type to a variable",
+      "Returning the wrong type from a function",
+      "Using a string where a number is expected (or vice versa)",
+      "Not using a type assertion when you know the type is correct"
+    ],
+    solutions: [
+      "Check the expected type and ensure the value matches",
+      "Use type assertions: value as string (if you're sure)",
+      "Add type guards: if (typeof value === 'string')",
+      "Update the function signature to accept the correct type",
+      "Use generic types to make functions more flexible"
+    ],
+    codeExample: `// ❌ Bad\nfunction greet(name: string): string {\n  return name.length;\n}\n\n// ✅ Good\nfunction greet(name: string): string {\n  return \`Hello, \${name}\`;\n}\n\n// ❌ Bad\nlet x: number = 'hello';\n\n// ✅ Good\nlet x: string = 'hello';`,
+    relatedErrors: ["ts-object-is-possibly-null", "ts-type-undefined"]
+  },
+  {
+    id: "js-unhandled-promise-rejection",
+    errorMessage: "UnhandledPromiseRejection",
+    language: "JavaScript",
+    category: "Promise",
+    explanation: "A Promise was rejected but there's no error handler to catch it. This can cause your application to crash or behave unexpectedly.",
+    causes: [
+      "Missing .catch() on a Promise chain",
+      "Not using try/catch with async/await",
+      "The Promise's rejection reason is not handled",
+      "Network errors or API failures without error handling",
+      "Multiple async operations where one fails without handling"
+    ],
+    solutions: [
+      "Add .catch() to handle promise rejections",
+      "Use try/catch with async/await",
+      "Add a global unhandledrejection handler",
+      "Handle errors in each async operation",
+      "Use Promise.allSettled() to handle all outcomes"
+    ],
+    codeExample: `// ❌ Bad — no error handling\nfetch('https://api.example.com/data')\n  .then(response => response.json());\n\n// ✅ Good — with error handling\nfetch('https://api.example.com/data')\n  .then(response => response.json())\n  .catch(error => console.error('Failed:', error));\n\n// ✅ Good — async/await\ntry {\n  const response = await fetch('https://api.example.com/data');\n  const data = await response.json();\n} catch (error) {\n  console.error('Failed:', error);\n}`,
+    relatedErrors: ["js-is-not-a-function", "js-reference-not-defined"]
+  },
 ];
