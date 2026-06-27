@@ -3317,4 +3317,68 @@ func greet() string {
     codeExample: `// ❌ Bad — no error handling\nfetch('https://api.example.com/data')\n  .then(response => response.json());\n\n// ✅ Good — with error handling\nfetch('https://api.example.com/data')\n  .then(response => response.json())\n  .catch(error => console.error('Failed:', error));\n\n// ✅ Good — async/await\ntry {\n  const response = await fetch('https://api.example.com/data');\n  const data = await response.json();\n} catch (error) {\n  console.error('Failed:', error);\n}`,
     relatedErrors: ["js-is-not-a-function", "js-reference-not-defined"]
   },
+  // === Additional Python Errors ===
+  {
+    id: "python-keyerror",
+    errorMessage: "KeyError: 'key'",
+    language: "Python",
+    category: "KeyError",
+    explanation: "You're trying to access a dictionary key that doesn't exist. Unlike JavaScript, Python dictionaries don't return undefined for missing keys — they raise a KeyError.",
+    causes: [
+      "Typo in the key name",
+      "Accessing a key that hasn't been added to the dictionary yet",
+      "Using bracket notation instead of .get() for optional keys",
+      "Dictionary structure differs from expected (nested keys missing)"
+    ],
+    solutions: [
+      "Use dict.get(key, default) to provide a fallback: `d.get('name', 'unknown')`",
+      "Check if key exists first: `if 'key' in d:`",
+      "Use try/except KeyError for expected missing keys",
+      "Use collections.defaultdict for automatic default values"
+    ],
+    codeExample: `# Bad\nuser = {"name": "Alice"}\nemail = user["email"]  # KeyError\n\n# Good — use .get()\nemail = user.get("email", "no-email@example.com")\n\n# Good — check first\nif "email" in user:\n    email = user["email"]\n\n# Good — try/except\ntry:\n    email = user["email"]\nexcept KeyError:\n    email = "no-email@example.com"`,
+    relatedErrors: ["python-attributeerror", "python-typeerror-none"]
+  },
+  {
+    id: "python-typeerror-operand",
+    errorMessage: "TypeError: unsupported operand type(s) for +: 'int' and 'str'",
+    language: "Python",
+    category: "TypeError",
+    explanation: "You're trying to use an operator (+, -, *, etc.) with incompatible types. Python won't implicitly convert between types like JavaScript does.",
+    causes: [
+      "Adding a number to a string without explicit conversion",
+      "Mixing types in arithmetic operations",
+      "Forgetting to convert user input (which is always a string)",
+      "Using + with a string and a non-string type"
+    ],
+    solutions: [
+      "Convert types explicitly: `int(str_value)` or `str(int_value)`",
+      "Use f-strings for string interpolation: `f\"Value: {num}\"`",
+      "Validate input types before operations",
+      "Use isinstance() to check types before combining"
+    ],
+    codeExample: `# Bad\nage = input("Enter age: ")  # returns str\nnext_year = age + 1  # TypeError: str + int\n\n# Good\nage = int(input("Enter age: "))\nnext_year = age + 1\n\n# Good — string formatting\nmessage = f"You will be {age + 1} next year"`,
+    relatedErrors: ["python-typeerror-none", "python-keyerror"]
+  },
+  {
+    id: "python-list-index-out-of-range",
+    errorMessage: "IndexError: list index out of range",
+    language: "Python",
+    category: "IndexError",
+    explanation: "You're trying to access a list element at an index that doesn't exist. Python lists are zero-indexed, so the last element is at index len(list) - 1.",
+    causes: [
+      "Accessing an index beyond the list length",
+      "Off-by-one error in loops (using <= instead of <)",
+      "Empty list with no elements",
+      "Assuming a list has more elements than it does"
+    ],
+    solutions: [
+      "Check list length first: `if len(my_list) > index:`",
+      "Use try/except IndexError for expected empty cases",
+      "Use for-each loops instead of index-based loops: `for item in my_list:`",
+      "Use enumerate() when you need both index and value"
+    ],
+    codeExample: `# Bad\nitems = [1, 2, 3]\nprint(items[5])  # IndexError\n\n# Good — check first\nif len(items) > 5:\n    print(items[5])\n\n# Good — use for-each\nfor item in items:\n    print(item)\n\n# Good — use enumerate\nfor i, item in enumerate(items):\n    print(f"{i}: {item}")`,
+    relatedErrors: ["python-keyerror", "python-attributeerror"]
+  },
 ];
