@@ -3051,4 +3051,71 @@ func greet() string {
     codeExample: "// ❌ Bad — panics in debug mode\nlet x: u8 = 255;\nlet y = x + 1; // panic!\n\n// ✅ Good — checked arithmetic\nlet x: u8 = 255;\nmatch x.checked_add(1) {\n  Some(result) => println!(\"{}\", result),\n  None => println!(\"overflow!\"),\n}\n\n// ✅ Good — saturating arithmetic\nlet x: u8 = 255;\nlet y = x.saturating_add(1); // y = 255\n\n// ✅ Good — wrapping arithmetic\nlet x: u8 = 255;\nlet y = x.wrapping_add(1); // y = 0",
     relatedErrors: ["rust-unwrap-none", "rust-type-mismatch"]
   },
+  // === Python ===
+  {
+    id: "python-nameerror",
+    errorMessage: "NameError: name 'x' is not defined",
+    language: "Python",
+    category: "NameError",
+    explanation: "You're trying to use a variable or function name that hasn't been defined in the current scope. Python doesn't have variable hoisting — names must be assigned before use.",
+    causes: [
+      "Using a variable before assigning it",
+      "Typo in variable or function name",
+      "Using a variable defined in a different scope (e.g., inside a function vs. global)",
+      "Forgetting to import a module or function",
+      "Using a keyword as a variable name"
+    ],
+    solutions: [
+      "Check the spelling of the variable name",
+      "Make sure the variable is defined before it's used",
+      "Use 'global' or 'nonlocal' if you need to access outer scope variables",
+      "Import the required module or function before using it"
+    ],
+    codeExample: "# Bad — name not defined\nprint(message)\n\n# Good — define before use\nmessage = \"Hello, World!\"\nprint(message)\n\n# Good — import before use\nfrom math import sqrt\nresult = sqrt(16)",
+    relatedErrors: ["python-typeerror", "python-attributeerror"]
+  },
+  {
+    id: "python-attributeerror",
+    errorMessage: "AttributeError: 'str' object has no attribute 'append'",
+    language: "Python",
+    category: "AttributeError",
+    explanation: "You're trying to call a method or access an attribute that doesn't exist for the given object type. This often happens when you confuse variable types or use the wrong API.",
+    causes: [
+      "Calling a method that doesn't exist for the object's type",
+      "Confusing string methods with list methods (or vice versa)",
+      "Using an attribute from a different version of a library",
+      "Accessing a property on a None value",
+      "Typo in the method or attribute name"
+    ],
+    solutions: [
+      "Check the type of the variable with type() or isinstance()",
+      "Review the documentation for the correct method name",
+      "Use hasattr() to check if an attribute exists before accessing it",
+      "Add None checks before accessing attributes on potentially None values"
+    ],
+    codeExample: "# Bad — strings don't have append\nname = \"hello\"\nname.append(\" world\")\n\n# Good — use string concatenation\nname = \"hello\"\nname = name + \" world\"\n\n# Good — check type first\nmy_list = [1, 2, 3]\nif hasattr(my_list, 'append'):\n    my_list.append(4)",
+    relatedErrors: ["python-nameerror", "python-typeerror"]
+  },
+  {
+    id: "python-importerror",
+    errorMessage: "ModuleNotFoundError: No module named 'requests'",
+    language: "Python",
+    category: "ImportError",
+    explanation: "Python can't find the module you're trying to import. This means the package isn't installed in your current Python environment, or the module name is wrong.",
+    causes: [
+      "The package isn't installed in the current environment",
+      "Using a different Python version than the one where the package is installed",
+      "Typo in the module name",
+      "Circular imports between modules",
+      "Virtual environment isn't activated"
+    ],
+    solutions: [
+      "Install the package: pip install <package-name>",
+      "Make sure you're using the right Python version",
+      "Activate your virtual environment if you're using one",
+      "Check if the package has a different import name"
+    ],
+    codeExample: "# Install first: pip install requests\nimport requests\nresponse = requests.get('https://example.com')\n\n# Good — use try/except for optional deps\ntry:\n    import pandas as pd\nexcept ImportError:\n    print('pandas not installed. Run: pip install pandas')",
+    relatedErrors: ["python-nameerror", "python-syntaxerror"]
+  },
 ];
