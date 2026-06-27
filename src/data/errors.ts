@@ -2884,4 +2884,47 @@ func greet() string {
     codeExample: "// ❌ Bad\nimport { useState } from 'react'\n'use client'\n\n// ✅ Good\n'use client'\nimport { useState } from 'react'",
     relatedErrors: ["nextjs-app-dir-client-component"]
   },
+  {
+    id: "react-useeffect-missing-dependency",
+    errorMessage: "React Hook useEffect has a missing dependency: 'foo'. Either include it or remove the dependency array.",
+    language: "React",
+    category: "Warning",
+    explanation: "React detected that your useEffect callback references a variable that isn't in the dependency array. This means the effect may use stale values when the variable changes.",
+    causes: [
+      "Forgetting to add a variable used inside useEffect to the dependency array",
+      "Intentionally omitting a dependency without understanding the consequences",
+      "Using object or array literals as dependencies (they're recreated each render)"
+    ],
+    solutions: [
+      "Add the missing variable to the dependency array",
+      "If the omission is intentional, use useCallback or useRef to stabilize the reference",
+      "Extract the value with useMemo if it's an expensive computation",
+      "Use the exhaustive-deps ESLint rule to catch this automatically"
+    ],
+    codeExample: "// ❌ Bad\nuseEffect(() => {\n  fetchData(userId);\n}, []); // userId is missing!\n\n// ✅ Good\nuseEffect(() => {\n  fetchData(userId);\n}, [userId]);",
+    relatedErrors: ["react-hooks-deps", "react-max-update-depth"]
+  },
+  {
+    id: "nextjs-hydration-mismatch",
+    errorMessage: "Hydration failed because the initial UI does not match what was rendered on the server.",
+    language: "Next.js",
+    category: "Error",
+    explanation: "The HTML rendered on the server doesn't match what the client-side React expected. This usually happens when the component renders differently on the server vs the client.",
+    causes: [
+      "Using `typeof window !== 'undefined'` checks that change output",
+      "Using `Date.now()` or `Math.random()` in the render output",
+      "Browser extensions injecting elements into the DOM",
+      "Using `useEffect` to modify state that should be in initial render",
+      "Conditional rendering based on browser-only APIs"
+    ],
+    solutions: [
+      "Use `useEffect` or useState to handle browser-only values after mount",
+      "Avoid Date.now() or Math.random() in JSX — move to useState/useEffect",
+      "Disable browser extensions during development",
+      "Use `suppressHydrationWarning` only for benign mismatches (e.g., timestamps)",
+      "Use dynamic import with `ssr: false` for browser-only components"
+    ],
+    codeExample: "// ❌ Bad\nfunction Page() {\n  return <p>Time: {Date.now()}</p>; // Different on server vs client\n}\n\n// ✅ Good\nfunction Page() {\n  const [time, setTime] = useState('');\n  useEffect(() => setTime(String(Date.now())), []);\n  return <p>Time: {time}</p>;\n}",
+    relatedErrors: ["react-hydration-failed"]
+  },
 ];
