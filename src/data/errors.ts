@@ -3381,4 +3381,67 @@ func greet() string {
     codeExample: `# Bad\nitems = [1, 2, 3]\nprint(items[5])  # IndexError\n\n# Good — check first\nif len(items) > 5:\n    print(items[5])\n\n# Good — use for-each\nfor item in items:\n    print(item)\n\n# Good — use enumerate\nfor i, item in enumerate(items):\n    print(f"{i}: {item}")`,
     relatedErrors: ["python-keyerror", "python-attributeerror"]
   },
+  // === Docker ===
+  {
+    id: "docker-cannot-connect-to-daemon",
+    errorMessage: "Cannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docker daemon running?",
+    language: "Docker",
+    category: "ConnectionError",
+    explanation: "The Docker CLI cannot communicate with the Docker daemon. This usually means the daemon service is not running or the current user lacks permission to access the Docker socket.",
+    causes: [
+      "Docker daemon service is stopped or crashed",
+      "User is not in the docker group (Linux)",
+      "Docker Desktop not started (macOS/Windows)",
+      "Socket file permissions are incorrect"
+    ],
+    solutions: [
+      "Start the daemon: `sudo systemctl start docker` (Linux) or restart Docker Desktop (macOS/Windows)",
+      "Add user to docker group: `sudo usermod -aG docker $USER` then log out and back in",
+      "Check Docker status: `docker info`",
+      "On macOS, ensure Docker Desktop is running in the menu bar"
+    ],
+    codeExample: `# Check if Docker is running\ndocker info\n\n# Start Docker daemon (Linux)\nsudo systemctl start docker\nsudo systemctl enable docker  # auto-start on boot\n\n# Add user to docker group\nsudo usermod -aG docker $USER\n# Then log out and back in`,
+    relatedErrors: ["docker-daemon-not-running", "docker-permission-denied"]
+  },
+  {
+    id: "docker-no-matching-manifest",
+    errorMessage: "no matching manifest for linux/arm64/v8 in the manifest list entries",
+    language: "Docker",
+    category: "ManifestError",
+    explanation: "You are trying to pull a Docker image that does not have a build for your platform architecture. This is common on Apple Silicon (M1/M2/M3) Macs and ARM-based Linux systems when the image was only built for amd64.",
+    causes: [
+      "Image was built only for amd64/x86_64 and not for ARM",
+      "Using an older image that predates multi-architecture support",
+      "Private registry has limited platform builds"
+    ],
+    solutions: [
+      "Use `--platform linux/amd64` to force the amd64 version: `docker pull --platform linux/amd64 image:tag`",
+      "Check available platforms: `docker manifest inspect image:tag`",
+      "Find an alternative image that supports your architecture",
+      "Build the image yourself for your platform"
+    ],
+    codeExample: `# Force pull amd64 image on ARM\ndocker pull --platform linux/amd64 nginx:latest\n\n# Check what platforms are available\ndocker manifest inspect nginx:latest\n\n# Run with platform specification\ndocker run --platform linux/amd64 nginx:latest`,
+    relatedErrors: ["docker-image-not-found", "docker-exec-failed"]
+  },
+  {
+    id: "docker-exec-failed",
+    errorMessage: "OCI runtime exec failed: exec failed: unable to start container process: exec: \"bash\": executable file not found in $PATH",
+    language: "Docker",
+    category: "ExecError",
+    explanation: "You tried to run a command inside a container using `docker exec`, but the specified shell or binary does not exist in the container. Minimal images (like Alpine or scratch-based) often lack bash.",
+    causes: [
+      "Using `bash` in a minimal image that only has `sh` (Alpine, scratch)",
+      "Typo in the shell or command name",
+      "Binary is not installed in the container image",
+      "PATH environment variable is different inside the container"
+    ],
+    solutions: [
+      "Try `sh` instead of `bash`: `docker exec -it container sh`",
+      "Check available shells: `docker exec -it container ls /bin/`",
+      "Install bash in the container: `apt-get install bash` (Debian) or `apk add bash` (Alpine)",
+      "Use `docker exec -it container /bin/sh` for minimal images"
+    ],
+    codeExample: `# Wrong — bash may not exist\ndocker exec -it my-container bash\n\n# Right — try sh for minimal images\ndocker exec -it my-container sh\n\n# Right — use full path\ndocker exec -it my-container /bin/sh\n\n# Install bash in Alpine container\ndocker exec -it my-container apk add bash`,
+    relatedErrors: ["docker-permission-denied", "docker-port-already-allocated"]
+  },
 ];
