@@ -3512,4 +3512,67 @@ func greet() string {
     codeExample: `/* ❌ z-index has no effect without positioning */\n.element { z-index: 100; }\n\n/* ✅ Add positioning */\n.element {\n  position: relative;\n  z-index: 100;\n}\n\n/* ✅ Fixed positioning for overlays */\n.overlay {\n  position: fixed;\n  z-index: 1000;\n  top: 0; left: 0; right: 0; bottom: 0;\n}`,
     relatedErrors: ["css-unknown-property", "css-selector-not-working"]
   },
+  {
+    id: "rust-cannot-borrow-as-mutable",
+    errorMessage: "cannot borrow `x` as mutable because it is also borrowed as immutable",
+    language: "Rust",
+    category: "BorrowChecker",
+    explanation: "Rust's borrow checker prevents having both an immutable and mutable reference to the same data at the same time. This is one of Rust's most common compilation errors for newcomers.",
+    causes: [
+      "Trying to mutate a value while an immutable reference to it still exists",
+      "Holding a reference across a mutating call",
+      "Iterating over a collection while trying to modify it",
+      "Calling a method that takes &mut self while holding a & reference"
+    ],
+    solutions: [
+      "Clone the data if you need both a read and write copy",
+      "Restructure code so the immutable reference goes out of scope before the mutable one",
+      "Use indices instead of references when iterating and modifying",
+      "Use RefCell<T> for interior mutability when the borrow checker is too strict"
+    ],
+    codeExample: `// ❌ Bad\nlet mut vec = vec![1, 2, 3];\nlet first = &vec[0]; // immutable borrow\nvec.push(4);         // mutable borrow — ERROR!\nprintln!("{}", first);\n\n// ✅ Good: read first, then write\nlet mut vec = vec![1, 2, 3];\nlet first = vec[0]; // copy the value\nvec.push(4);\nprintln!("{}", first);`,
+    relatedErrors: ["rust-use-after-free", "rust-multiple-mutable-references"]
+  },
+  {
+    id: "rust-use-after-free",
+    errorMessage: "borrow later used here after move",
+    language: "Rust",
+    category: "OwnershipError",
+    explanation: "You're trying to use a value after it has been moved to another owner. In Rust, assignment transfers ownership by default, so the original variable becomes invalid.",
+    causes: [
+      "Passing a value to a function by value (not by reference) and using it afterwards",
+      "Assigning a value to another variable without copying",
+      "Moving a value into a closure or thread",
+      "Calling .to_owned(), .to_string(), or similar conversion methods"
+    ],
+    solutions: [
+      "Use references (&T) instead of moving values",
+      "Clone the value before moving: `let clone = val.clone();`",
+      "Use Copy types (i32, f64, bool, char) which are copied instead of moved",
+      "Use Rc<T> or Arc<T> for shared ownership"
+    ],
+    codeExample: `// ❌ Bad\nlet s1 = String::from("hello");\nlet s2 = s1;      // s1 is moved to s2\nprintln!("{}", s1); // ERROR: s1 was moved\n\n// ✅ Good: clone first\nlet s1 = String::from("hello");\nlet s2 = s1.clone();\nprintln!("{} {}", s1, s2);\n\n// ✅ Good: use references\nlet s1 = String::from("hello");\nlet s2 = &s1;\nprintln!("{} {}", s1, s2);`,
+    relatedErrors: ["rust-cannot-borrow-as-mutable", "rust-value-dropped-after-binding"]
+  },
+  {
+    id: "rust-index-out-of-bounds",
+    errorMessage: "index out of bounds: the len is L but the index is I",
+    language: "Rust",
+    category: "PanicError",
+    explanation: "You're trying to access an array or vector element at an index that doesn't exist. Rust panics immediately rather than returning garbage data like C/C++.",
+    causes: [
+      "Hard-coded index that exceeds the array length",
+      "Off-by-one error in loop bounds",
+      "Using .unwrap() on a get() return value",
+      "Calculating an index from user input without bounds checking"
+    ],
+    solutions: [
+      "Use .get() method which returns Option<T> instead of panicking",
+      "Check bounds before indexing: `if i < vec.len()`",
+      "Use .get_mut() for mutable access",
+      "Use .enumerate() in loops to get safe index-value pairs"
+    ],
+    codeExample: `// ❌ Bad\nlet v = vec![1, 2, 3];\nlet x = v[5]; // PANIC: index out of bounds\n\n// ✅ Good: use get()\nlet v = vec![1, 2, 3];\nif let Some(x) = v.get(5) {\n    println!("{}", x);\n} else {\n    println!("Index out of bounds");\n}\n\n// ✅ Good: safe iteration\nfor (i, val) in v.iter().enumerate() {\n    println!("{}: {}", i, val);\n}`,
+    relatedErrors: ["rust-unwrap-on-none", "rust-panic-unwinding"]
+  },
 ];

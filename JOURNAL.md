@@ -13,7 +13,7 @@
 - "Golang nil pointer" (solution content)
 
 ### Current stats
-- **Errors:** 166+ (was 163+)
+- **Errors:** 163 (corrected from 166 — removed duplicates)
 - **Languages covered:** 24+ (was 23+)
 
 ---
