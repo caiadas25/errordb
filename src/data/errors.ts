@@ -3444,4 +3444,72 @@ func greet() string {
     codeExample: `# Wrong — bash may not exist\ndocker exec -it my-container bash\n\n# Right — try sh for minimal images\ndocker exec -it my-container sh\n\n# Right — use full path\ndocker exec -it my-container /bin/sh\n\n# Install bash in Alpine container\ndocker exec -it my-container apk add bash`,
     relatedErrors: ["docker-permission-denied", "docker-port-already-allocated"]
   },
+  // === CSS ===
+  {
+    id: "css-selector-not-working",
+    errorMessage: "My CSS selector isn't applying styles to the expected element",
+    language: "CSS",
+    category: "SelectorIssue",
+    explanation: "Your CSS selector is valid but not targeting the element you expect. This is usually caused by specificity issues, incorrect selectors, or the element not existing in the DOM at the time the styles are applied.",
+    causes: [
+      "Another rule with higher specificity overrides your styles",
+      "The selector doesn't match the element structure (wrong parent, wrong class name)",
+      "Inline styles or !important override stylesheet rules",
+      "The element is dynamically added after the styles load",
+      "Using the wrong selector syntax (e.g., .class instead #id)"
+    ],
+    solutions: [
+      "Use browser DevTools to inspect the element and see which rules apply",
+      "Increase specificity: #id is stronger than .class, .class is stronger than element",
+      "Avoid !important — use more specific selectors instead",
+      "Check for typos in class names or IDs",
+      "For dynamic content, ensure styles are in the main stylesheet, not scoped"
+    ],
+    codeExample: `/* ❌ Low specificity — overridden by .container p */\np { color: red; }\n\n/* ✅ Higher specificity */\n.container > p { color: red; }\n\n/* ❌ Wrong — missing dot for class selector */\nmy-class { color: red; }\n\n/* ✅ Correct */\n.my-class { color: red; }`,
+    relatedErrors: ["css-unknown-property", "css-invalid-value"]
+  },
+  {
+    id: "css-flexbox-not-working",
+    errorMessage: "Flexbox container is not laying out children as expected",
+    language: "CSS",
+    category: "LayoutIssue",
+    explanation: "Flexbox properties aren't producing the expected layout. This is often caused by missing the display: flex declaration, misunderstanding flex-direction defaults, or child elements not being direct flex children.",
+    causes: [
+      "Missing `display: flex` on the parent container",
+      "Child elements are not direct children (nested too deep)",
+      "Using margin without accounting for flexbox auto margins",
+      "Conflicting width/height constraints on flex items",
+      "Using inline elements that don't respond to flex properties"
+    ],
+    solutions: [
+      "Ensure the parent has `display: flex` or `display: inline-flex`",
+      "Only direct children of the flex container are flex items",
+      "Use `margin: auto` on a flex child for centering",
+      "Remove fixed widths/heights that conflict with flex behavior",
+      "Use `flex: 1` or `flex-grow: 1` to fill available space"
+    ],
+    codeExample: `/* ❌ Parent is not a flex container */\n.parent > .child { flex: 1; }\n\n/* ✅ Parent must be display: flex */\n.parent {\n  display: flex;\n  gap: 1rem;\n}\n.parent > .child { flex: 1; }\n\n/* ✅ Centering with flex */\n.parent {\n  display: flex;\n  justify-content: center;\n  align-items: center;\n}`,
+    relatedErrors: ["css-unknown-property", "css-invalid-value"]
+  },
+  {
+    id: "css-z-index-not-working",
+    errorMessage: "z-index is not working — element is not stacking above others",
+    language: "CSS",
+    category: "StackingIssue",
+    explanation: "z-index only works on positioned elements (position: relative, absolute, fixed, or sticky). If the element has no positioning, z-index has no effect. A parent's stacking context can also limit the z-index of its children.",
+    causes: [
+      "Element has no positioning (z-index requires position property)",
+      "A parent creates a new stacking context that limits the child",
+      "Another element has a higher z-index in the same stacking context",
+      "Using z-index on elements that are not siblings"
+    ],
+    solutions: [
+      "Add `position: relative` (or absolute/fixed/sticky) to the element",
+      "Check parent elements for z-index or opacity that creates stacking contexts",
+      "Use DevTools to see the actual stacking order",
+      "Avoid z-index values over 1000 — use a z-index scale (1-10, 100-110, etc.)"
+    ],
+    codeExample: `/* ❌ z-index has no effect without positioning */\n.element { z-index: 100; }\n\n/* ✅ Add positioning */\n.element {\n  position: relative;\n  z-index: 100;\n}\n\n/* ✅ Fixed positioning for overlays */\n.overlay {\n  position: fixed;\n  z-index: 1000;\n  top: 0; left: 0; right: 0; bottom: 0;\n}`,
+    relatedErrors: ["css-unknown-property", "css-selector-not-working"]
+  },
 ];
