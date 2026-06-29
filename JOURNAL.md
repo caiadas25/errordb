@@ -1,3 +1,22 @@
+## Sprint A (Round 12) — June 29, 2026 (Growth Sprint — ErrorDB Quick Wins)
+### What was done
+- Added 3 high-volume Kotlin error entries:
+  - `kotlin-no-value-passed-for-parameter` — missing required function arguments
+  - `kotlin-cannot-infer-type-parameter` — type inference failure with generics
+  - `kotlin-illegalargumentexception` — invalid argument runtime exception
+- All include causes, solutions, code examples, and cross-links
+
+### Keywords targeted
+- "Kotlin no value passed for parameter" (new error page — high search volume)
+- "Kotlin cannot infer type parameter" (new error page)
+- "Kotlin IllegalArgumentException" (new error page)
+
+### Current stats
+- **Errors:** 169 (was 166)
+- **Languages covered:** 24+ (unchanged)
+
+---
+
 ## Sprint A (Round 11) — June 29, 2026 (Growth Sprint — ErrorDB Quick Wins)
 ### What was done
 - Added 3 high-volume Rust error entries:
