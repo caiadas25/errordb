@@ -3575,4 +3575,68 @@ func greet() string {
     codeExample: `// ❌ Bad\nlet v = vec![1, 2, 3];\nlet x = v[5]; // PANIC: index out of bounds\n\n// ✅ Good: use get()\nlet v = vec![1, 2, 3];\nif let Some(x) = v.get(5) {\n    println!("{}", x);\n} else {\n    println!("Index out of bounds");\n}\n\n// ✅ Good: safe iteration\nfor (i, val) in v.iter().enumerate() {\n    println!("{}: {}", i, val);\n}`,
     relatedErrors: ["rust-unwrap-on-none", "rust-panic-unwinding"]
   },
+  // === Kotlin ===
+  {
+    id: "kotlin-no-value-passed-for-parameter",
+    errorMessage: "No value passed for parameter 'paramName'",
+    language: "Kotlin",
+    category: "CompilationError",
+    explanation: "A function or constructor requires parameters that you haven't provided. Kotlin enforces strict parameter matching at compile time — no optional parameters without default values.",
+    causes: [
+      "Missing required arguments in a function call",
+      "Calling a constructor without all required parameters",
+      "Not using named arguments when parameter order is ambiguous",
+      "Calling a Java method that has overloaded versions"
+    ],
+    solutions: [
+      "Provide all required parameters in the correct order",
+      "Use named arguments: `fun(param1 = value1, param2 = value2)`",
+      "Check function signature for default parameter values",
+      "Use @JvmOverloads to generate overloaded methods from Kotlin defaults"
+    ],
+    codeExample: `// ❌ Bad\nfun greet(name: String, age: Int) { println("$name is $age") }\ngreet("Alice") // Error: No value passed for parameter 'age'\n\n// ✅ Good\ngreet("Alice", 30)\n\n// ✅ Good: use named arguments\ngreet(name = "Alice", age = 30)\n\n// ✅ Good: default parameters\nfun greet(name: String, age: Int = 25) { println("$name is $age") }\ngreet("Alice") // Works now`,
+    relatedErrors: ["kotlin-type-mismatch", "kotlin-unresolved-reference"]
+  },
+  {
+    id: "kotlin-cannot-infer-type-parameter",
+    errorMessage: "Cannot infer type parameter T",
+    language: "Kotlin",
+    category: "TypeInferenceError",
+    explanation: "The Kotlin compiler cannot determine the type parameter for a generic function or class. This usually happens when there isn't enough context to infer the type from usage.",
+    causes: [
+      "Empty collection literal without explicit type",
+      "Generic function with no arguments that could determine the type",
+      "Using a nullable type where a non-null type is expected",
+      "Ambiguous return type from a lambda"
+    ],
+    solutions: [
+      "Explicitly specify the type: `listOf<String>()` or `emptyList<Int>()`",
+      "Add a type annotation to the variable: `val x: List<String> = listOf()`",
+      "Provide a type parameter to the function: `arrayOf<String>(\"a\")`",
+      "Check that the context provides enough information for type inference"
+    ],
+    codeExample: `// ❌ Bad\nval list = listOf() // Cannot infer type parameter\n\n// ✅ Good: explicit type\nval list: List<String> = listOf()\n\n// ✅ Good: type parameter\nval list = listOf<String>()\n\n// ✅ Good: empty list with type\nval map = emptyMap<String, Int>()`,
+    relatedErrors: ["kotlin-type-mismatch", "kotlin-unresolved-reference"]
+  },
+  {
+    id: "kotlin-illegalargumentexception",
+    errorMessage: "IllegalArgumentException: <message>",
+    language: "Kotlin",
+    category: "RuntimeException",
+    explanation: "An argument passed to a function is invalid or out of expected range. This is a common runtime exception that indicates a precondition check failed.",
+    causes: [
+      "Passing a null value to a non-null parameter",
+      "Providing a value outside an allowed range",
+      "Invalid format string or URL",
+      "Passing empty string when non-empty is required"
+    ],
+    solutions: [
+      "Validate arguments before passing: `require(name.isNotBlank())`",
+      "Use the `require()` standard library function for precondition checks",
+      "Check the function documentation for expected parameter ranges",
+      "Use `check()` for conditions that should never be false"
+    ],
+    codeExample: `// ❌ Bad: no validation\nfun setAge(age: Int) {\n    if (age < 0 || age > 150) throw IllegalArgumentException("Invalid age")\n    // ...\n}\n\n// ✅ Good: use require()\nfun setAge(age: Int) {\n    require(age in 0..150) { "Age must be 0-150, got $age" }\n    // ...\n}\n\n// ✅ Good: require for preconditions\nfun divide(a: Int, b: Int): Int {\n    require(b != 0) { "Division by zero" }\n    return a / b\n}`,
+    relatedErrors: ["kotlin-null-pointer", "kotlin-type-mismatch"]
+  },
 ];
