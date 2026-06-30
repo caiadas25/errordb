@@ -3766,4 +3766,120 @@ func greet() string {
     codeExample: `// ❌ Bad\nfinal count = 0;\ncount = 1; // Error: Can't assign variable 'count'\n\n// ✅ Good: use var\nvar count = 0;\ncount = 1;\n\n// ✅ Good: late final\nlate final String name;\nname = 'Alice'; // first assignment works\n// name = 'Bob'; // Error: second assignment fails`,
     relatedErrors: ["dart-uninitialized-final-variable", "dart-constant-value"]
   },
+  {
+    id: "python-permission-error",
+    errorMessage: "PermissionError: [Errno 13] Permission denied",
+    language: "Python",
+    category: "PermissionError",
+    explanation: "Your program tried to access a file or directory without the necessary operating system permissions. This is common when working with system files, logs, or directories owned by another user.",
+    causes: [
+      "Trying to write to a file owned by root or another user",
+      "Trying to execute a script without the execute permission bit set",
+      "Trying to read a file with restrictive permissions (e.g., /etc/shadow)",
+      "Directory does not have write permission",
+      "Running the script as a regular user when it needs elevated privileges"
+    ],
+    solutions: [
+      "Check file permissions with `ls -la /path/to/file`",
+      "Change permissions with `chmod` (e.g., `chmod +x script.py` for execute)",
+      "Change ownership with `chown` (e.g., `sudo chown $USER /path/to/file`)",
+      "Run with appropriate privileges (use `sudo` carefully)",
+      "For directories, ensure the parent directory allows writing"
+    ],
+    codeExample: `# ❌ Bad — file owned by root
+with open("/var/log/app.log", "a") as f:
+    f.write("data")\n# PermissionError: [Errno 13] Permission denied
+
+# ✅ Good — check permissions first
+import os
+path = "/var/log/app.log"
+if os.access(path, os.W_OK):
+    with open(path, "a") as f:
+        f.write("data")
+else:
+    print(f"No write permission for {path}")`,
+    relatedErrors: ["python-fileno-error", "linux-permission-denied"],
+  },
+  {
+    id: "go-imported-and-not-used",
+    errorMessage: "imported and not used",
+    language: "Go",
+    category: "Compile Error",
+    explanation: "You imported a package but never used any of its exported symbols. Go enforces that all imports must be used — unused imports are a compile error, not a warning.",
+    causes: [
+      "Imported a package but removed the code that used it",
+      "Typo in the function or type name from the imported package",
+      "Imported the wrong package for the function you're calling",
+      "Refactored code and forgot to remove the import"
+    ],
+    solutions: [
+      "Remove the unused import line",
+      "Use the package: call a function or reference a type from it",
+      "Check for typos in function names from the imported package",
+      "Use `_` to import for side effects: `import _ \"database/sql/driver\"`"
+    ],
+    codeExample: `// ❌ Bad
+package main
+
+import (
+    "fmt"
+    "os" // imported and not used
+)
+
+func main() {
+    fmt.Println("Hello")
+}
+
+// ✅ Good — remove unused import
+package main
+
+import "fmt"
+
+func main() {
+    fmt.Println("Hello")
+}`,
+    relatedErrors: ["go-undefined-type", "go-cannot-assign"],
+  },
+  {
+    id: "python-http-connection-refused",
+    errorMessage: "ConnectionRefusedError: [Errno 111] Connection refused",
+    language: "Python",
+    category: "ConnectionError",
+    explanation: "Your program tried to connect to a network address (IP:port) but the target machine refused the connection. The port is either not listening, the service is down, or a firewall is blocking it.",
+    causes: [
+      "The target server/service is not running",
+      "The service is listening on a different port",
+      "A firewall is blocking the connection",
+      "The server is listening on localhost but you're connecting to 127.0.0.1",
+      "Too many connections already open on the target port"
+    ],
+    solutions: [
+      "Verify the service is running: `systemctl status <service>` or `docker ps`",
+      "Check which port the service is listening on: `ss -tlnp` or `netstat -tlnp`",
+      "Ensure the hostname/IP and port are correct in your code",
+      "Check firewall rules: `sudo ufw status` or `sudo iptables -L`",
+      "Try connecting with `telnet host port` or `curl -v host:port` to diagnose"
+    ],
+    codeExample: `import requests
+
+# ❌ Bad — server not running on this port
+response = requests.get("http://localhost:5000/api/data")
+# ConnectionRefusedError
+
+# ✅ Good — check connectivity first
+import socket
+
+def check_port(host, port):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.settimeout(2)
+    result = sock.connect_ex((host, port))
+    sock.close()
+    return result == 0
+
+if check_port("localhost", 5000):
+    response = requests.get("http://localhost:5000/api/data")
+else:
+    print("Service not running on port 5000")`,
+    relatedErrors: ["python-timeout-error", "node-econnrefused"],
+  },
 ];
