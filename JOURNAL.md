@@ -1,3 +1,21 @@
+## Sprint A (Round 22) -- June 30, 2026 (Growth Sprint)
+### What was done
+- Added 2 high-volume errors:
+  - js-syntaxerror-unexpected-end-json: "SyntaxError: Unexpected end of JSON input"
+    - Causes: empty API response, HTML error page, CORS opaque response, double-read body
+    - Solutions: check response.ok, try/catch JSON.parse, log response.text()
+  - python-valueerror-too-many-values-to-unpack: "ValueError: too many values to unpack (expected 2)"
+    - Causes: tuple with more elements than variables, wrong CSV column count
+    - Solutions: star unpacking, indexing, check length first
+- All with causes, solutions, code examples, and cross-links
+- Total: 193 errors (was 191)
+
+### Keywords targeted
+- "SyntaxError Unexpected end of JSON input" (new error page -- very high volume)
+- "ValueError too many values to unpack Python" (new error page -- very high volume)
+
+---
+
 ## Sprint A (Round 21) — June 30, 2026 (Growth Sprint — ErrorDB Quick Wins)
 ### What was done
 - Added 2 high-volume Python errors:
