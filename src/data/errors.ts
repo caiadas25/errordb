@@ -4317,4 +4317,106 @@ def find_user(id: int) -> Optional[dict]:
     return None`,
     relatedErrors: ["js-cannot-read-properties-of-undefined", "java-nullpointerexception"],
   },
+  {
+    id: "python-modulenotfounderror",
+    errorMessage: "ModuleNotFoundError: No module named 'xyz'",
+    language: "Python",
+    category: "ImportError",
+    explanation: "Python can't find the module you're trying to import. This means the module isn't installed, isn't in your Python path, or you have a typo in the module name.",
+    causes: [
+      "The module is not installed in the current Python environment",
+      "You're using a different Python version or virtual environment than expected",
+      "Typo in the module or package name",
+      "The module name conflicts with a local file (e.g., naming your file 'random.py')",
+      "The module was installed for a different Python interpreter (e.g., pip3 vs pip)"
+    ],
+    solutions: [
+      "Install the module: `pip install module_name`",
+      "Check you're using the right Python environment: `which python` and `pip list`",
+      "Verify the module name spelling",
+      "Don't name your files the same as standard library modules",
+      "Use `python -m pip install module_name` if multiple Python versions exist"
+    ],
+    codeExample: `# ❌ Module not installed
+import pandas as pd  # ModuleNotFoundError: No module named 'pandas'
+
+# ✅ Install it first
+# Terminal: pip install pandas
+import pandas as pd
+
+# ❌ Wrong environment
+# If you have multiple Python versions:
+python3 -m pip install requests  # installs for python3
+python2 -m pip install requests  # installs for python2
+
+# ✅ Check which Python you're using
+import sys
+print(sys.executable)  # Shows which Python is running
+print(sys.path)        # Shows module search paths
+
+# ❌ File name conflicts with module
+# If you name your file "random.py":
+import random  # Imports YOUR file, not the stdlib module!
+
+# ✅ Rename your file to something else`,
+    relatedErrors: ["js-cannot-read-properties-of-undefined", "python-nonetype-object"],
+  },
+  {
+    id: "js-typeerror-x-is-not-a-function",
+    errorMessage: "TypeError: x is not a function",
+    language: "JavaScript",
+    category: "TypeError",
+    explanation: "You're trying to call something as a function, but it's not a function. The variable might be undefined, null, a number, a string, or an object that isn't callable.",
+    causes: [
+      "Calling a variable that hasn't been assigned a function value",
+      "Calling a method that doesn't exist on an object",
+      "Using arrow function syntax incorrectly",
+      "Import/export mismatch (calling a named export as default or vice versa)",
+      "Async function called without await (returns Promise, not result)"
+    ],
+    solutions: [
+      "Check if the value is actually a function: `typeof x === 'function'`",
+      "Verify the import/export names match",
+      "Use optional chaining for methods: `obj?.method?.()`",
+      "Check if you need to instantiate a class: `new ClassName()` instead of `ClassName()`",
+      "Ensure async functions are awaited properly"
+    ],
+    codeExample: `// ❌ Calling a non-function
+let result = "hello";
+result();  // TypeError: result is not a function
+
+// ❌ Wrong import
+// utils.js exports: export const fetchData = () => {...}
+import { fetchData } from './utils';
+const data = fetchData();  // ✅ correct
+
+// utils.js default export: export default () => {...}
+import fetchData from './utils';
+const data = fetchData();  // ✅ correct
+import { fetchData } from './utils';  // ❌ TypeError
+
+// ❌ Async without await
+async function getData() {
+  return fetch('/api/data');
+}
+const response = getData();     // ❌ Returns Promise, not Response
+const data = response.json();   // ❌ TypeError
+
+// ✅ Correct async usage
+async function getData() {
+  const response = await getData();  // ✅ Await the promise
+  const data = await response.json(); // ✅ Then call .json()
+  return data;
+}
+
+// ❌ Class without new
+class Dog {
+  constructor(name) { this.name = name; }
+}
+const dog = Dog("Rex");  // ❌ TypeError
+
+// ✅ Use new
+const dog = new Dog("Rex");  // ✅`,
+    relatedErrors: ["js-cannot-read-properties-of-undefined", "js-reference-not-defined"],
+  },
 ];

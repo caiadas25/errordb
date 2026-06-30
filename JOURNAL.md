@@ -1,3 +1,19 @@
+## Sprint A (Round 20) — June 30, 2026 (Growth Sprint — ErrorDB Quick Wins)
+### What was done
+- Added 2 high-volume error entries:
+  - python-modulenotfounderror: "ModuleNotFoundError: No module named 'xyz'" (pip install, environment, file naming solutions)
+  - js-typeerror-x-is-not-a-function: "TypeError: x is not a function" (import/export, async/await, class instantiation solutions)
+- All include causes, solutions, code examples, and cross-links
+- Current stats: 189 errors (was 187), 25+ languages
+
+### Keywords targeted
+- "python ModuleNotFoundError" (new error page — very high volume)
+- "No module named" Python error (new error page)
+- "TypeError x is not a function" (new error page — very high volume)
+- "JavaScript is not a function" (new error page)
+
+---
+
 ## Sprint A (Round 19) — June 30, 2026 (Growth Sprint — Full Sprint)
 ### What was done
 - Added 3 high-volume error entries:
