@@ -4419,4 +4419,51 @@ const dog = Dog("Rex");  // ❌ TypeError
 const dog = new Dog("Rex");  // ✅`,
     relatedErrors: ["js-cannot-read-properties-of-undefined", "js-reference-not-defined"],
   },
+  // === Python ===
+  {
+    id: "python-indexerror-list-index-out-of-range",
+    errorMessage: "IndexError: list index out of range",
+    language: "Python",
+    category: "IndexError",
+    explanation: "You're trying to access an element at an index that doesn't exist in the list. Python lists are zero-indexed, so the first element is at index 0, and the last element is at index len(list) - 1.",
+    causes: [
+      "Accessing an index beyond the list length (e.g., my_list[10] when list has 5 elements)",
+      "Off-by-one error in loop bounds (e.g., range(len(list) + 1) instead of range(len(list)))",
+      "Empty list — accessing any index fails",
+      "Using negative index on empty list (e.g., my_list[-1] when list is empty)",
+      "Wrong assumption about list contents after filtering or slicing"
+    ],
+    solutions: [
+      "Check list length before accessing: if i < len(my_list)",
+      "Use for item in my_list instead of indexing with range()",
+      "Use try/except IndexError to handle edge cases gracefully",
+      "Use my_list[-1] only after confirming list is not empty",
+      "Debug: print(len(my_list)) and the index you're accessing"
+    ],
+    codeExample: `# ❌ Bad\nmy_list = [1, 2, 3]\nprint(my_list[5])  # IndexError\n\n# ❌ Bad (off-by-one)\nfor i in range(len(my_list) + 1):\n    print(my_list[i])  # IndexError on last iteration\n\n# ✅ Good — iterate directly\nfor item in my_list:\n    print(item)\n\n# ✅ Good — safe access\ndef get_item(lst, index):\n    if 0 <= index < len(lst):\n        return lst[index]\n    return None`,
+    relatedErrors: ["python-typeerror-list-index-out-of-range", "python-keyerror"],
+  },
+  {
+    id: "python-typeerror-unsupported-operand",
+    errorMessage: "TypeError: unsupported operand type(s) for +: 'int' and 'str'",
+    language: "Python",
+    category: "TypeError",
+    explanation: "You're trying to use an operator (like +, -, *) between two types that don't support that operation. The most common case is trying to concatenate a string and a number.",
+    causes: [
+      "Adding a string and an integer: 'age: ' + 25",
+      "Forgetting to convert input() to int (input() always returns a string)",
+      "Mixing numeric types in unexpected ways",
+      "Passing a string where a number is expected",
+      "Forgetting to convert between types before arithmetic"
+    ],
+    solutions: [
+      "Convert the string to int/float: int('25') or float('3.14')",
+      "Use f-strings or str(): f\"age: {25}\" or \"age: \" + str(25)",
+      "Always validate input types before operations",
+      "Use type hints to catch issues early",
+      "Check with isinstance() before arithmetic"
+    ],
+    codeExample: `# ❌ Bad\nage = input("Enter age: ")  # Returns a string\nnext_year = age + 1  # TypeError!\n\n# ✅ Good — convert input\nage = int(input("Enter age: "))\nnext_year = age + 1\n\n# ❌ Bad\nresult = "Total: " + 42  # TypeError\n\n# ✅ Good\nresult = f"Total: {42}"\n# or\nresult = "Total: " + str(42)`,
+    relatedErrors: ["python-valueerror-literal", "python-typeerror-not-supported"],
+  },
 ];

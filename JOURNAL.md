@@ -1,3 +1,21 @@
+## Sprint A (Round 21) — June 30, 2026 (Growth Sprint — ErrorDB Quick Wins)
+### What was done
+- Added 2 high-volume Python errors:
+  - python-indexerror-list-index-out-of-range: "IndexError: list index out of range"
+    - Causes: off-by-one, empty list, negative index on empty list
+    - Solutions: check length, iterate directly, try/except, safe access function
+  - python-typeerror-unsupported-operand: "TypeError: unsupported operand type(s) for +: 'int' and 'str'"
+    - Causes: string + number, input() returns string, mixed types
+    - Solutions: int()/float(), f-strings, str(), isinstance()
+- All with causes, solutions, code examples, and cross-links
+- Total: 191 errors (was 189)
+
+### Keywords targeted
+- "IndexError list index out of range Python" (new error page — very high volume)
+- "TypeError unsupported operand type Python" (new error page — very high volume)
+
+---
+
 ## Sprint A (Round 20) — June 30, 2026 (Growth Sprint — ErrorDB Quick Wins)
 ### What was done
 - Added 2 high-volume error entries:
