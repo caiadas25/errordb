@@ -4466,4 +4466,90 @@ const dog = new Dog("Rex");  // ✅`,
     codeExample: `# ❌ Bad\nage = input("Enter age: ")  # Returns a string\nnext_year = age + 1  # TypeError!\n\n# ✅ Good — convert input\nage = int(input("Enter age: "))\nnext_year = age + 1\n\n# ❌ Bad\nresult = "Total: " + 42  # TypeError\n\n# ✅ Good\nresult = f"Total: {42}"\n# or\nresult = "Total: " + str(42)`,
     relatedErrors: ["python-valueerror-literal", "python-typeerror-not-supported"],
   },
+  // === JavaScript ===
+  {
+    id: "js-syntaxerror-unexpected-end-json",
+    errorMessage: "SyntaxError: Unexpected end of JSON input",
+    language: "JavaScript",
+    category: "SyntaxError",
+    explanation: "You're calling JSON.parse() on a string that isn't valid JSON — typically an empty string, incomplete response, or HTML error page. This happens most often when fetching data from an API and the response is not what you expect.",
+    causes: [
+      "API returns an empty response body (200 with no content)",
+      "API returns an HTML error page instead of JSON (404, 500, etc.)",
+      "Network error causes an empty or truncated response",
+      "Response body was already consumed (read twice)",
+      "CORS error causes an opaque response with empty body",
+      "Server returns 'null' or empty string instead of JSON"
+    ],
+    solutions: [
+      "Check response.ok before parsing: if (!response.ok) throw new Error()",
+      "Log response.text() before JSON.parse() to see what you actually received",
+      "Use try/catch around JSON.parse() to handle malformed responses",
+      "Check Content-Type header: response.headers.get('content-type')",
+      "Verify the API URL is correct and returns JSON",
+      "Check browser Network tab to see the actual response body"
+    ],
+    codeExample: `// ❌ Bad — no check before parsing
+const res = await fetch('/api/data');
+const data = await res.json(); // SyntaxError if response is empty
+
+// ✅ Good — validate response first
+const res = await fetch('/api/data');
+if (!res.ok) {
+  throw new Error(\`HTTP \${res.status}: \${res.statusText}\`);
+}
+const data = await res.json();
+
+// ✅ Good — with try/catch
+try {
+  const data = await JSON.parse(someString);
+} catch (e) {
+  console.error('Invalid JSON:', e.message);
+}`,
+    relatedErrors: ["js-typeerror-x-is-not-a-function", "node-enoent"],
+  },
+  // === Python ===
+  {
+    id: "python-valueerror-too-many-values-to-unpack",
+    errorMessage: "ValueError: too many values to unpack (expected 2)",
+    language: "Python",
+    category: "ValueError",
+    explanation: "You're unpacking an iterable into variables, but the iterable has more items than variables. For example, trying to unpack 3 values into 2 variables.",
+    causes: [
+      "Unpacking a tuple/list with more elements than variables: a, b = (1, 2, 3)",
+      "Dictionary .items() returns more key-value pairs than expected",
+      "Function returns a tuple with unexpected number of values",
+      "CSV row has more columns than expected",
+      "Iterating over nested data with wrong unpacking pattern"
+    ],
+    solutions: [
+      "Use * to capture remaining values: a, *rest = (1, 2, 3)",
+      "Check the length of the iterable before unpacking",
+      "Use indexing instead of unpacking: values[0], values[1]",
+      "Use a loop if the number of elements varies",
+      "Print the iterable first to see its actual structure",
+      "Use named tuples or dataclasses for structured data"
+    ],
+    codeExample: `# ❌ Bad — too many values to unpack
+point = (1, 2, 3)
+x, y = point  # ValueError: too many values to unpack
+
+# ✅ Good — use star to capture extras
+x, *rest = point  # x=1, rest=[2, 3]
+
+# ✅ Good — or use all three
+x, y, z = point  # x=1, y=2, z=3
+
+# ❌ Bad — wrong unpacking from dict.items()
+data = {'a': 1, 'b': 2, 'c': 3}
+for key, value in data.items():
+    print(key)  # works fine
+
+# ✅ Good — when structure is unknown, use indexing
+data = [(1, 2, 3), (4, 5, 6)]
+for row in data:
+    first = row[0]  # safe access
+    print(first)`,
+    relatedErrors: ["python-indexerror-list-index-out-of-range", "python-typeerror-unsupported-operand"],
+  },
 ];
