@@ -3986,4 +3986,80 @@ if condition {
 println!("{}", x);`,
     relatedErrors: ["rust-cannot-move", "rust-borrow-checker"],
   },
+  // === High-Volume Errors (Sprint B) ===
+  {
+    id: "java-indexoutofboundsexception-range",
+    errorMessage: "java.lang.IndexOutOfBoundsException: Index 0 out of bounds for length 0",
+    language: "Java",
+    category: "IndexOutOfBoundsException",
+    explanation: "You tried to access an element at an index that does not exist in the array or List. This usually happens when the collection is empty (size 0) and you try to access index 0.",
+    causes: [
+      "The array or List is empty (size 0)",
+      "You are using an index >= size() or >= .length",
+      "A loop counter goes beyond the collection bounds",
+      "The List was not populated before access",
+      "Off-by-one error in loop conditions"
+    ],
+    solutions: [
+      "Check the size before accessing: `if (!list.isEmpty()) { list.get(0); }`",
+      "Use a for-each loop instead of indexed access: `for (String s : list)`",
+      "Verify the collection was populated correctly",
+      "Add bounds checking in your loop: `for (int i = 0; i < list.size(); i++)`"
+    ],
+    codeExample: `// Bad: assumes list has elements
+List<String> list = new ArrayList<>();
+String first = list.get(0); // IndexOutOfBoundsException
+
+// Good: check size first
+List<String> list = new ArrayList<>();
+if (!list.isEmpty()) {
+    String first = list.get(0);
+}
+
+// Good: use for-each loop
+for (String item : list) {
+    System.out.println(item);
+}`,
+    relatedErrors: ["java-indexoutofboundsexception", "java-arrayindexoutofboundsexception"],
+  },
+  {
+    id: "node-unhandled-promise-rejection",
+    errorMessage: "UnhandledPromiseRejectionWarning: Error: ENOENT: no such file or directory",
+    language: "Node.js",
+    category: "PromiseRejection",
+    explanation: "A Promise was rejected (an async operation failed) but no .catch() handler or try/catch block caught the error. In modern Node.js, unhandled promise rejections crash the process.",
+    causes: [
+      "An async function throws an error without a try/catch",
+      "A .then() chain lacks a .catch() handler",
+      "File system operations fail (file not found, permissions)",
+      "Network requests fail (DNS, timeout, connection refused)",
+      "Database queries fail (connection lost, syntax error)"
+    ],
+    solutions: [
+      "Wrap async code in try/catch: try { await doSomething(); } catch (e) { ... }",
+      "Add .catch() to Promise chains: doSomething().catch(handleError)",
+      "Use process.on(unhandledRejection, ...) for global error handling",
+      "Always handle file/network errors before they propagate"
+    ],
+    codeExample: `// Bad: no error handling
+async function readFile(path) {
+  const data = await fs.readFile(path, "utf8"); // crashes if file missing
+  return data;
+}
+
+// Good: try/catch
+async function readFile(path) {
+  try {
+    const data = await fs.readFile(path, "utf8");
+    return data;
+  } catch (err) {
+    if (err.code === "ENOENT") {
+      console.error("File not found:", path);
+      return null;
+    }
+    throw err;
+  }
+}`,
+    relatedErrors: ["node-enoent", "python-http-connection-refused"],
+  },
 ];
