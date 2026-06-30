@@ -4062,4 +4062,124 @@ async function readFile(path) {
 }`,
     relatedErrors: ["node-enoent", "python-http-connection-refused"],
   },
+  // === New entries: Sprint B Round 17 ===
+  {
+    id: "node-econnreset",
+    errorMessage: "Error: read ECONNRESET",
+    language: "Node.js",
+    category: "NetworkError",
+    explanation: "The remote server closed the TCP connection abruptly while data was being read. This means the server killed the connection before your Node.js client finished receiving the response.",
+    causes: [
+      "Server crashed or shut down while handling the request",
+      "Server has a timeout shorter than your request takes",
+      "Network interruption between client and server",
+      "Server is under load and dropping connections",
+      "Keep-alive connection was closed by the server"
+    ],
+    solutions: [
+      "Add retry logic with exponential backoff",
+      "Check if the server is running and healthy",
+      "Reduce request payload size or add streaming",
+      "Set appropriate timeouts on your HTTP client",
+      "Use Connection: close header instead of keep-alive",
+      "Check firewall or proxy settings for connection limits"
+    ],
+    codeExample: `// ❌ No retry logic
+const response = await fetch("https://api.example.com/data");
+
+// ✅ With retry logic
+async function fetchWithRetry(url, retries = 3) {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const response = await fetch(url, { signal: AbortSignal.timeout(10000) });
+      return response;
+    } catch (err) {
+      if (err.code === "ECONNRESET" && i < retries - 1) {
+        await new Promise(r => setTimeout(r, 1000 * 2 ** i));
+        continue;
+      }
+      throw err;
+    }
+  }
+}`,
+    relatedErrors: ["node-econnrefused", "python-http-connection-refused"],
+  },
+  {
+    id: "py-ssl-cert-verify-failed",
+    errorMessage: "ssl.SSLCertVerificationError: [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed",
+    language: "Python",
+    category: "SSLError",
+    explanation: "Python's SSL/TLS library could not verify the server's SSL certificate. This commonly happens on macOS (missing root certificates) or when connecting to servers with self-signed certificates.",
+    causes: [
+      "macOS Python install missing root certificates (install Certificates.command)",
+      "Self-signed or expired server certificate",
+      "Corporate proxy intercepting HTTPS traffic",
+      "System clock is incorrect (certificate appears not yet valid or expired)",
+      "Outdated CA certificate bundle in Python"
+    ],
+    solutions: [
+      "macOS: Run /Applications/Python 3.x/Install Certificates.command",
+      "Install certifi: pip install certifi",
+      "Update CA certs: pip install --upgrade certifi",
+      "For self-signed certs: use verify=False (development only) or provide CA bundle",
+      "Set REQUESTS_CA_BUNDLE or CURL_CA_BUNDLE environment variable",
+      "Fix system clock if dates are wrong"
+    ],
+    codeExample: `# ❌ Certificate verification fails
+import requests
+response = requests.get("https://self-signed.example.com")
+# ssl.SSLCertVerificationError
+
+# ✅ Option 1: Use certifi
+import certifi
+response = requests.get("https://self-signed.example.com", verify=certifi.where())
+
+# ✅ Option 2: Disable verification (dev only, NEVER in production)
+response = requests.get("https://self-signed.example.com", verify=False)
+
+# ✅ Option 3: Provide CA bundle
+response = requests.get("https://self-signed.example.com", verify="/path/to/ca-bundle.crt")`,
+    relatedErrors: ["python-http-connection-refused", "node-econnrefused"],
+  },
+  {
+    id: "react-hydration-mismatch",
+    errorMessage: "Hydration failed because the initial UI does not match what was rendered on the server",
+    language: "React",
+    category: "HydrationError",
+    explanation: "React expected the server-rendered HTML to match exactly what the client rendered, but they differ. This happens when rendering depends on client-only state (browser APIs, window object, Date.now(), localStorage).",
+    causes: [
+      "Using browser APIs (window, document, navigator) during render",
+      "Using Date.now() or new Date() that differs between server and client",
+      "Reading from localStorage/sessionStorage during render",
+      "Conditional rendering based on screen size or media queries",
+      "Third-party scripts modifying the DOM before hydration",
+      "useEffect logic accidentally placed in render"
+    ],
+    solutions: [
+      "Move client-only code into useEffect (runs only on client)",
+      "Use suppressHydrationWarning on elements that intentionally differ",
+      "Use dynamic import with { ssr: false } for client-only components",
+      "Use useSyncExternalStore for browser state (localStorage, media queries)",
+      "Ensure date/time rendering is consistent (use UTC or suppress warnings)",
+      "Disable browser extensions that modify DOM during testing"
+    ],
+    codeExample: `// ❌ Renders differently on server vs client
+function Greeting() {
+  const isClient = typeof window !== "undefined"; // undefined on server
+  return <p>{isClient ? "Welcome back!" : "Welcome!"}</p>;
+}
+
+// ✅ Use useEffect for client-only state
+function Greeting() {
+  const [isClient, setIsClient] = useState(false);
+  useEffect(() => setIsClient(true), []);
+  return <p>{isClient ? "Welcome back!" : "Welcome!"}</p>;
+}
+
+// ✅ Or use suppressHydrationWarning
+function CurrentTime() {
+  return <time suppressHydrationWarning>{new Date().toLocaleTimeString()}</time>;
+}`,
+    relatedErrors: ["react-invalid-hook-call", "react-hooks-deps"],
+  },
 ];

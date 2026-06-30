@@ -68,7 +68,27 @@ All 5 entries should include: causes, solutions, code examples, and cross-links.
 
 ## Previous Sprints
 
-### Sprint A (Round 16) — June 30, 2026 (Growth Sprint — ErrorDB Quick Wins)
+### Sprint B (Round 17) — June 30, 2026 (Growth Sprint — ErrorDB Quick Wins)
+### What was done
+- Added 3 high-volume error entries:
+  - `node-econnreset` — Error: read ECONNRESET. Server closed TCP connection abruptly. Includes retry logic with exponential backoff code example.
+  - `py-ssl-cert-verify-failed` — ssl.SSLCertVerificationError: certificate verify failed. Common on macOS and with self-signed certs. Includes certifi and CA bundle solutions.
+  - `react-hydration-mismatch` — Hydration failed because initial UI does not match server render. Client-only state, Date.now(), localStorage issues. Includes useEffect and suppressHydrationWarning solutions.
+
+### Keywords targeted
+- "ECONNRESET Node.js" (new error page — very high search volume)
+- "Python SSL certificate verify failed" (new error page — very high search volume)
+- "React hydration failed" (new error page — very high search volume)
+- "read ECONNRESET" (solution content)
+- "SSLCertVerificationError Python" (solution content)
+
+### Current stats
+- **Errors:** 184 (was 181)
+- **Languages covered:** 25+ (unchanged)
+
+---
+
+## Sprint A (Round 16) — June 30, 2026 (Growth Sprint — ErrorDB Quick Wins)
 #### What was done
 - Added 3 high-volume error entries:
   - `js-cannot-read-properties-of-null` — TypeError: Cannot read properties of null (reading 'addEventListener'). DOM element not loaded, wrong selector, script timing.
