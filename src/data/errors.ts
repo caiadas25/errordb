@@ -3381,6 +3381,69 @@ func greet() string {
     codeExample: `# Bad\nitems = [1, 2, 3]\nprint(items[5])  # IndexError\n\n# Good — check first\nif len(items) > 5:\n    print(items[5])\n\n# Good — use for-each\nfor item in items:\n    print(item)\n\n# Good — use enumerate\nfor i, item in enumerate(items):\n    print(f"{i}: {item}")`,
     relatedErrors: ["python-keyerror", "python-attributeerror"]
   },
+  {
+    id: "python-recursionerror",
+    errorMessage: "RecursionError: maximum recursion depth exceeded",
+    language: "Python",
+    category: "RecursionError",
+    explanation: "Your function called itself too many times, exceeding Python's default recursion limit (typically 1000). This usually means a missing base case or infinite recursion.",
+    causes: [
+      "Missing or incorrect base case in recursive function",
+      "Infinite recursion due to circular references",
+      "Recursion limit too low for a legitimate deep recursion",
+      "Mutual recursion without proper termination"
+    ],
+    solutions: [
+      "Add or fix the base case in your recursive function",
+      "Convert recursive algorithm to iterative using a loop or stack",
+      "Increase recursion limit: `sys.setrecursionlimit(2000)` (use with caution)",
+      "Use tail-call optimization if available in your Python variant"
+    ],
+    codeExample: `# Bad — no base case\ndef count_down(n):\n    print(n)\n    count_down(n - 1)  # RecursionError!\n\n# Good — base case\ndef count_down(n):\n    if n <= 0:\n        print("Done!")\n        return\n    print(n)\n    count_down(n - 1)\n\n# Alternative — iterative\ndef count_down(n):\n    while n > 0:\n        print(n)\n        n -= 1\n    print("Done!")`,
+    relatedErrors: ["python-infinite-loop", "python-stackoverflow"]
+  },
+  {
+    id: "python-unicodedecodeerror",
+    errorMessage: "UnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 0",
+    language: "Python",
+    category: "UnicodeDecodeError",
+    explanation: "Python tried to read a file as UTF-8 but encountered bytes that aren't valid UTF-8. This commonly happens with files created on Windows (which use different encodings) or binary files opened in text mode.",
+    causes: [
+      "File is not UTF-8 encoded (common with Windows files using cp1252 or latin-1)",
+      "Binary file opened in text mode",
+      "Corrupted file",
+      "Mixed encodings in the same file"
+    ],
+    solutions: [
+      "Specify the correct encoding: `open('file.txt', encoding='cp1252')`",
+      "Open binary files in binary mode: `open('file.txt', 'rb')`",
+      "Use errors parameter: `open('file.txt', errors='ignore')`",
+      "Detect encoding first with chardet or charset-normalizer library"
+    ],
+    codeExample: `# Bad — assumes UTF-8\nwith open('windows_file.txt') as f:\n    content = f.read()  # UnicodeDecodeError!\n\n# Good — specify encoding\nwith open('windows_file.txt', encoding='cp1252') as f:\n    content = f.read()\n\n# Good — use errors parameter\nwith open('file.txt', errors='replace') as f:\n    content = f.read()  # replaces bad bytes with ?`,
+    relatedErrors: ["python-ioerror", "python-file-not-found"]
+  },
+  {
+    id: "python-valueerror-literal",
+    errorMessage: "ValueError: invalid literal for int() with base 10: 'abc'",
+    language: "Python",
+    category: "ValueError",
+    explanation: "You tried to convert a string to an integer using int(), but the string doesn't contain a valid number. The string must contain only digits (and optionally a sign and decimal point for float conversion).",
+    causes: [
+      "String contains non-numeric characters (letters, spaces, special chars)",
+      "String has leading/trailing whitespace",
+      "User input that wasn't validated before conversion",
+      "String contains locale-specific number formatting (e.g., commas as thousands separator)"
+    ],
+    solutions: [
+      "Validate input before conversion: `if s.isdigit(): int(s)`",
+      "Strip whitespace first: `int(s.strip())`",
+      "Remove formatting: `int(s.replace(',', ''))`",
+      "Use try/except: `try: val = int(s) except ValueError: handle_error()`"
+    ],
+    codeExample: `# Bad — no validation\nuser_input = "abc"\nnum = int(user_input)  # ValueError!\n\n# Good — validate first\nuser_input = "abc"\nif user_input.isdigit():\n    num = int(user_input)\n\n# Good — try/except\ntry:\n    num = int(user_input)\nexcept ValueError:\n    print(f"'{user_input}' is not a valid number")\n\n# Good — handle floats too\ntry:\n    num = float(user_input)\nexcept ValueError:\n    print("Invalid number")`,
+    relatedErrors: ["python-typeerror", "python-keyerror"]
+  },
   // === Docker ===
   {
     id: "docker-cannot-connect-to-daemon",
