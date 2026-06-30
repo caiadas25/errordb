@@ -4466,6 +4466,112 @@ const dog = new Dog("Rex");  // ✅`,
     codeExample: `# ❌ Bad\nage = input("Enter age: ")  # Returns a string\nnext_year = age + 1  # TypeError!\n\n# ✅ Good — convert input\nage = int(input("Enter age: "))\nnext_year = age + 1\n\n# ❌ Bad\nresult = "Total: " + 42  # TypeError\n\n# ✅ Good\nresult = f"Total: {42}"\n# or\nresult = "Total: " + str(42)`,
     relatedErrors: ["python-valueerror-literal", "python-typeerror-not-supported"],
   },
+  // === Ruby ===
+  {
+    id: "ruby-nomethoderror-undefined-method",
+    errorMessage: "NoMethodError: undefined method `foo' for #<Bar:0x00007f>",
+    language: "Ruby",
+    category: "NoMethodError",
+    explanation: "You're calling a method that doesn't exist on the object. This is Ruby's equivalent of TypeError for method calls. The error message shows the method name, the receiver object, and its class.",
+    causes: [
+      "Typo in the method name",
+      "Calling a method on nil (very common: nil has very few methods)",
+      "Method was renamed or removed in a newer version",
+      "Calling an instance method where a class method is needed (or vice versa)",
+      "The method exists on a superclass but not the subclass",
+      "Using a method from a gem that isn't required/loaded"
+    ],
+    solutions: [
+      "Check for nil: use `obj&.method` (safe navigation) or `obj&.method || default`",
+      "Verify the method name spelling and check the API docs",
+      "Use `respond_to?` to check if a method exists before calling it",
+      "Check `obj.class` and `obj.methods` to see what methods are available",
+      "Ensure all gems are properly required at the top of your file",
+      "Use `extend` or `include` to mix in the module that defines the method"
+    ],
+    codeExample: `# ❌ Bad — calling method on nil
+user = User.find_by(email: "test@example.com")  # returns nil
+user.name  # NoMethodError: undefined method 'name' for nil:NilClass
+
+# ✅ Good — safe navigation operator
+user&.name
+user&.name || "Anonymous"
+
+# ✅ Good — check existence first
+if user
+  user.name
+end
+
+# ❌ Bad — calling class method on instance
+array = [1, 2, 3]
+array.new  # NoMethodError — Array.new is a class method
+
+# ✅ Good — use the correct scope
+my_array = Array.new(5)  # [nil, nil, nil, nil, nil]
+
+# ✅ Good — check if method exists
+if obj.respond_to?(:foo)
+  obj.foo
+end`,
+    relatedErrors: ["ruby-argumenterror", "js-cannot-read-properties-of-undefined"],
+  },
+  // === Go ===
+  {
+    id: "go-nil-pointer-dereference",
+    errorMessage: "runtime error: invalid memory address or nil pointer dereference",
+    language: "Go",
+    category: "RuntimeError",
+    explanation: "You're dereferencing (accessing fields or methods of) a pointer that is nil. In Go, nil pointers don't point to valid memory, so any attempt to access their fields causes a panic.",
+    causes: [
+      "Calling a method on a nil pointer receiver",
+      "Accessing a field of a nil struct pointer",
+      "Using a map or slice that was never initialized (nil map/slice)",
+      "Not checking the error return before using a value",
+      "Forgetting to initialize a pointer with & or new()",
+      "Unmarshaling JSON into a nil pointer"
+    ],
+    solutions: [
+      "Always check if a pointer is nil before dereferencing: if ptr != nil { ... }",
+      "Initialize maps and slices: m := make(map[string]int) or s := []int{}",
+      "Use the safe pattern: if err != nil { return err } immediately after the call",
+      "Use a zero-value check: if ptr == nil { return default }",
+      "Initialize struct pointers with &StructName{} before use",
+      "Use the blank identifier _ for unused return values where appropriate"
+    ],
+    codeExample: `// ❌ Bad — dereferencing nil pointer
+type User struct {
+    Name string
+}
+func getUser(id int) *User {
+    return nil  // user not found
+}
+u := getUser(999)
+fmt.Println(u.Name)  // panic: nil pointer dereference
+
+// ✅ Good — check for nil
+u := getUser(999)
+if u != nil {
+    fmt.Println(u.Name)
+} else {
+    fmt.Println("User not found")
+}
+
+// ❌ Bad — nil map
+var m map[string]int
+m["key"] = 1  // panic: assignment to entry in nil map
+
+// ✅ Good — initialize map
+m := make(map[string]int)
+m["key"] = 1
+
+// ✅ Good — use safe error handling
+result, err := doSomething()
+if err != nil {
+    log.Fatal(err)
+}
+fmt.Println(result)`,
+    relatedErrors: ["go-index-out-of-range", "js-cannot-read-properties-of-undefined"],
+  },
   // === JavaScript ===
   {
     id: "js-syntaxerror-unexpected-end-json",
