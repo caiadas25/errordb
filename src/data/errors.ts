@@ -4182,4 +4182,139 @@ function CurrentTime() {
 }`,
     relatedErrors: ["react-invalid-hook-call", "react-hooks-deps"],
   },
+  {
+    id: "node-enoent",
+    errorMessage: "Error: ENOENT: no such file or directory, open '/path/to/file'",
+    language: "Node.js",
+    category: "FileSystemError",
+    explanation: "The system cannot find the file specified. ENOENT stands for 'Error NO ENTry' (no entry). This happens when you try to read, write, or access a file or directory that doesn't exist at the specified path.",
+    causes: [
+      "File path is incorrect (typo, wrong directory)",
+      "File hasn't been created yet",
+      "Working directory is different than expected",
+      "File was deleted or moved",
+      "Using relative path when absolute is needed (or vice versa)"
+    ],
+    solutions: [
+      "Verify the file path exists: fs.existsSync(path) or check with ls/dir",
+      "Use path.resolve() or path.join() to build absolute paths",
+      "Check your working directory with process.cwd()",
+      "Create the file/directory before accessing it: fs.mkdirSync(dir, { recursive: true })",
+      "Use try/catch to handle missing files gracefully"
+    ],
+    codeExample: `// ❌ File doesn't exist
+const data = fs.readFileSync('config.json', 'utf-8');
+
+// ✅ Check first
+if (fs.existsSync('config.json')) {
+  const data = fs.readFileSync('config.json', 'utf-8');
+}
+
+// ✅ Use try/catch
+try {
+  const data = fs.readFileSync('config.json', 'utf-8');
+} catch (err) {
+  if (err.code === 'ENOENT') {
+    console.log('File not found, using defaults');
+  }
+}
+
+// ✅ Use async with error handling
+const { readFile } = require('fs/promises');
+try {
+  const data = await readFile('config.json', 'utf-8');
+} catch (err) {
+  if (err.code === 'ENOENT') {
+    // Handle missing file
+  }
+}`,
+    relatedErrors: ["python-filenotfounderror", "java-filenotfoundexception"],
+  },
+  {
+    id: "java-nullpointerexception",
+    errorMessage: "java.lang.NullPointerException",
+    language: "Java",
+    category: "NullPointerException",
+    explanation: "You tried to call a method or access a field on an object reference that is null. This is one of the most common Java exceptions and occurs when an object hasn't been initialized or has been explicitly set to null.",
+    causes: [
+      "Calling a method on a null reference",
+      "Accessing a field on a null object",
+      "Array indexing on a null array",
+      "Unboxing a null Integer/Double/etc to a primitive",
+      "Method parameter was null when it shouldn't be"
+    ],
+    solutions: [
+      "Add null checks before using objects: if (obj != null)",
+      "Use Optional<T> for values that may be absent",
+      "Initialize objects before using them",
+      "Use Objects.requireNonNull() for parameter validation",
+      "Use the null-safe operator in Kotlin or similar patterns"
+    ],
+    codeExample: `// ❌ NullPointerException
+String name = null;
+System.out.println(name.length()); // NPE!
+
+// ✅ Null check
+if (name != null) {
+    System.out.println(name.length());
+}
+
+// ✅ Use Optional
+Optional<String> optName = Optional.ofNullable(name);
+optName.ifPresent(n -> System.out.println(n.length()));
+
+// ✅ Objects.requireNonNull for parameters
+public void processName(String name) {
+    Objects.requireNonNull(name, "Name must not be null");
+    System.out.println(name.length());
+}`,
+    relatedErrors: ["python-nonetype-object", "js-cannot-read-properties-of-undefined"],
+  },
+  {
+    id: "python-nonetype-object",
+    errorMessage: "AttributeError: 'NoneType' object has no attribute 'xyz'",
+    language: "Python",
+    category: "AttributeError",
+    explanation: "You're trying to access an attribute or method on None. This happens when a function returns None (explicitly or by default) and you treat the result as if it has a value.",
+    causes: [
+      "Function returns None implicitly (no return statement)",
+      "Variable assigned None and not checked before use",
+      "Dictionary.get() returns None for missing key",
+      "List.pop() on empty list returns None",
+      "Assignment expressions (walrus operator) returning None"
+    ],
+    solutions: [
+      "Check for None before using the value: if result is not None",
+      "Use assert statements in development: assert result is not None",
+      "Use try/except with AttributeError",
+      "Set default values: result = func() or default_value",
+      "Use typing.Optional and check in type-checking tools (mypy)"
+    ],
+    codeExample: `# ❌ NoneType has no attribute
+def find_user(id):
+    if id > 100:
+        return {"name": "Alice"}
+    # implicitly returns None
+
+user = find_user(1)
+print(user["name"])  # AttributeError: 'NoneType' object has no attribute '__getitem__'
+
+# ✅ Check for None
+user = find_user(1)
+if user is not None:
+    print(user["name"])
+
+# ✅ Use default value
+user = find_user(1) or {"name": "Unknown"}
+print(user["name"])
+
+# ✅ Use Optional type hint
+from typing import Optional
+
+def find_user(id: int) -> Optional[dict]:
+    if id > 100:
+        return {"name": "Alice"}
+    return None`,
+    relatedErrors: ["js-cannot-read-properties-of-undefined", "java-nullpointerexception"],
+  },
 ];
