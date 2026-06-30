@@ -1,4 +1,17 @@
 ## Sprint A (Round 23) -- June 30, 2026 (Growth Sprint)
+## Sprint A (Round 24) -- June 30, 2026 (Growth Sprint)
+### What was done
+- Added 2 high-volume errors:
+  - python-keyerror: "KeyError: 'name'" (dict.get, defaultdict, try/except solutions)
+  - js-cannot-read-property-of-undefined: "TypeError: Cannot read properties of undefined" (optional chaining, nullish coalescing)
+  - All with causes, solutions, code examples, and cross-links
+  - Total: 197 errors (was 195)
+
+### Keywords targeted
+- "Python KeyError" (new error page -- very high volume)
+- "JavaScript Cannot read properties of undefined" (new error page -- very high volume)
+
+---
 ### What was done
 - Added 2 high-volume errors:
   - ruby-nomethoderror-undefined-method: "NoMethodError: undefined method `foo' for #<Bar>"
