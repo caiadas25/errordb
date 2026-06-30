@@ -3639,4 +3639,68 @@ func greet() string {
     codeExample: `// ❌ Bad: no validation\nfun setAge(age: Int) {\n    if (age < 0 || age > 150) throw IllegalArgumentException("Invalid age")\n    // ...\n}\n\n// ✅ Good: use require()\nfun setAge(age: Int) {\n    require(age in 0..150) { "Age must be 0-150, got $age" }\n    // ...\n}\n\n// ✅ Good: require for preconditions\nfun divide(a: Int, b: Int): Int {\n    require(b != 0) { "Division by zero" }\n    return a / b\n}`,
     relatedErrors: ["kotlin-null-pointer", "kotlin-type-mismatch"]
   },
+  // === Flutter / Dart ===
+  {
+    id: "dart-undefined-named-parameter",
+    errorMessage: "Error: The named parameter 'foo' isn't defined",
+    language: "Dart",
+    category: "CompileError",
+    explanation: "You're passing a named parameter to a function or constructor that doesn't exist or is misspelled. Dart is strict about named parameters and will catch this at compile time.",
+    causes: [
+      "Typo in the parameter name",
+      "The parameter was renamed in a recent API update",
+      "The parameter exists in a different version of the package",
+      "Using a named parameter on a positional parameter"
+    ],
+    solutions: [
+      "Check the function/constructor signature for the correct parameter name",
+      "Look at the package documentation or source code",
+      "Use the IDE's autocomplete to find the correct parameter name",
+      "Check if the package was recently updated and the API changed"
+    ],
+    codeExample: `// ❌ Bad\nContainer(\n  color: Colors.red,\n  background: Colors.blue, // Error: 'background' isn't defined\n)\n\n// ✅ Good\nContainer(\n  color: Colors.red,\n  decoration: BoxDecoration(color: Colors.blue),\n)`,
+    relatedErrors: ["dart-too-many-positional-arguments", "dart-type-not-subtype"]
+  },
+  {
+    id: "dart-type-not-subtype",
+    errorMessage: "type 'Foo' is not a subtype of type 'Bar'",
+    language: "Dart",
+    category: "TypeError",
+    explanation: "You're trying to assign a value of one type to a variable or parameter that expects a different type. This is a runtime error in Dart when dynamic typing is involved.",
+    causes: [
+      "Using a dynamic variable that holds a different type at runtime",
+      "Casting a value to an incorrect type",
+      "Passing the wrong type to a function parameter",
+      "Using `as` keyword for an invalid cast"
+    ],
+    solutions: [
+      "Use type checking with `is` before casting: `if (obj is String) { obj.length }`",
+      "Use `as?` for safe casting: `final name = obj as? String`",
+      "Ensure the variable is the correct type before assignment",
+      "Use pattern matching with switch statements for complex cases"
+    ],
+    codeExample: `// ❌ Bad\ndynamic value = 42;\nString name = value; // type 'int' is not a subtype of type 'String'\n\n// ✅ Good: safe cast\ndynamic value = 42;\nif (value is String) {\n  print(value.length);\n}\n\n// ✅ Good: as? operator\ndynamic value = 42;\nString? name = value as String?; // null if not a String`,
+    relatedErrors: ["dart-argument-type-not-assignable", "dart-illegal-override"]
+  },
+  {
+    id: "dart-cannot-assign-final-variable",
+    errorMessage: "Error: Can't assign variable 'foo'",
+    language: "Dart",
+    category: "CompileError",
+    explanation: "You're trying to reassign a variable declared as `final` or `const`. In Dart, `final` variables can only be assigned once, and `const` variables are compile-time constants.",
+    causes: [
+      "Using `final` instead of `var` for a variable that needs to be reassigned",
+      "Trying to reassign a `const` variable",
+      "Trying to reassign a parameter that's declared as `final`",
+      "Using `final` in a class field that needs to be mutable"
+    ],
+    solutions: [
+      "Change `final` to `var` if the variable needs to be reassigned",
+      "Use `late final` if you need to initialize it later",
+      "For class fields, use `var` instead of `final` if you need mutation",
+      "For `const`, change to `final` or `var` if you need runtime assignment"
+    ],
+    codeExample: `// ❌ Bad\nfinal count = 0;\ncount = 1; // Error: Can't assign variable 'count'\n\n// ✅ Good: use var\nvar count = 0;\ncount = 1;\n\n// ✅ Good: late final\nlate final String name;\nname = 'Alice'; // first assignment works\n// name = 'Bob'; // Error: second assignment fails`,
+    relatedErrors: ["dart-uninitialized-final-variable", "dart-constant-value"]
+  },
 ];

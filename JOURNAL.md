@@ -1,3 +1,23 @@
+## Sprint A (Round 13) — June 30, 2026 (Growth Sprint — ErrorDB Quick Wins)
+### What was done
+- Added 3 high-volume Flutter/Dart error entries:
+  - `dart-undefined-named-parameter` — named parameter doesn't exist or is misspelled
+  - `dart-type-not-subtype` — type assignment/casting error at runtime
+  - `dart-cannot-assign-final-variable` — reassigning a `final` or `const` variable
+- All include causes, solutions, code examples, and cross-links
+
+### Keywords targeted
+- "Dart undefined named parameter" (new error page — high search volume)
+- "Dart type not subtype" (new error page)
+- "Dart cannot assign final variable" (new error page)
+- "Flutter error: The named parameter 'foo' isn't defined" (solution content)
+
+### Current stats
+- **Errors:** 172 (was 169)
+- **Languages covered:** 25+ (was 24+)
+
+---
+
 ## Sprint A (Round 12) — June 29, 2026 (Growth Sprint — ErrorDB Quick Wins)
 ### What was done
 - Added 3 high-volume Kotlin error entries:
