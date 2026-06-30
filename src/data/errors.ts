@@ -3882,4 +3882,108 @@ else:
     print("Service not running on port 5000")`,
     relatedErrors: ["python-timeout-error", "node-econnrefused"],
   },
+  // === High-Volume Errors (Round 16) ===
+  {
+    id: "js-cannot-read-properties-of-null",
+    errorMessage: "TypeError: Cannot read properties of null (reading 'addEventListener')",
+    language: "JavaScript",
+    category: "TypeError",
+    explanation: "You're trying to call a method or access a property on `null`. This happens when `document.querySelector()` or similar DOM methods return null because the element doesn't exist in the DOM when your script runs.",
+    causes: [
+      "The DOM element hasn't loaded yet when your script executes",
+      "The selector (ID, class, tag) doesn't match any element",
+      "The element was removed from the DOM before your script ran",
+      "A typo in the element ID or class name",
+      "The script is in the `<head>` without `defer` or `DOMContentLoaded`"
+    ],
+    solutions: [
+      "Add your script at the end of `<body>` or use `defer` attribute",
+      "Wrap code in `document.addEventListener('DOMContentLoaded', () => { ... })`",
+      "Check your selector matches an element: `console.log(document.querySelector('#myId'))`",
+      "Use optional chaining: `el?.addEventListener(...)` for defensive code"
+    ],
+    codeExample: `// ❌ Bad — script runs before DOM loads
+const btn = document.querySelector("#myBtn");
+btn.addEventListener("click", handler); // TypeError if btn is null
+
+// ✅ Good — wait for DOM
+document.addEventListener("DOMContentLoaded", () => {
+  const btn = document.querySelector("#myBtn");
+  btn?.addEventListener("click", handler);
+});
+
+// ✅ Good — script at end of body + optional chaining
+const btn = document.querySelector("#myBtn");
+btn?.addEventListener("click", handler);`,
+    relatedErrors: ["js-cannot-read-properties-of-undefined", "node-document-is-not-defined"],
+  },
+  {
+    id: "python-modulenotfounderror",
+    errorMessage: "ModuleNotFoundError: No module named 'requests'",
+    language: "Python",
+    category: "ImportError",
+    explanation: "Python can't find the module you're trying to import. The module isn't installed, or you're using the wrong Python version/pip environment.",
+    causes: [
+      "The package isn't installed in the current Python environment",
+      "You're using a virtual environment but forgot to activate it",
+      "You installed with `pip3` but are running with `python` (or vice versa)",
+      "The package name differs from the import name (e.g., `Pillow` vs `PIL`)",
+      "A typo in the module name"
+    ],
+    solutions: [
+      "Install the package: `pip install <package-name>`",
+      "Ensure you're in the right environment: `which python` and `pip list`",
+      "Use `python -m pip install <package>` to install for the active Python",
+      "Check the correct import name in the package docs"
+    ],
+    codeExample: `# ❌ Bad — module not installed
+import requests  # ModuleNotFoundError
+
+# ✅ Good — install first
+# pip install requests
+import requests
+
+# ✅ Good — check if installed
+import importlib.util
+spec = importlib.util.find_spec("requests")
+if spec is None:
+    print("requests not installed. Run: pip install requests")
+else:
+    import requests`,
+    relatedErrors: ["python-importerror", "python-circular-import"],
+  },
+  {
+    id: "rust-expected-binding",
+    errorMessage: "error[E0658]: cannot find value `x` in this scope",
+    language: "Rust",
+    category: "NameError",
+    explanation: "You're trying to use a variable that hasn't been defined in the current scope. In Rust, variables must be declared before use, and they follow strict scoping rules.",
+    causes: [
+      "The variable is defined inside a block but used outside it",
+      "A typo in the variable name",
+      "The variable was moved and can no longer be used",
+      "The variable is defined in a different scope (e.g., inside an if block without binding)"
+    ],
+    solutions: [
+      "Declare the variable before the block where you use it",
+      "Check for typos in variable names",
+      "Use `clone()` or `copy()` if the variable is moved",
+      "Bind the variable outside the block and assign inside: `let x; if condition { x = value; }`"
+    ],
+    codeExample: `// ❌ Bad — variable scope limited to if block
+if condition {
+    let x = 42;
+}
+println!("{}", x); // cannot find value 'x'
+
+// ✅ Good — declare outside
+let x;
+if condition {
+    x = 42;
+} else {
+    x = 0;
+}
+println!("{}", x);`,
+    relatedErrors: ["rust-cannot-move", "rust-borrow-checker"],
+  },
 ];
