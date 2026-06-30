@@ -4658,4 +4658,94 @@ for row in data:
     print(first)`,
     relatedErrors: ["python-indexerror-list-index-out-of-range", "python-typeerror-unsupported-operand"],
   },
+  {
+    id: "python-keyerror",
+    title: "KeyError",
+    message: "KeyError: 'name'",
+    language: "Python",
+    framework: "core",
+    category: "runtime",
+    severity: "medium",
+    causes: [
+      "Accessing a dictionary key that does not exist",
+      "Typo in the key name",
+      "Key was removed or never added",
+      "Using bracket notation instead of .get()",
+      "Nested dict access where intermediate key is missing",
+    ],
+    solutions: [
+      "Use dict.get(key, default) instead of dict[key]",
+      "Check if the key exists with: if key in dict",
+      "Use collections.defaultdict for automatic defaults",
+      "Use try/except KeyError for graceful handling",
+      "Use dict.setdefault(key, default) to initialize missing keys",
+    ],
+    codeExample: `# ❌ Bad — KeyError if 'name' is missing
+data = {'age': 25}
+name = data['name']  # KeyError: 'name'
+
+# ✅ Good — use .get() with a default
+name = data.get('name', 'Unknown')
+
+# ✅ Good — check before accessing
+if 'name' in data:
+    name = data['name']
+else:
+    name = 'Unknown'
+
+# ✅ Good — use defaultdict for auto-defaults
+from collections import defaultdict
+counts = defaultdict(int)
+counts['missing']  # returns 0, no error
+
+# ✅ Good — nested dict safety
+user = {'profile': {}}
+city = user.get('profile', {}).get('city', 'Unknown')`,
+    relatedErrors: ["python-nonetype-object", "python-indexerror-list-index-out-of-range"],
+  },
+  {
+    id: "js-cannot-read-property-of-undefined",
+    title: "TypeError: Cannot read properties of undefined",
+    message: "TypeError: Cannot read properties of undefined (reading 'name')",
+    language: "JavaScript",
+    framework: "core",
+    category: "runtime",
+    severity: "medium",
+    causes: [
+      "Accessing a property on an undefined value",
+      "Async data not yet loaded when component renders",
+      "Destructuring a property from undefined",
+      "API response missing expected fields",
+      "Object returned from a function is undefined",
+    ],
+    solutions: [
+      "Use optional chaining: obj?.property",
+      "Add null/undefined checks before access",
+      "Provide default values during destructuring",
+      "Use guard clauses early in the function",
+      "Validate API responses before using them",
+    ],
+    codeExample: `// ❌ Bad — cannot read property of undefined
+const user = undefined;
+console.log(user.name); // TypeError
+
+// ✅ Good — optional chaining
+const name = user?.name; // undefined, no error
+
+// ✅ Good — nullish coalescing for defaults
+const name = user?.name ?? 'Unknown';
+
+// ✅ Good — destructuring with defaults
+const { name = 'Unknown', email = '' } = user ?? {};
+
+// ✅ Good — guard clause
+function getUserName(user) {
+  if (!user) return 'Unknown';
+  return user.name;
+}
+
+// ✅ Good — safe nested access
+const city = user?.address?.city ?? 'Unknown';`,
+    relatedErrors: ["js-typeerror-x-is-not-a-function", "python-nonetype-object"],
+  },
 ];
