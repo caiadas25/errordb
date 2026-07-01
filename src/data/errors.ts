@@ -5123,4 +5123,141 @@ rl.on('line', (line) => {
     codeExample: `// ❌ Bad — can't move while borrowed\nlet name = String::from(\"Alice\");\nlet reference = &name;\nlet moved = name;  // Error! name is borrowed\nprintln!("{}", reference);\n\n// ✅ Good — finish using the reference first\nlet name = String::from(\"Alice\");\nlet reference = &name;\nprintln!("{}", reference);\nlet moved = name;  // OK, reference is no longer used\n\n// ✅ Good — clone if you need both\nlet name = String::from(\"Alice\");\nlet reference = &name;\nlet cloned = name.clone();\nprintln!("{}", reference);\nlet moved = cloned;  // OK\n\n// ❌ Bad — can't move out of a Vec while iterating\nlet v = vec![String::from(\"hello\"), String::from(\"world\")];\nfor item in v {\n    println!("{}", item);  // Error! moves item\n}\n\n// ✅ Good — iterate by reference\nlet v = vec![String::from(\"hello\"), String::from(\"world\")];\nfor item in &v {\n    println!("{}", item);\n}`,
     relatedErrors: ["rust-borrow-checker", "rust-use-after-free"]
   },
+  // === New high-volume errors (Sprint A Round 32) ===
+  {
+    id: "js-fetch-failed",
+    errorMessage: "TypeError: fetch failed",
+    language: "JavaScript",
+    category: "TypeError",
+    explanation: "The built-in fetch() API (or node-fetch/undici) failed to complete the request. This is a generic wrapper error — the actual cause is usually in the .cause property of the error. Very common in Node.js 18+ where fetch is built-in.",
+    causes: [
+      "Target server is down or not accepting connections",
+      "Network connectivity issues (no internet, firewall blocking)",
+      "DNS resolution failure (invalid hostname)",
+      "TLS/SSL certificate errors",
+      "Request timeout (server too slow to respond)",
+      "Invalid URL format or protocol (http vs https mismatch)"
+    ],
+    solutions: [
+      "Check the .cause property for the real error: catch(e) { console.log(e.cause) }",
+      "Verify the target URL is correct and accessible",
+      "Check network connectivity: ping or curl the target",
+      "For Node.js, ensure you're not behind a proxy blocking outbound requests",
+      "Add retry logic with exponential backoff",
+      "Check DNS resolution: nslookup hostname"
+    ],
+    codeExample: `// ❌ Bad — no error details
+try {
+  const res = await fetch("https://api.example.com/data");
+} catch (e) {
+  console.log(e.message); // "fetch failed" — not helpful
+}
+
+// ✅ Good — check .cause for real error
+try {
+  const res = await fetch("https://api.example.com/data");
+  if (!res.ok) throw new Error(\`HTTP \${res.status}\`);
+} catch (e) {
+  console.log(e.message);  // "fetch failed"
+  console.log(e.cause);    // Error: connect ECONNREFUSED 127.0.0.1:3000
+}
+
+// ✅ Good — retry with backoff
+async function fetchWithRetry(url, retries = 3) {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(\`HTTP \${res.status}\`);
+      return res;
+    } catch (e) {
+      if (i === retries - 1) throw e;
+      await new Promise(r => setTimeout(r, 1000 * 2 ** i));
+    }
+  }
+}`,
+    relatedErrors: ["node-err-connection-refused", "js-cors-error"]
+  },
+  {
+    id: "python-valueerror-could-not-convert",
+    errorMessage: "ValueError: could not convert string to float: 'abc'",
+    language: "Python",
+    category: "ValueError",
+    explanation: "You're trying to convert a string to a floating-point number, but the string doesn't contain a valid number. This happens frequently when parsing user input, CSV files, or API responses.",
+    causes: [
+      "String contains non-numeric characters (letters, spaces, special chars)",
+      "Empty string being converted to float",
+      "String with thousands separator (e.g., '1,000.50')",
+      "String with currency symbol (e.g., '$19.99')",
+      "Whitespace around the number (e.g., ' 42.5 ')"
+    ],
+    solutions: [
+      "Strip whitespace first: float(s.strip())",
+      "Remove formatting: float(s.replace(',', '').replace('$', ''))",
+      "Use try/except to handle invalid input gracefully",
+      "Validate input before conversion",
+      "Use regex to extract numeric parts: float(re.search(r'[-+]?\\d*\\.?\\d+', s).group())"
+    ],
+    codeExample: `# ❌ Bad — no error handling
+price = float("$19.99")  # ValueError!
+
+# ❌ Bad — no stripping
+value = float(" 42.5 ")  # ValueError!
+
+# ✅ Good — strip and handle
+def safe_float(s, default=0.0):
+    try:
+        return float(s.strip().replace(',', '').replace('$', ''))
+    except (ValueError, AttributeError):
+        return default
+
+price = safe_float("$19.99")  # 19.99
+value = safe_float(" 42.5 ")  # 42.5
+bad = safe_float("hello")     # 0.0
+
+# ✅ Good — regex extraction
+import re
+text = "Price: $19.99 USD"
+match = re.search(r'[-+]?\\d*\\.?\\d+', text)
+if match:
+    price = float(match.group())  # 19.99`,
+    relatedErrors: ["python-typeerror-unsupported-operand", "python-indexerror-list-index-out-of-range"]
+  },
+  {
+    id: "npm-err-404-not-found",
+    errorMessage: "npm ERR! 404 Not Found - GET https://registry.npmjs.org/package-name",
+    language: "Node.js",
+    category: "npm",
+    explanation: "npm cannot find the package you're trying to install. The package doesn't exist on the npm registry, or you've misspelled the package name. This is one of the most common npm errors.",
+    causes: [
+      "Package name is misspelled",
+      "Package has been unpublished or removed from npm",
+      "Package is private and requires authentication",
+      "Using wrong registry (scoped package on public registry)",
+      "Typo in package name (e.g., 'react-dom' vs 'react-dom-dom')"
+    ],
+    solutions: [
+      "Double-check the package name: npm search <partial-name>",
+      "Verify the package exists: npm view <package-name>",
+      "For private packages, run npm login first",
+      "Check if the package was renamed (search npmjs.com)",
+      "For scoped packages, ensure correct scope: @scope/package-name"
+    ],
+    codeExample: `# ❌ Bad — wrong package name
+npm install react-domjs  # 404 Not Found
+
+# ✅ Good — search first
+npm search react-dom  # Find correct name
+npm install react-dom  # Correct
+
+# ❌ Bad — private package without auth
+npm install @my-company/private-lib  # 404 Not Found
+
+# ✅ Good — login first
+npm login --registry=https://registry.npmjs.org/
+npm install @my-company/private-lib
+
+# ✅ Good — verify package exists
+npm view package-name  # Shows package info if it exists`,
+    relatedErrors: ["npm-err-code-eresolve", "node-enoent"]
+  },
 ];
