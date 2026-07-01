@@ -5260,4 +5260,67 @@ npm install @my-company/private-lib
 npm view package-name  # Shows package info if it exists`,
     relatedErrors: ["npm-err-code-eresolve", "node-enoent"]
   },
+  {
+    id: "git-detached-head",
+    errorMessage: "You are in 'detached HEAD' state",
+    language: "Git",
+    category: "Warning",
+    explanation: "You've checked out a specific commit, tag, or branch without switching to a new branch. Any commits you make in this state won't belong to any branch and will be lost when you switch away.",
+    causes: [
+      "Running git checkout <commit-hash> directly",
+      "Running git checkout <tag-name>",
+      "Checking out a PR on GitHub which defaults to detached HEAD",
+      "Running git rebase which detaches HEAD during the process"
+    ],
+    solutions: [
+      "Create a branch: git checkout -b my-branch",
+      "If you want to keep changes: git checkout -b my-branch HEAD",
+      "To discard changes: git checkout main",
+      "For PRs: git checkout -b pr-branch-name"
+    ],
+    codeExample: `# ❌ Bad — detached HEAD\n$ git checkout abc1234\nHEAD is now at abc1234 commit message\n\n# ✅ Good — create a branch\n$ git checkout -b my-feature abc1234\nSwitched to a new branch 'my-feature'\n\n# ✅ Good — from detached state\n$ git checkout -b saved-work HEAD\nSwitched to a new branch 'saved-work'`,
+    relatedErrors: ["git-merge-branch-not-found", "git-rebase-conflict"]
+  },
+  {
+    id: "git-merge-branch-not-found",
+    errorMessage: "fatal: refusing to merge unrelated histories",
+    language: "Git",
+    category: "Fatal",
+    explanation: "Git is refusing to merge two branches that don't share a common ancestor. This typically happens when merging two repositories that were initialized separately, or when the main branch was force-pushed.",
+    causes: [
+      "Merging two repositories that were initialized independently",
+      "Force-pushing to the main branch, losing shared history",
+      "Merging a branch from a freshly reinitialized repo",
+      "Using --allow-unrelated-histories when you shouldn't"
+    ],
+    solutions: [
+      "Use --allow-unrelated-histories if the merge is intentional: git merge --allow-unrelated-histories other-branch",
+      "Rebase instead of merge: git rebase main",
+      "If accidental, reset the merge: git merge --abort",
+      "For new repos, consider using git pull --rebase instead"
+    ],
+    codeExample: `# ❌ Bad — merge fails\n$ git merge feature\nfatal: refusing to merge unrelated histories\n\n# ✅ Good — if intentional\n$ git merge --allow-unrelated-histories feature\n\n# ✅ Good — abort and rebase\n$ git merge --abort\n$ git rebase main`,
+    relatedErrors: ["git-detached-head", "git-rebase-conflict"]
+  },
+  {
+    id: "python-typeerror-unsupported-operand",
+    errorMessage: "TypeError: unsupported operand type(s) for +: 'int' and 'str'",
+    language: "Python",
+    category: "TypeError",
+    explanation: "You're trying to use the + operator between two incompatible types, like adding a number to a string. Python doesn't automatically convert types in arithmetic operations.",
+    causes: [
+      "Mixing numeric and string types in arithmetic",
+      "Reading input() without converting to int/float",
+      "API response returns string instead of number",
+      "JSON field containing number stored as string"
+    ],
+    solutions: [
+      "Explicit type conversion: int(str_value) or str(int_value)",
+      "Use f-strings for display: f'{x} + {y}'",
+      "Validate input before arithmetic: isinstance(value, (int, float))",
+      "Use type hints and a linter to catch these early"
+    ],
+    codeExample: `# ❌ Bad\nage = input("Enter age: ")  # returns string\nnext_year = age + 1  # TypeError\n\n# ✅ Good\nage = int(input("Enter age: "))  # convert to int\nnext_year = age + 1\n\n# ✅ Good — for display\nname = "Alice"\nprint("Hello " + name)  # string concat is fine\n\n# ❌ Bad\nx = "5"\nresult = x * 2  # "55", not 10\nresult = x + 2  # TypeError`,
+    relatedErrors: ["python-typeerror-not-hashable", "js-nan"]
+  },
 ];
