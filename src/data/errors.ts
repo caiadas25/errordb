@@ -4945,4 +4945,55 @@ rl.on('line', (line) => {
     codeExample: 'package main\n\nimport (\n    "fmt"\n    "os"       // ❌ unused\n    "strings"  // ❌ unused\n)\n\n// ✅ Good — remove unused imports\nimport "fmt"\n\nfunc main() {\n    fmt.Println("Hello, World!")\n}\n\n// Or use blank identifier for side effects\nimport _ "github.com/lib/pq"  // registers postgres driver',
     relatedErrors: ["go-cannot-declare-new-variables", "go-undefined-function"]
   },
+  // === Sprint A Round 29 ===
+  {
+    id: "python-syntaxerror-invalid-syntax",
+    errorMessage: "SyntaxError: invalid syntax",
+    language: "Python",
+    category: "SyntaxError",
+    explanation: "Python encountered a line of code that violates the language grammar. This is the most common error in Python, especially for beginners. It means the Python parser can't figure out what the code is supposed to do.",
+    causes: [
+      "Missing parentheses in a print statement (Python 3 requires print())",
+      "Using = instead of == in a comparison (if x = 5)",
+      "Missing colon after if, for, while, def, class, or try",
+      "Incorrect indentation after a colon",
+      "Using reserved keywords as variable names (class = 5)",
+      "Incomplete expression (hanging operator at end of line)",
+      "Missing closing parenthesis, bracket, or quote"
+    ],
+    solutions: [
+      "Check for missing colons at the end of if/for/while/def/class statements",
+      "Use == for comparison, = only for assignment",
+      "Make sure print() has parentheses in Python 3",
+      "Check for missing closing brackets or quotes",
+      "Avoid using Python keywords as variable names",
+      "Use a linter (pylint, flake8) to catch syntax errors automatically",
+      "Look at the line number in the error — the issue is usually on or just before that line"
+    ],
+    codeExample: `# ❌ Bad — missing parentheses (Python 3)\nprint "hello"\n# SyntaxError: invalid syntax\n\n# ❌ Bad — = instead of ==\nif x = 5:\n    print("yes")\n# SyntaxError: invalid syntax\n\n# ❌ Bad — missing colon\nif x > 5\n    print("yes")\n# SyntaxError: invalid syntax\n\n# ❌ Bad — reserved keyword\nclass = "Math"\n# SyntaxError: invalid syntax\n\n# ✅ Good\nprint("hello")\nif x == 5:\n    print("yes")\nif x > 5:\n    print("yes")\nclass_name = "Math"`,
+    relatedErrors: ["python-indentationerror", "python-taberror"]
+  },
+  {
+    id: "react-objects-not-valid-child",
+    errorMessage: "Objects are not valid as a React child",
+    language: "React",
+    category: "ReactError",
+    explanation: "You're trying to render a JavaScript object directly inside JSX. React can only render strings, numbers, arrays, and other React elements — not plain objects. This commonly happens when you forget to access a specific property of an object.",
+    causes: [
+      "Rendering an object directly: <div>{myObject}</div> instead of <div>{myObject.name}</div>",
+      "API response returns an object where you expected a string",
+      "State holds an object but you render it without accessing a property",
+      "Passing an object as a child to a component that expects a string",
+      "JSON.parse returns an object you forgot to extract a value from"
+    ],
+    solutions: [
+      "Access a specific property: <div>{user.name}</div> instead of <div>{user}</div>",
+      "Use JSON.stringify() if you need to display the whole object for debugging",
+      "Check what the API returns — it might wrap data in an object",
+      "Use optional chaining: <div>{user?.name ?? 'Unknown'}</div>",
+      "If rendering a list of objects, map to a string or element: items.map(i => <span>{i.label}</span>)"
+    ],
+    codeExample: `// ❌ Bad — rendering object directly\nconst user = { name: "Alice", age: 30 };\nreturn <div>{user}</div>; // Error!\n\n// ✅ Good — access a property\nreturn <div>{user.name}</div>;\n\n// ✅ Good — render all properties\nreturn (\n  <div>\n    <p>Name: {user.name}</p>\n    <p>Age: {user.age}</p>\n  </div>\n);\n\n// ✅ Good — for debugging, stringify\nreturn <pre>{JSON.stringify(user, null, 2)}</pre>;\n\n// ❌ Bad — API returns object, expected string\nconst response = await fetch("/api/data");\nconst data = await response.json();\nreturn <div>{data}</div>; // Error if data is an object!\n\n// ✅ Good — access the right property\nreturn <div>{data.message}</div>;`,
+    relatedErrors: ["react-hydration-mismatch", "react-cannot-read-properties-of-undefined"]
+  },
 ];
