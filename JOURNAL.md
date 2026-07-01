@@ -1,3 +1,30 @@
+## Sprint C (Round 26) -- July 1, 2026 (Growth Sprint)
+### What was done
+- Added 3 high-volume errors:
+  - python-importerror-cannot-import-name: "ImportError: cannot import name 'something'"
+    - Causes: typo, circular import, wrong package version
+    - Solutions: check module exports, lazy import, fix circular deps
+  - js-cors-error: CORS policy blocked by No Access-Control-Allow-Origin header
+    - Causes: missing CORS headers, different origin, preflight failure
+    - Solutions: server CORS headers, proxy, Next.js rewrites
+  - docker-container-exits-immediately: Container starts then exits
+    - Causes: CMD finishes immediately, startup crash, missing env vars
+    - Solutions: docker logs, interactive debug, foreground process, exec
+  - All with causes, solutions, code examples, and cross-links
+- Total: 203 errors (was 200)
+
+### Keywords targeted
+- "ImportError cannot import name" (new error page -- very high volume)
+- "CORS policy No Access-Control-Allow-Origin" (new error page -- very high volume)
+- "Docker container exits immediately" (new error page -- high volume)
+- "how to fix CORS error" (error content)
+
+### SEO fixes
+- Auto-generated sitemap includes new error pages
+- Cross-linked related errors
+
+---
+
 ## Sprint B (Round 25) -- July 1, 2026 (Growth Sprint)
 ### What was done
 - Added 3 high-volume errors:

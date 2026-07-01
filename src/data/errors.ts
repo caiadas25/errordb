@@ -4771,4 +4771,82 @@ rl.on('line', (line) => {
 // NODE_OPTIONS="--max-old-space-size=4096" next build`,
     relatedErrors: ["node-heap-out-of-memory", "js-cannot-read-properties-of-undefined"]
   },
+  {
+    id: "python-importerror-cannot-import-name",
+    errorMessage: "ImportError: cannot import name 'something' from 'module_name'",
+    language: "Python",
+    category: "ImportError",
+    explanation: "Python can't find the specific name (function, class, variable) you're trying to import from the module. The module exists, but the name you specified doesn't exist within it.",
+    causes: [
+      "Typo in the name you're importing",
+      "The name doesn't exist in the module (it may have been removed or renamed)",
+      "Circular import: module A imports from module B which imports from module A",
+      "The module hasn't been fully initialized yet when the import runs",
+      "You're importing from the wrong version of a package",
+      "The name is defined conditionally or lazily and isn't available yet"
+    ],
+    solutions: [
+      "Check the module's documentation for the correct name",
+      "Use `import module` and then `module.name` to see what's available",
+      "Run `dir(module_name)` in a Python shell to list all exports",
+      "Fix circular imports by moving the import inside a function",
+      "Upgrade or downgrade the package to the correct version",
+      "Use `from module import *` temporarily to see what names exist"
+    ],
+    codeExample: `# ❌ Bad — wrong name\nfrom collections import OrderedDict2\n\n# ❌ Bad — circular import\n# a.py imports from b.py, b.py imports from a.py\n\n# ✅ Good — check what's available\nimport collections\nprint(dir(collections))\n\n# ✅ Good — use the correct name\nfrom collections import OrderedDict\n\n# ✅ Good — lazy import to break circular dependency\ndef get_something():\n    from my_module import something\n    return something`,
+    relatedErrors: ["python-modulenotfounderror", "python-nameerror-name-is-not-defined"]
+  },
+  // === JavaScript ===
+  {
+    id: "js-cors-error",
+    errorMessage: "Access to XMLHttpRequest at 'https://api.example.com' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.",
+    language: "JavaScript",
+    category: "NetworkError",
+    explanation: "The browser's CORS (Cross-Origin Resource Sharing) policy is blocking the request. The server at the target URL didn't include the required `Access-Control-Allow-Origin` header in its response, so the browser refuses to let your JavaScript code access the response.",
+    causes: [
+      "The API server doesn't include CORS headers in its response",
+      "You're making a request from a different origin (protocol, domain, or port) than the server",
+      "The server only allows specific origins and yours isn't in the list",
+      "The request includes custom headers that trigger a preflight OPTIONS request that fails",
+      "Using credentials (cookies/auth) without the server allowing it",
+      "The API requires a specific Content-Type that triggers preflight"
+    ],
+    solutions: [
+      "Add CORS headers on the server: `Access-Control-Allow-Origin: *` or specific origin",
+      "Use a proxy server or Next.js API routes to bypass CORS during development",
+      "Configure your backend to include proper CORS headers for your frontend domain",
+      "In development, use your framework's proxy setting (e.g., Next.js rewrites)",
+      "Ensure the server handles OPTIONS preflight requests correctly",
+      "Check if the API provides a CORS configuration option"
+    ],
+    codeExample: `// ❌ Bad — direct cross-origin request (blocked)\nfetch('https://api.example.com/data')\n  .then(res => res.json())\n  .catch(err => console.error('CORS error'));\n\n// ✅ Good — use a proxy in Next.js (next.config.js)\n// module.exports = {\n//   async rewrites() {\n//     return [{\n//       source: '/api/:path*',\n//       destination: 'https://api.example.com/:path*'\n//     }];\n//   }\n// };\n\n// ✅ Good — Express server CORS setup\nconst cors = require('cors');\napp.use(cors({ origin: 'http://localhost:3000' }));\n\n// ✅ Good — fetch through your own API route\nfetch('/api/proxy/data').then(res => res.json());`,
+    relatedErrors: ["js-network-request-failed", "node-econnreset"]
+  },
+  // === Docker ===
+  {
+    id: "docker-container-exits-immediately",
+    errorMessage: "Error response from daemon: Cannot start container xyz: OCI runtime create failed: container process is already dead",
+    language: "Docker",
+    category: "ContainerError",
+    explanation: "Your Docker container starts and immediately exits. This usually means the main process inside the container is crashing or finishing instantly, often because the command isn't set up for long-running execution.",
+    causes: [
+      "The CMD or ENTRYPOINT command finishes immediately (e.g., a script that runs and exits)",
+      "The application inside the container has a startup error and crashes",
+      "The Dockerfile CMD uses exec form but the process isn't found",
+      "Missing environment variables that the application requires",
+      "The container doesn't have a foreground process (daemon mode issue)",
+      "Volume mount points to a non-existent directory or wrong permissions"
+    ],
+    solutions: [
+      "Check logs: `docker logs <container_id>` to see the crash output",
+      "Run interactively to debug: `docker run -it <image> /bin/sh`",
+      "Ensure your CMD runs a foreground process (not a daemon script)",
+      "For web servers, make sure the command doesn't fork to background",
+      "Check that required environment variables are set with `-e` flags",
+      "Verify the entrypoint script has correct permissions and line endings",
+      "Use `docker run --rm <image>` to see exit behavior clearly"
+    ],
+    codeExample: `# ❌ Bad — script runs and exits immediately\nCMD ["./startup.sh"]\n# startup.sh runs db migration then exits\n\n# ✅ Good — run the app in foreground\nCMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]\n# Or for Node.js:\nCMD ["node", "server.js"]\n\n# ✅ Good — combine migration + foreground in one script\n#!/bin/sh\npython manage.py migrate\nexec python manage.py runserver 0.0.0.0:8000\n# exec replaces the shell so PID 1 is your app\n\n# Debug commands:\ndocker logs <container_id>\ndocker run -it <image> /bin/sh\ndocker inspect <container_id>`,
+    relatedErrors: ["docker-cannot-find-image", "docker-no-space-left-on-device"]
+  },
 ];
