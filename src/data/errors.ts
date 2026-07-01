@@ -5323,4 +5323,68 @@ npm view package-name  # Shows package info if it exists`,
     codeExample: `# ❌ Bad\nage = input("Enter age: ")  # returns string\nnext_year = age + 1  # TypeError\n\n# ✅ Good\nage = int(input("Enter age: "))  # convert to int\nnext_year = age + 1\n\n# ✅ Good — for display\nname = "Alice"\nprint("Hello " + name)  # string concat is fine\n\n# ❌ Bad\nx = "5"\nresult = x * 2  # "55", not 10\nresult = x + 2  # TypeError`,
     relatedErrors: ["python-typeerror-not-hashable", "js-nan"]
   },
+  {
+    id: "git-push-rejected",
+    errorMessage: "! [rejected] main -> main (non-fast-forward)",
+    language: "Git",
+    category: "Error",
+    explanation: "Your local branch has diverged from the remote. Someone pushed changes to the remote branch that you don't have locally. Git refuses to push to prevent overwriting their work.",
+    causes: [
+      "Another developer pushed changes before you",
+      "You rebased and rewrote commit history",
+      "You checked out a different branch and made commits there",
+      "Force-pushing to a shared branch"
+    ],
+    solutions: [
+      "Pull first: git pull --rebase origin main (replays your commits on top)",
+      "Pull with merge: git pull origin main (creates a merge commit)",
+      "Force push (dangerous): git push --force-with-lease (safer than --force)",
+      "Use git fetch + git rebase for cleaner history"
+    ],
+    codeExample: `# ❌ Bad — push rejected\n$ git push\n! [rejected] main -> main (non-fast-forward)\n\n# ✅ Good — pull with rebase\n$ git pull --rebase origin main\n$ git push\n\n# ✅ Good — force with lease (safer)\n$ git push --force-with-lease origin main`,
+    relatedErrors: ["git-merge-branch-not-found", "git-detached-head"]
+  },
+  {
+    id: "python-file-not-found-error",
+    errorMessage: "FileNotFoundError: [Errno 2] No such file or directory: 'data.csv'",
+    language: "Python",
+    category: "FileError",
+    explanation: "Python cannot find the file you're trying to open. The file doesn't exist at the specified path, or you're running the script from a different directory than expected.",
+    causes: [
+      "File path is relative and script is run from wrong directory",
+      "File was deleted or moved",
+      "Typo in filename or directory name",
+      "File is in a different directory than the script",
+      "Using forward slashes on Windows (or vice versa)"
+    ],
+    solutions: [
+      "Use os.path.exists() to check before opening",
+      "Use absolute paths: open('/full/path/to/file.txt')",
+      "Use pathlib for cross-platform paths: Path(__file__).parent / 'data.csv'",
+      "Check current working directory: os.getcwd()"
+    ],
+    codeExample: `# ❌ Bad — fragile relative path\nwith open("data.csv") as f:\n    data = f.read()\n\n# ✅ Good — relative to script location\nfrom pathlib import Path\nscript_dir = Path(__file__).parent\ndata_path = script_dir / "data.csv"\nwith open(data_path) as f:\n    data = f.read()\n\n# ✅ Good — check first\nimport os\nif os.path.exists("data.csv"):\n    with open("data.csv") as f:\n        data = f.read()\nelse:\n    print("File not found")`,
+    relatedErrors: ["python-io-operation-on-closed-file", "node-enoent"]
+  },
+  {
+    id: "js-cors-error",
+    errorMessage: "Access to fetch at 'https://api.example.com' from origin 'http://localhost:3000' has been blocked by CORS policy",
+    language: "JavaScript",
+    category: "NetworkError",
+    explanation: "The browser's Same-Origin Policy blocks cross-origin requests unless the server explicitly allows them with CORS headers. This is a security feature, not a bug.",
+    causes: [
+      "Server doesn't send Access-Control-Allow-Origin header",
+      "Request includes credentials (cookies, auth headers) without proper CORS config",
+      "Server only allows specific origins, not yours",
+      "Preflight OPTIONS request fails or times out"
+    ],
+    solutions: [
+      "Configure server to send proper CORS headers",
+      "Use a proxy server or API gateway for development",
+      "Use server-side rendering to avoid client-side CORS",
+      "Check if the API has a CORS configuration endpoint"
+    ],
+    codeExample: `// Server-side fix (Express.js)\napp.use((req, res, next) => {\n  res.header('Access-Control-Allow-Origin', '*');\n  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');\n  res.header('Access-Control-Allow-Headers', 'Content-Type');\n  next();\n});\n\n// Client-side workaround (development)\n// Use a proxy in package.json or vite.config.js\n// "proxy": "http://localhost:8080"`,
+    relatedErrors: ["js-fetch-failed", "node-err-require-esm"]
+  },
 ];
