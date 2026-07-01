@@ -4658,4 +4658,117 @@ for row in data:
     print(first)`,
     relatedErrors: ["python-typeerror-unsupported-operand"],
   },
+  // === Node.js ===
+  {
+    id: "node-err-require-esm",
+    errorMessage: "Error [ERR_REQUIRE_ESM]: require() of ES Module ... not supported.",
+    language: "Node.js",
+    category: "ERR_REQUIRE_ESM",
+    explanation: "You're trying to `require()` an ES Module (ESM) from a CommonJS (CJS) context. Node.js cannot load ESM modules using `require()` — ESM must be loaded with `import` or dynamic `import()`.",
+    causes: [
+      "The dependency you're importing has been updated to use ES Modules (type: module in package.json)",
+      "Your project uses CommonJS (no type: module in package.json) but imports an ESM-only package",
+      "Using require() instead of import in a file that depends on ESM packages",
+      "The package.json of the dependency specifies \"type\": \"module\""
+    ],
+    solutions: [
+      "Convert your file to use `import` instead of `require()`",
+      "Add `\"type\": \"module\"` to your package.json (may require other changes)",
+      "Use dynamic import: `const mod = await import('package-name')`",
+      "Check if the package offers a CJS build (some packages have dual CJS/ESM exports)",
+      "Downgrade the dependency to a version that still supports CJS",
+      "Use a bundler like esbuild or webpack that can handle ESM/CJS interop"
+    ],
+    codeExample: `// ❌ Bad — CommonJS require() of ESM package
+const somePackage = require('some-esm-package');
+
+// ✅ Good — Use import
+import somePackage from 'some-esm-package';
+
+// ✅ Good — Dynamic import in CommonJS
+const somePackage = await import('some-esm-package');
+
+// ✅ Good — Add "type": "module" to package.json
+// Then use import everywhere`,
+    relatedErrors: ["node-cannot-find-module", "node-enoent"]
+  },
+  // === Python ===
+  {
+    id: "python-typeerror-unhashable-type",
+    errorMessage: "TypeError: unhashable type: 'dict'",
+    language: "Python",
+    category: "TypeError",
+    explanation: "You're trying to use a mutable object (like a dict, list, or set) as a dictionary key or as an element of a set. Only hashable (immutable) types can be used as dictionary keys or set elements.",
+    causes: [
+      "Using a dictionary as a key in another dictionary: `{my_dict: value}`",
+      "Using a list as a set element: `{[1, 2, 3]}`",
+      "Passing a dict/list to a function that requires hashable arguments (like `hash()`)",
+      "Using a dict/list as a key in a `defaultdict` or `Counter`",
+      "Trying to add a mutable object to a `frozenset`"
+    ],
+    solutions: [
+      "Convert the dict to a `frozenset` or tuple: `frozenset(my_dict.items())`",
+      "Use a tuple instead of a list as a set element: `{(1, 2, 3)}`",
+      "Use an immutable type as a dict key (str, int, tuple, frozenset)",
+      "If you need to store complex structures as keys, consider using a nested dict instead",
+      "Use `json.dumps()` to convert a dict to a hashable string key"
+    ],
+    codeExample: `# ❌ Bad — dict is not hashable
+my_dict = {"a": 1, "b": 2}
+lookup = {my_dict: "value"}  # TypeError
+
+# ✅ Good — Use a frozenset or tuple
+lookup = {frozenset(my_dict.items()): "value"}
+
+# ✅ Good — Use a tuple for list keys
+my_list = [1, 2, 3]
+lookup = {tuple(my_list): "value"}
+
+# ✅ Good — Use json string as key
+import json
+lookup = {json.dumps(my_dict, sort_keys=True): "value"}`,
+    relatedErrors: ["python-typeerror-unhashable-type-set", "python-typeerror-list-index-out-of-range"]
+  },
+  // === JavaScript ===
+  {
+    id: "js-out-of-memory",
+    errorMessage: "FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory",
+    language: "JavaScript",
+    category: "MemoryError",
+    explanation: "Node.js has run out of memory. The V8 engine has a default heap size limit (typically 1.5GB-4GB depending on platform) and your program has exceeded it.",
+    causes: [
+      "Memory leak: variables, event listeners, or closures holding references that prevent garbage collection",
+      "Processing very large files or datasets entirely in memory",
+      "Infinite recursion or very deep call stacks",
+      "Accumulating objects in arrays/maps without cleanup",
+      "Loading a very large module tree or many dependencies",
+      "Circular references preventing garbage collection"
+    ],
+    solutions: [
+      "Increase the heap size: `node --max-old-space-size=8192 script.js`",
+      "Fix memory leaks: use Chrome DevTools heap snapshots to find retained objects",
+      "Stream large files instead of loading entirely into memory (fs.createReadStream)",
+      "Use generators or async iteration for large datasets",
+      "Process data in chunks instead of loading everything at once",
+      "Check for event listener leaks: remove listeners when done",
+      "Use `--inspect` flag to profile memory usage"
+    ],
+    codeExample: `// ❌ Bad — Loading entire large file
+const fs = require('fs');
+const data = fs.readFileSync('huge-file.json', 'utf8');
+const parsed = JSON.parse(data); // Uses 2x memory
+
+// ✅ Good — Stream and process in chunks
+const fs = require('fs');
+const readline = require('readline');
+const stream = fs.createReadStream('huge-file.json');
+const rl = readline.createInterface({ input: stream });
+rl.on('line', (line) => {
+  // Process one line at a time
+});
+
+// ✅ Good — Increase heap size for build tools
+// NODE_OPTIONS="--max-old-space-size=4096" next build`,
+    relatedErrors: ["node-heap-out-of-memory", "js-cannot-read-properties-of-undefined"]
+  },
 ];

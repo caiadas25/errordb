@@ -1,4 +1,25 @@
-## Sprint A (Round 23) -- June 30, 2026 (Growth Sprint)
+## Sprint B (Round 25) -- July 1, 2026 (Growth Sprint)
+### What was done
+- Added 3 high-volume errors:
+  - node-err-require-esm: "Error [ERR_REQUIRE_ESM]: require() of ES Module not supported"
+    - Causes: ESM-only package, CommonJS context, require() vs import
+    - Solutions: Use import, dynamic import, type:module, dual CJS/ESM
+  - python-typeerror-unhashable-type: "TypeError: unhashable type: 'dict'"
+    - Causes: dict as key, list in set, hash() on mutable
+    - Solutions: frozenset, tuple, json.dumps as key
+  - js-out-of-memory: "FATAL ERROR: Reached heap limit Allocation failed"
+    - Causes: memory leak, large files, infinite recursion
+    - Solutions: --max-old-space-size, streaming, DevTools profiling
+  - Total: 200 errors (was 197)
+
+### Keywords targeted
+- "Node.js ERR_REQUIRE_ESM" (new error page -- high volume)
+- "Python TypeError unhashable type dict" (new error page -- high volume)
+- "JavaScript heap out of memory" (new error page -- high volume)
+- "ERR_REQUIRE_ESM fix" (error content)
+
+---
+
 ## Sprint A (Round 24) -- June 30, 2026 (Growth Sprint)
 ### What was done
 - Added 2 high-volume errors:
@@ -12,94 +33,3 @@
 - "JavaScript Cannot read properties of undefined" (new error page -- very high volume)
 
 ---
-### What was done
-- Added 2 high-volume errors:
-  - ruby-nomethoderror-undefined-method: "NoMethodError: undefined method `foo' for #<Bar>"
-    - Causes: typo, nil object, method renamed, instance vs class method, missing require
-    - Solutions: safe navigation operator (&.), respond_to?, nil check, require gems
-  - go-nil-pointer-dereference: "runtime error: invalid memory address or nil pointer dereference"
-    - Causes: nil pointer method call, nil struct pointer, uninitialized map/slice, unchecked error
-    - Solutions: nil check, make() for maps/slices, error handling pattern
-  - Total: 195 errors (was 193)
-
-### Keywords targeted
-- "Ruby NoMethodError undefined method" (new error page -- very high volume)
-- "Go nil pointer dereference" (new error page -- very high volume)
-
----
-## Sprint A (Round 22) -- June 30, 2026 (Growth Sprint)
-### What was done
-- Added 2 high-volume errors:
-  - js-syntaxerror-unexpected-end-json: "SyntaxError: Unexpected end of JSON input"
-    - Causes: empty API response, HTML error page, CORS opaque response, double-read body
-    - Solutions: check response.ok, try/catch JSON.parse, log response.text()
-  - python-valueerror-too-many-values-to-unpack: "ValueError: too many values to unpack (expected 2)"
-    - Causes: tuple with more elements than variables, wrong CSV column count
-    - Solutions: star unpacking, indexing, check length first
-- All with causes, solutions, code examples, and cross-links
-- Total: 193 errors (was 191)
-
-### Keywords targeted
-- "SyntaxError Unexpected end of JSON input" (new error page -- very high volume)
-- "ValueError too many values to unpack Python" (new error page -- very high volume)
-
----
-
-## Sprint A (Round 21) — June 30, 2026 (Growth Sprint — ErrorDB Quick Wins)
-### What was done
-- Added 2 high-volume Python errors:
-  - python-indexerror-list-index-out-of-range: "IndexError: list index out of range"
-    - Causes: off-by-one, empty list, negative index on empty list
-    - Solutions: check length, iterate directly, try/except, safe access function
-  - python-typeerror-unsupported-operand: "TypeError: unsupported operand type(s) for +: 'int' and 'str'"
-    - Causes: string + number, input() returns string, mixed types
-    - Solutions: int()/float(), f-strings, str(), isinstance()
-- All with causes, solutions, code examples, and cross-links
-- Total: 191 errors (was 189)
-
-### Keywords targeted
-- "IndexError list index out of range Python" (new error page — very high volume)
-- "TypeError unsupported operand type Python" (new error page — very high volume)
-
----
-
-## Sprint A (Round 20) — June 30, 2026 (Growth Sprint — ErrorDB Quick Wins)
-### What was done
-- Added 2 high-volume error entries:
-  - python-modulenotfounderror: "ModuleNotFoundError: No module named 'xyz'" (pip install, environment, file naming solutions)
-  - js-typeerror-x-is-not-a-function: "TypeError: x is not a function" (import/export, async/await, class instantiation solutions)
-- All include causes, solutions, code examples, and cross-links
-- Current stats: 189 errors (was 187), 25+ languages
-
-### Keywords targeted
-- "python ModuleNotFoundError" (new error page — very high volume)
-- "No module named" Python error (new error page)
-- "TypeError x is not a function" (new error page — very high volume)
-- "JavaScript is not a function" (new error page)
-
----
-
-## Sprint A (Round 19) — June 30, 2026 (Growth Sprint — Full Sprint)
-### What was done
-- Added 3 high-volume error entries:
-  - node-enoent: "Error: ENOENT: no such file or directory" (path.resolve, try/catch solutions)
-  - java-nullpointerexception: "java.lang.NullPointerException" (Optional, null checks, requireNonNull)
-  - python-nonetype-object: "AttributeError: NoneType object has no attribute" (Optional type hints, default values)
-- All include causes, solutions, code examples, and cross-links
-- Current stats: 187 errors (was 184), 25+ languages
-
-### Keywords targeted
-- "ENOTENT error node.js" (new error page — very high volume)
-- "java NullPointerException" (new error page — extremely high volume)
-- "Python AttributeError NoneType object" (new error page — very high volume)
-
----
-
-## Daily Strategic Review — June 30, 2026, 17:00 UTC
-
-### Deployment Status
-- **Latest deploy:** Sprint B R16 (Java IndexOutOfBoundsException + Node.js UnhandledPromiseRejection)
-- **Errors total:** 183 (was 181)
-- **Languages:** 25+
-- **State:** READY, production, IAD1 region
-- **Zero runtime errors** across all tracked categories
