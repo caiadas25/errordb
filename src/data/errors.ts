@@ -5387,4 +5387,71 @@ npm view package-name  # Shows package info if it exists`,
     codeExample: `// Server-side fix (Express.js)\napp.use((req, res, next) => {\n  res.header('Access-Control-Allow-Origin', '*');\n  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');\n  res.header('Access-Control-Allow-Headers', 'Content-Type');\n  next();\n});\n\n// Client-side workaround (development)\n// Use a proxy in package.json or vite.config.js\n// "proxy": "http://localhost:8080"`,
     relatedErrors: ["js-fetch-failed", "node-err-require-esm"]
   },
+  {
+    id: "python-recursionerror-max-depth",
+    errorMessage: "RecursionError: maximum recursion depth exceeded",
+    language: "Python",
+    category: "RecursionError",
+    explanation: "Python hit the maximum recursion depth limit (default 1000). This means a function is calling itself too many times without reaching a base case, or the recursion is genuinely too deep for the stack.",
+    causes: [
+      "Infinite recursion — missing or unreachable base case",
+      "Circular data structures causing recursive traversal to loop",
+      "Very deep recursion (e.g., traversing deeply nested JSON or trees)",
+      "Recursive function with too many local variables per call"
+    ],
+    solutions: [
+      "Add or fix the base case to stop recursion",
+      "Increase the limit: `sys.setrecursionlimit(5000)` (use cautiously)",
+      "Convert to iterative approach with a stack or queue",
+      "Use `@functools.lru_cache` to memoize recursive calls"
+    ],
+    codeExample: `# ❌ Infinite recursion (no base case)\ndef factorial(n):\n    return n * factorial(n - 1)\n\n# ✅ Base case added\ndef factorial(n):\n    if n <= 1:\n        return 1\n    return n * factorial(n - 1)\n\n# ✅ Iterative alternative\ndef factorial(n):\n    result = 1\n    for i in range(2, n + 1):\n        result *= i\n    return result\n\n# Increase limit (temporary fix)\nimport sys\nsys.setrecursionlimit(5000)`,
+    relatedErrors: ["python-syntaxerror-invalid-syntax", "python-typeerror-unsupported-operand"]
+  },
+  {
+    id: "js-err-connection-refused",
+    errorMessage: "ERR_CONNECTION_REFUSED",
+    language: "JavaScript",
+    category: "NetworkError",
+    explanation: "The browser or Node.js cannot establish a TCP connection to the target server. The server is either not running, not listening on the expected port, or a firewall is blocking the connection.",
+    causes: [
+      "Target server is not running or has crashed",
+      "Wrong hostname or port in the URL",
+      "Firewall or security group blocking the connection",
+      "Server is listening on a different network interface (e.g., 127.0.0.1 vs 0.0.0.0)",
+      "Server is starting up slowly and hasn't bound to the port yet"
+    ],
+    solutions: [
+      "Verify the server is running: `curl http://localhost:PORT`",
+      "Check the port number in your code and the server config",
+      "Check firewall rules: `sudo ufw status` or cloud security groups",
+      "Ensure server binds to 0.0.0.0 (not just 127.0.0.1) for remote access",
+      "Add retry logic with exponential backoff for transient failures"
+    ],
+    codeExample: `// ❌ Wrong port or server not running\nfetch('http://localhost:3000/api/data')\n  .catch(err => console.error(err.message))\n  // TypeError: Failed to fetch\n\n// ✅ Retry with backoff\nasync function fetchWithRetry(url, retries = 3) {\n  for (let i = 0; i < retries; i++) {\n    try {\n      const res = await fetch(url)\n      if (!res.ok) throw new Error(res.statusText)\n      return await res.json()\n    } catch (err) {\n      if (i === retries - 1) throw err\n      await new Promise(r => setTimeout(r, 1000 * 2 ** i))\n    }\n  }\n}\n\n// Check if server is up first\ncurl -s http://localhost:3000/health`,
+    relatedErrors: ["js-fetch-failed", "node-econnrefused"]
+  },
+  {
+    id: "git-permission-denied-publickey",
+    errorMessage: "Permission denied (publickey).",
+    language: "Git",
+    category: "AuthenticationError",
+    explanation: "SSH authentication failed when connecting to the Git remote. The server rejected your SSH key, or no matching key was offered. This is the most common error when pushing/pulling over SSH.",
+    causes: [
+      "SSH key not added to the remote (GitHub/GitLab) account",
+      "Wrong SSH key being offered (multiple keys in ~/.ssh/)",
+      "SSH agent not running or key not added to agent",
+      "Remote URL uses SSH but you expected HTTPS",
+      "Key file has wrong permissions (must be 600 for private key)"
+    ],
+    solutions: [
+      "Check which key is being used: `ssh -T git@github.com`",
+      "Add key to agent: `ssh-add ~/.ssh/id_ed25519`",
+      "Copy public key to GitHub: `cat ~/.ssh/id_ed25519.pub`",
+      "Fix permissions: `chmod 600 ~/.ssh/id_ed25519`",
+      "Switch remote to HTTPS: `git remote set-url origin https://github.com/user/repo.git`"
+    ],
+    codeExample: `# Test SSH connection\nssh -T git@github.com\n# Hi username! You've successfully authenticated\n\n# Check which key is offered\nssh -vT git@github.com 2>&1 | grep "Offering"\n\n# Add key to SSH agent\neval "$(ssh-agent -s)"\nssh-add ~/.ssh/id_ed25519\n\n# Fix permissions\nchmod 700 ~/.ssh\nchmod 600 ~/.ssh/id_ed25519\nchmod 644 ~/.ssh/id_ed25519.pub\n\n# Switch to HTTPS if needed\ngit remote set-url origin https://github.com/user/repo.git`,
+    relatedErrors: ["git-push-rejected", "git-detached-head"]
+  },
 ];
