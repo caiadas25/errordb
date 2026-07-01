@@ -4996,4 +4996,56 @@ rl.on('line', (line) => {
     codeExample: `// ❌ Bad — rendering object directly\nconst user = { name: "Alice", age: 30 };\nreturn <div>{user}</div>; // Error!\n\n// ✅ Good — access a property\nreturn <div>{user.name}</div>;\n\n// ✅ Good — render all properties\nreturn (\n  <div>\n    <p>Name: {user.name}</p>\n    <p>Age: {user.age}</p>\n  </div>\n);\n\n// ✅ Good — for debugging, stringify\nreturn <pre>{JSON.stringify(user, null, 2)}</pre>;\n\n// ❌ Bad — API returns object, expected string\nconst response = await fetch("/api/data");\nconst data = await response.json();\nreturn <div>{data}</div>; // Error if data is an object!\n\n// ✅ Good — access the right property\nreturn <div>{data.message}</div>;`,
     relatedErrors: ["react-hydration-mismatch", "react-cannot-read-properties-of-undefined"]
   },
+  // === Sprint B Round 30 ===
+  {
+    id: "java-could-not-find-or-load-main-class",
+    errorMessage: "Error: Could not find or load main class",
+    language: "Java",
+    category: "RuntimeError",
+    explanation: "The Java Virtual Machine (JVM) cannot locate the main class specified in the command. This happens when the class file doesn't exist at the expected path, the class name doesn't match, or the classpath is misconfigured.",
+    causes: [
+      "The class name doesn't match the filename (case-sensitive)",
+      "The .class file hasn't been compiled yet",
+      "The classpath doesn't include the directory containing the .class file",
+      "Running from the wrong directory",
+      "The class is in a package but you're not using the full package path",
+      "Typo in the class name"
+    ],
+    solutions: [
+      "Make sure the class name exactly matches the filename (Java is case-sensitive)",
+      "Compile first: javac MyClass.java, then run: java MyClass",
+      "Run from the directory containing the .class file",
+      "Use the full package path: java com.example.MyClass",
+      "Check your classpath with: echo %CLASSPATH% (Windows) or echo $CLASSPATH (Mac/Linux)",
+      "Use -cp flag: java -cp ./src com.example.MyClass"
+    ],
+    codeExample: `// ❌ Bad — filename is MyClass.java but class name is MyClass\n// $ javac MyClass.java\n// $ java MyClass\n// Error: Could not find or load main class MyClass\n\n// ✅ Good — ensure class name matches filename\n// File: HelloWorld.java\npublic class HelloWorld {\n    public static void main(String[] args) {\n        System.out.println("Hello, World!");\n    }\n}\n// $ javac HelloWorld.java\n// $ java HelloWorld\n// Hello, World!\n\n// ✅ Good — for packaged classes, use full path\n// File: src/com/example/App.java\n// $ javac src/com/example/App.java\n// $ java -cp src com.example.App`,
+    relatedErrors: ["java-classnotfoundexception", "java-noclassdeffounderror"]
+  },
+  {
+    id: "typescript-type-not-assignable",
+    errorMessage: "Type 'X' is not assignable to type 'Y'",
+    language: "TypeScript",
+    category: "TypeError",
+    explanation: "TypeScript's type checker found that a value of one type cannot be used where another type is expected. This is the most common TypeScript error and covers a wide range of type mismatches.",
+    causes: [
+      "Passing a string where a number is expected (or vice versa)",
+      "Missing required properties in an object",
+      "Extra properties not defined in the type (object literal excess property check)",
+      "Returning the wrong type from a function",
+      "Using a union type incorrectly",
+      "Null or undefined where a concrete type is expected",
+      "Array type mismatch: string[] where number[] is expected"
+    ],
+    solutions: [
+      "Check the type annotations and ensure the value matches",
+      "Add or remove properties to match the expected type",
+      "Use type assertions (as Type) if you know the type is correct at runtime",
+      "Use optional chaining and nullish coalescing for nullable values",
+      "Update the type definition if the expected type is too strict",
+      "Use generic types to make functions more flexible"
+    ],
+    codeExample: `// ❌ Bad — wrong type\nlet name: string = 42;\n// Type '42' is not assignable to type 'string'\n\n// ❌ Bad — missing property\ninterface User { name: string; age: number; }\nconst user: User = { name: "Alice" };\n// Property 'age' is missing\n\n// ❌ Bad — extra property (object literal check)\nconst user: User = { name: "Alice", age: 30, email: "a@b.com" };\n// Object literal may only specify known properties\n\n// ✅ Good — match the types\nlet name: string = "Alice";\nlet age: number = 42;\n\n// ✅ Good — include all required properties\nconst user: User = { name: "Alice", age: 30 };\n\n// ✅ Good — use type assertion if you know better\nconst input = document.getElementById("name") as HTMLInputElement;\ninput.value = "Hello";\n\n// ✅ Good — use optional properties\ninterface User {\n  name: string;\n  age: number;\n  email?: string; // optional\n}`,
+    relatedErrors: ["typescript-property-does-not-exist", "typescript-argument-not-assignable"]
+  },
 ];
