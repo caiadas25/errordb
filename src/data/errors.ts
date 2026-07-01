@@ -4899,4 +4899,50 @@ rl.on('line', (line) => {
     codeExample: `// ❌ Bad — variable not declared\nconsole.log(name); // ReferenceError: name is not defined\n\n// ✅ Good — declare before use\nconst name = "Alice";\nconsole.log(name); // Alice\n\n// ❌ Bad — block scope leak\nif (true) {\n  let secret = 42;\n}\nconsole.log(secret); // ReferenceError: secret is not defined\n\n// ✅ Good — declare in accessible scope\nlet secret;\nif (true) {\n  secret = 42;\n}\nconsole.log(secret); // 42\n\n// ❌ Bad — function expression called before defined\nsayHello(); // ReferenceError: Cannot access 'sayHello' before initialization\nconst sayHello = () => console.log("Hello!");\n\n// ✅ Good — function declaration is hoisted\nsayHello(); // Hello!\nfunction sayHello() { console.log("Hello!"); }`,
     relatedErrors: ["js-cannot-read-properties-of-undefined", "js-cannot-access-before-initialization"]
   },
+  // === Sprint A Round 28 ===
+  {
+    id: "python-indentationerror",
+    errorMessage: "IndentationError: unexpected indent",
+    language: "Python",
+    category: "IndentationError",
+    explanation: "Python uses indentation to define code blocks. This error occurs when a line is indented more (or less) than expected, breaking the indentation structure.",
+    causes: [
+      "Mixed tabs and spaces — Python expects consistent indentation",
+      "A line is indented but shouldn't be (e.g., after an if statement with no body)",
+      "Missing colon at the end of a function, if, for, while, or class statement",
+      "Extra indentation in a continuation line",
+      "Copy-pasting code from different sources with different indentation styles"
+    ],
+    solutions: [
+      "Use spaces consistently (4 spaces per indent level is PEP 8 standard)",
+      "Check your editor's settings to convert tabs to spaces",
+      "Make sure every block (if, for, while, def, class) has a colon and an indented body",
+      "Use an auto-formatter like black or autopep8 to fix indentation automatically",
+      "Enable 'Show Whitespace' in your editor to see tabs vs spaces"
+    ],
+    codeExample: `# ❌ Bad — mixed tabs and spaces\nif True:\n\tprint("hello")  # tab\n    print("world")  # spaces\n\n# ✅ Bad — missing colon\nif True\n    print("hello")\n\n# ✅ Good — consistent 4-space indentation\nif True:\n    print("hello")\n    print("world")\n\n# Auto-format with black:\n# pip install black\n# black your_script.py`,
+    relatedErrors: ["python-taberror", "python-syntaxerror-invalid-syntax"]
+  },
+  {
+    id: "go-undeclared-import",
+    errorMessage: "imported and not used",
+    language: "Go",
+    category: "CompileError",
+    explanation: "Go requires that every imported package is actually used in the code. If you import a package but don't reference any of its symbols, the compiler rejects the code.",
+    causes: [
+      "You imported a package but forgot to use it",
+      "You removed code that used the package but left the import",
+      "You imported the wrong package name",
+      "You have a typo in the variable/function name from the imported package"
+    ],
+    solutions: [
+      "Remove unused import statements",
+      "Use an IDE that auto-removes unused imports (VS Code, GoLand)",
+      "Run 'goimports' to auto-fix imports: go install golang.org/x/tools/cmd/goimports@latest",
+      "Use the blank identifier for side-effect imports: import _ \"github.com/lib/pq\"",
+      "Check for typos in the function/variable names from the import"
+    ],
+    codeExample: 'package main\n\nimport (\n    "fmt"\n    "os"       // ❌ unused\n    "strings"  // ❌ unused\n)\n\n// ✅ Good — remove unused imports\nimport "fmt"\n\nfunc main() {\n    fmt.Println("Hello, World!")\n}\n\n// Or use blank identifier for side effects\nimport _ "github.com/lib/pq"  // registers postgres driver',
+    relatedErrors: ["go-cannot-declare-new-variables", "go-undefined-function"]
+  },
 ];
