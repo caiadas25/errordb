@@ -60,3 +60,19 @@
 - "JavaScript Cannot read properties of undefined" (new error page -- very high volume)
 
 ---
+
+## Sprint D (Round 27) -- July 1, 2026 (Growth Sprint)
+### What was done
+- Added 2 high-volume errors:
+  - python-nonetype-not-callable: TypeError: 'NoneType' object is not callable (missing return, shadowed built-ins)
+  - js-referenceerror-not-defined: ReferenceError: myVariable is not defined (undeclared variables, scope issues)
+  - All with causes, solutions, code examples, and cross-links
+  - Total: 205 errors (was 203)
+
+### Keywords targeted
+- "TypeError NoneType object is not callable" (new error page -- very high volume)
+- "ReferenceError is not defined" (new error page -- very high volume)
+- "Python NoneType callable" (error content)
+- "JavaScript ReferenceError" (error content)
+
+---

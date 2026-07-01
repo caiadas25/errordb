@@ -4849,4 +4849,54 @@ rl.on('line', (line) => {
     codeExample: `# ❌ Bad — script runs and exits immediately\nCMD ["./startup.sh"]\n# startup.sh runs db migration then exits\n\n# ✅ Good — run the app in foreground\nCMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]\n# Or for Node.js:\nCMD ["node", "server.js"]\n\n# ✅ Good — combine migration + foreground in one script\n#!/bin/sh\npython manage.py migrate\nexec python manage.py runserver 0.0.0.0:8000\n# exec replaces the shell so PID 1 is your app\n\n# Debug commands:\ndocker logs <container_id>\ndocker run -it <image> /bin/sh\ndocker inspect <container_id>`,
     relatedErrors: ["docker-cannot-find-image", "docker-no-space-left-on-device"]
   },
+  // === Python ===
+  {
+    id: "python-nonetype-not-callable",
+    errorMessage: "TypeError: 'NoneType' object is not callable",
+    language: "Python",
+    category: "TypeError",
+    explanation: "You're trying to call a variable like a function, but its value is None. This happens when a function doesn't have an explicit return statement (implicitly returns None), and you then try to call the result as if it were a function.",
+    causes: [
+      "A function has no return statement and you call its return value as a function",
+      "You accidentally shadowed a built-in function (e.g., list = [1,2,3]; list())",
+      "An assignment overwrites a function with None (e.g., my_func = my_func())",
+      "A method returns None and you try to chain another call on it",
+      "A variable was expected to hold a function/class but is None due to a failed import or initialization"
+    ],
+    solutions: [
+      "Check the function for a missing or misplaced return statement",
+      "Avoid using variable names that shadow built-ins (don't use list, dict, type as variable names)",
+      "Use a debugger or print statements to check the variable's value before calling",
+      "Add a None check: `if my_func is not None: my_func()`",
+      "Verify that imports are successful and the function/class is actually loaded"
+    ],
+    codeExample: `# ❌ Bad — function returns None, then called as function\ndef get_multiplier(factor):\n    result = factor * 2\n    # Missing return statement!\n\nmultiplier = get_multiplier(5)\nprint(multiplier(3))  # TypeError: 'NoneType' object is not callable\n\n# ✅ Good — add return statement\ndef get_multiplier(factor):\n    def multiply(x):\n        return x * factor\n    return multiply\n\nmultiplier = get_multiplier(5)\nprint(multiplier(3))  # 15\n\n# ❌ Bad — shadowing built-in\ntype = "hello"\nprint(type(42))  # TypeError: 'str' object is not callable\n\n# ✅ Good — don't shadow built-ins\ntype_name = "hello"\nprint(type(42))  # <class 'int'>`,
+    relatedErrors: ["python-nameerror-name-is-not-defined", "python-attributeerror-nonetype"]
+  },
+  // === JavaScript ===
+  {
+    id: "js-referenceerror-not-defined",
+    errorMessage: "ReferenceError: myVariable is not defined",
+    language: "JavaScript",
+    category: "ReferenceError",
+    explanation: "You're trying to use a variable, function, or object that hasn't been declared in the current scope. Unlike some other languages, JavaScript doesn't create variables until they're explicitly declared with var, let, or const.",
+    causes: [
+      "The variable hasn't been declared yet (typo or missing declaration)",
+      "The variable is declared in a different scope (block, function, module)",
+      "The variable is declared with const/let in a block scope and used outside it",
+      "A function is called before it's defined (for function declarations, they're hoisted, but not for function expressions or arrow functions)",
+      "You're trying to access an undeclared global variable",
+      "The variable name has a typo"
+    ],
+    solutions: [
+      "Declare the variable before using it with let, const, or var",
+      "Check for typos in the variable name",
+      "Move the declaration to the appropriate scope",
+      "For function expressions and arrow functions, define them before calling",
+      "Use typeof to safely check if a variable exists: `if (typeof myVar !== 'undefined')`",
+      "Enable strict mode to catch undeclared variables early"
+    ],
+    codeExample: `// ❌ Bad — variable not declared\nconsole.log(name); // ReferenceError: name is not defined\n\n// ✅ Good — declare before use\nconst name = "Alice";\nconsole.log(name); // Alice\n\n// ❌ Bad — block scope leak\nif (true) {\n  let secret = 42;\n}\nconsole.log(secret); // ReferenceError: secret is not defined\n\n// ✅ Good — declare in accessible scope\nlet secret;\nif (true) {\n  secret = 42;\n}\nconsole.log(secret); // 42\n\n// ❌ Bad — function expression called before defined\nsayHello(); // ReferenceError: Cannot access 'sayHello' before initialization\nconst sayHello = () => console.log("Hello!");\n\n// ✅ Good — function declaration is hoisted\nsayHello(); // Hello!\nfunction sayHello() { console.log("Hello!"); }`,
+    relatedErrors: ["js-cannot-read-properties-of-undefined", "js-cannot-access-before-initialization"]
+  },
 ];
