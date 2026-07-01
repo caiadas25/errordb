@@ -1,3 +1,51 @@
+## Sprint A (Round 31) -- July 1, 2026 (Growth Sprint)
+### What was done
+- Added 3 high-volume errors:
+  - cpp-segmentation-fault: "Segmentation fault (core dumped)"
+    - Causes: null pointer dereference, array out of bounds, dangling pointers, stack overflow
+    - Solutions: gdb debugging, smart pointers, std::vector, AddressSanitizer
+  - python-module-not-found: "ModuleNotFoundError: No module named 'xyz'"
+    - Causes: missing install, wrong environment, typos, circular imports
+    - Solutions: pip install, verify environment, check package vs import name
+  - rust-cannot-move-out-of: "cannot move out of value because it is borrowed"
+    - Causes: moving while borrowed, dangling references, iterator consumption
+    - Solutions: clone, use references, .into_iter(), Rc/Arc
+- Total: 214 errors (was 211)
+
+### Keywords targeted
+- "Segmentation fault C++" (new error page -- very high volume)
+- "ModuleNotFoundError Python" (new error page -- very high volume)
+- "cannot move out of value Rust" (new error page -- high volume)
+
+### SEO fixes
+- Auto-generated sitemap includes new error pages
+- Cross-linked related errors
+
+---
+
+## Sprint B (Round 30) -- July 1, 2026 (Growth Sprint)
+### What was done
+- Added 2 high-volume errors:
+  - java-could-not-find-or-load-main-class: "Error: Could not find or load main class"
+    - Causes: classpath issues, wrong class name, missing .class file, package path
+    - Solutions: verify filename, compile first, use full package path, check classpath
+  - typescript-type-not-assignable: "Type 'X' is not assignable to type 'Y'"
+    - Causes: type mismatches, missing properties, excess properties, nullable types
+    - Solutions: type assertions, optional chaining, update type definitions
+- Total: 211 errors (was 209)
+
+### Keywords targeted
+- "Java Could not find or load main class" (new error page -- very high volume)
+- "TypeScript Type is not assignable" (new error page -- very high volume)
+- "main class error Java" (error content)
+- "TS2322 error" (error content)
+
+### SEO fixes
+- Auto-generated sitemap includes new error pages
+- Cross-linked related errors
+
+---
+
 ## Sprint A (Round 29) -- July 1, 2026 (Growth Sprint)
 ### What was done
 - Added 2 high-volume errors:

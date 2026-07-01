@@ -5048,4 +5048,79 @@ rl.on('line', (line) => {
     codeExample: `// ❌ Bad — wrong type\nlet name: string = 42;\n// Type '42' is not assignable to type 'string'\n\n// ❌ Bad — missing property\ninterface User { name: string; age: number; }\nconst user: User = { name: "Alice" };\n// Property 'age' is missing\n\n// ❌ Bad — extra property (object literal check)\nconst user: User = { name: "Alice", age: 30, email: "a@b.com" };\n// Object literal may only specify known properties\n\n// ✅ Good — match the types\nlet name: string = "Alice";\nlet age: number = 42;\n\n// ✅ Good — include all required properties\nconst user: User = { name: "Alice", age: 30 };\n\n// ✅ Good — use type assertion if you know better\nconst input = document.getElementById("name") as HTMLInputElement;\ninput.value = "Hello";\n\n// ✅ Good — use optional properties\ninterface User {\n  name: string;\n  age: number;\n  email?: string; // optional\n}`,
     relatedErrors: ["typescript-property-does-not-exist", "typescript-argument-not-assignable"]
   },
+  // === Sprint A Round 31 ===
+  {
+    id: "cpp-segmentation-fault",
+    errorMessage: "Segmentation fault (core dumped)",
+    language: "C++",
+    category: "RuntimeError",
+    explanation: "Your program tried to access memory it doesn't own. This is one of the most common and dangerous C++ errors — the OS kills your process immediately when it detects an illegal memory access.",
+    causes: [
+      "Dereferencing a null or uninitialized pointer",
+      "Accessing an array out of bounds",
+      "Using a dangling pointer (pointing to freed memory)",
+      "Stack overflow from infinite recursion",
+      "Writing to read-only memory",
+      "Double-freeing already freed memory"
+    ],
+    solutions: [
+      "Use a debugger (gdb) to find the exact line: gdb ./program, then run",
+      "Initialize all pointers before use",
+      "Use smart pointers (std::unique_ptr, std::shared_ptr) instead of raw pointers",
+      "Use std::vector instead of C-style arrays for bounds checking",
+      "Enable AddressSanitizer: compile with -fsanitize=address",
+      "Check for null before dereferencing pointers"
+    ],
+    codeExample: `// ❌ Bad — dereferencing null pointer\nint* ptr = nullptr;\n*ptr = 42;  // Segmentation fault!\n\n// ❌ Bad — array out of bounds\nint arr[5] = {1, 2, 3, 4, 5};\narr[10] = 6;  // Segmentation fault!\n\n// ❌ Bad — dangling pointer\nint* ptr = new int(42);\ndelete ptr;\n*ptr = 10;  // Undefined behavior!\n\n// ✅ Good — null check before dereference\nif (ptr != nullptr) {\n    *ptr = 42;\n}\n\n// ✅ Good — use std::vector for bounds safety\nstd::vector<int> vec = {1, 2, 3, 4, 5};\nat(10);  // Throws std::out_of_range instead of segfault\n\n// ✅ Good — use smart pointers\nauto ptr = std::make_unique<int>(42);\n*ptr = 10;  // Safe, auto-cleanup`,
+    relatedErrors: ["cpp-null-pointer-dereference", "cpp-stack-overflow"]
+  },
+  {
+    id: "python-module-not-found",
+    errorMessage: "ModuleNotFoundError: No module named 'xyz'",
+    language: "Python",
+    category: "ImportError",
+    explanation: "Python can't find the module you're trying to import. This happens when the module isn't installed, is installed in a different Python environment, or has a different name than expected.",
+    causes: [
+      "The package isn't installed (pip install package_name)",
+      "Using the wrong Python environment (virtualenv vs system)",
+      "Typo in the module name",
+      "Circular imports between modules",
+      "Module installed for Python 2 but running Python 3 (or vice versa)",
+      "Package name differs from import name (Pillow imports as PIL)"
+    ],
+    solutions: [
+      "Install the package: pip install package_name",
+      "Verify the correct Python environment: which python, pip list",
+      "Check package name vs import name on PyPI",
+      "Use python -m pip install if you have multiple Python versions",
+      "Check for circular imports in your project",
+      "Look for __init__.py files in package directories"
+    ],
+    codeExample: `# ❌ Bad — module not installed\nimport pandas as pd  # ModuleNotFoundError!\n\n# ✅ Good — install it first\n# $ pip install pandas\nimport pandas as pd\n\n# ❌ Bad — wrong environment\n# $ which python  → /usr/bin/python (system)\n# $ pip install requests  → installs to system Python\n# $ python script.py  → uses virtualenv Python\n# ModuleNotFoundError!\n\n# ✅ Good — install to the active environment\n# $ source venv/bin/activate\n# (venv) $ pip install requests\n# (venv) $ python script.py  → works!\n\n# ❌ Bad — package name ≠ import name\nimport pillow  # ModuleNotFoundError!\n\n# ✅ Good — check the import name\n# pip install Pillow → import PIL\nfrom PIL import Image`,
+    relatedErrors: ["python-importerror", "python-no-module-named"]
+  },
+  {
+    id: "rust-cannot-move-out-of",
+    errorMessage: "cannot move out of value because it is borrowed",
+    language: "Rust",
+    category: "OwnershipError",
+    explanation: "You're trying to move a value into a new scope while it's still borrowed by another reference. Rust's borrow checker prevents this to guarantee memory safety — if the value moved, the existing reference would point to freed memory.",
+    causes: [
+      "Trying to pass an owned value to a function while a reference to it exists",
+      "Returning a value that's still borrowed",
+      "Moving a struct field while other fields are still in use",
+      "Iterating over a collection while trying to move elements out of it",
+      "Using a value after moving it to another variable"
+    ],
+    solutions: [
+      "Clone the value if you need it in two places: value.clone()",
+      "Use references (&) instead of moving ownership",
+      "Use .into_iter() to consume an iterator",
+      "Restructure code to finish using the reference before the move",
+      "Use Rc<T> or Arc<T> for shared ownership when needed",
+      "Consider if the value needs to be owned or just borrowed"
+    ],
+    codeExample: `// ❌ Bad — can't move while borrowed\nlet name = String::from(\"Alice\");\nlet reference = &name;\nlet moved = name;  // Error! name is borrowed\nprintln!("{}", reference);\n\n// ✅ Good — finish using the reference first\nlet name = String::from(\"Alice\");\nlet reference = &name;\nprintln!("{}", reference);\nlet moved = name;  // OK, reference is no longer used\n\n// ✅ Good — clone if you need both\nlet name = String::from(\"Alice\");\nlet reference = &name;\nlet cloned = name.clone();\nprintln!("{}", reference);\nlet moved = cloned;  // OK\n\n// ❌ Bad — can't move out of a Vec while iterating\nlet v = vec![String::from(\"hello\"), String::from(\"world\")];\nfor item in v {\n    println!("{}", item);  // Error! moves item\n}\n\n// ✅ Good — iterate by reference\nlet v = vec![String::from(\"hello\"), String::from(\"world\")];\nfor item in &v {\n    println!("{}", item);\n}`,
+    relatedErrors: ["rust-borrow-checker", "rust-use-after-free"]
+  },
 ];
