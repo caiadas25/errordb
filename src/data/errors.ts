@@ -5498,4 +5498,50 @@ npm view package-name  # Shows package info if it exists`,
     codeExample: `# Check if module is installed\nnpm list express\n\n# If not found, install it\nnpm install express\n\n# Nuclear option: reinstall everything\nrm -rf node_modules package-lock.json\nnpm install\n\n# For ES module issues in package.json:\n# { "type": "module" }  ← ES modules\n# (no "type" field)    ← CommonJS`,
     relatedErrors: ["python-modulenotfounderror", "js-import-error"]
   },
+  {
+    id: "docker-permission-denied",
+    errorMessage: "Got permission denied while trying to connect to the Docker daemon socket",
+    language: "Docker",
+    category: "PermissionDenied",
+    explanation: "Your user account doesn't have permission to access the Docker daemon. Docker requires membership in the 'docker' group (Linux) or admin privileges to manage containers.",
+    causes: [
+      "User is not in the 'docker' group on Linux",
+      "Docker socket file has wrong permissions",
+      "Running Docker commands as a non-root user without docker group",
+      "Docker Desktop not running or not installed",
+      "Remote Docker daemon requires authentication"
+    ],
+    solutions: [
+      "Add your user to the docker group: `sudo usermod -aG docker $USER` then log out and back in",
+      "Run with sudo: `sudo docker <command>`",
+      "Fix socket permissions: `sudo chmod 666 /var/run/docker.sock` (temporary fix)",
+      "Start Docker Desktop if using macOS/Windows",
+      "For remote Docker: configure DOCKER_HOST and authentication"
+    ],
+    codeExample: `# Add user to docker group (permanent fix)\nsudo usermod -aG docker $USER\n# Log out and back in for changes to take effect\n\n# Temporary fix: run with sudo\nsudo docker run hello-world\n\n# Check if Docker daemon is running\nsudo systemctl status docker\n\n# Start Docker if not running\nsudo systemctl start docker`,
+    relatedErrors: ["docker-no-space-left", "docker-connection-refused"]
+  },
+  {
+    id: "python-connectionrefused-errno-111",
+    errorMessage: "ConnectionRefusedError: [Errno 111] Connection refused",
+    language: "Python",
+    category: "ConnectionError",
+    explanation: "Your program tried to connect to a network address (IP:port) but the target server actively refused the connection. This means a server is expected at that address but either isn't running, is listening on a different port, or is rejecting your connection.",
+    causes: [
+      "The server you're trying to reach isn't running",
+      "Wrong port number specified in the connection",
+      "Server is running but bound to a different interface (localhost vs 0.0.0.0)",
+      "Firewall is blocking the connection",
+      "Service hasn't finished starting up yet"
+    ],
+    solutions: [
+      "Verify the server is running: `curl localhost:<port>`",
+      "Check the port number in your connection string",
+      "Ensure the server is bound to the correct interface",
+      "Check firewall rules: `sudo ufw status` or `sudo iptables -L`",
+      "Add a retry/wait loop if the server starts asynchronously"
+    ],
+    codeExample: `import socket\n\n# Test if a port is listening\ndef is_port_open(host, port):\n    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:\n        s.settimeout(2)\n        return s.connect_ex((host, port)) == 0\n\nprint(is_port_open("localhost", 8080))\n\n# Retry connection with backoff\nimport time\nfor attempt in range(5):\n    try:\n        s = socket.create_connection(("localhost", 8080), timeout=5)\n        s.close()\n        print("Connected!")\n        break\n    except ConnectionRefusedError:\n        print(f"Attempt {attempt + 1} failed, retrying...")\n        time.sleep(2 ** attempt)`,
+    relatedErrors: ["js-err-connection-refused", "python-timeout"]
+  },
 ];
