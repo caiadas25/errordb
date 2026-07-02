@@ -5454,4 +5454,48 @@ npm view package-name  # Shows package info if it exists`,
     codeExample: `# Test SSH connection\nssh -T git@github.com\n# Hi username! You've successfully authenticated\n\n# Check which key is offered\nssh -vT git@github.com 2>&1 | grep "Offering"\n\n# Add key to SSH agent\neval "$(ssh-agent -s)"\nssh-add ~/.ssh/id_ed25519\n\n# Fix permissions\nchmod 700 ~/.ssh\nchmod 600 ~/.ssh/id_ed25519\nchmod 644 ~/.ssh/id_ed25519.pub\n\n# Switch to HTTPS if needed\ngit remote set-url origin https://github.com/user/repo.git`,
     relatedErrors: ["git-push-rejected", "git-detached-head"]
   },
+  {
+    id: "python-typeerror-unsupported-operand",
+    errorMessage: "TypeError: unsupported operand type(s) for +: 'int' and 'str'",
+    language: "Python",
+    category: "TypeError",
+    explanation: "You're trying to use the `+` operator between two incompatible types — usually an integer and a string. Python doesn't automatically convert between types when using arithmetic operators.",
+    causes: [
+      "Adding a number to a string without explicit conversion",
+      "Reading user input (which returns a string) and doing math without converting",
+      "Concatenating values from a dict or API that aren't the expected type",
+      "Forgetting to cast string arguments from argparse or env vars"
+    ],
+    solutions: [
+      "Convert to the same type: `int(x) + int(y)` or `str(x) + str(y)`",
+      "Use f-strings for mixed output: `f\"Count: {count}\"`",
+      "Add type checking before operations: `if isinstance(x, int): ...`",
+      "Use try/except to handle type mismatches gracefully"
+    ],
+    codeExample: `# ❌ Wrong — input() returns a string\nage = input("Enter age: ")  # "25"\nnext_year = age + 1  # TypeError!\n\n# ✅ Convert to int first\nage = int(input("Enter age: "))\nnext_year = age + 1  # 26\n\n# ✅ Use f-string for display\nname = "Alice"\nprint("Hello, " + name)  # Works (both strings)\nprint(f"Hello, {name}")  # Cleaner`,
+    relatedErrors: ["python-nameerror", "python-valueerror"]
+  },
+  {
+    id: "node-module-not-found",
+    errorMessage: "Error: Cannot find module 'express'",
+    language: "Node.js",
+    category: "ModuleNotFound",
+    explanation: "Node.js can't find the specified module in node_modules. The module either isn't installed, is installed in the wrong location, or there's a typo in the import path.",
+    causes: [
+      "Module not installed (forgot npm install)",
+      "node_modules was deleted or corrupted",
+      "Module is installed in a parent directory but you're importing from a subdirectory",
+      "Typo in the module name",
+      "Using ES module syntax in a CommonJS project or vice versa"
+    ],
+    solutions: [
+      "Run `npm install` or `yarn install` to install dependencies",
+      "Delete node_modules and package-lock.json, then run `npm install` again",
+      "Check the module name spelling in package.json",
+      "Verify the module is listed in package.json dependencies",
+      "For monorepos, ensure you're in the correct package directory"
+    ],
+    codeExample: `# Check if module is installed\nnpm list express\n\n# If not found, install it\nnpm install express\n\n# Nuclear option: reinstall everything\nrm -rf node_modules package-lock.json\nnpm install\n\n# For ES module issues in package.json:\n# { "type": "module" }  ← ES modules\n# (no "type" field)    ← CommonJS`,
+    relatedErrors: ["python-modulenotfounderror", "js-import-error"]
+  },
 ];
